@@ -1,3 +1,13 @@
+%{
+#define YYDEBUG 1
+
+
+%}
+
+
+
+
+
 %token IDENTIFIER 
 %token INTEGER_CONSTANT FLOATING_CONSTANT CHARACTER_CONSTANT ENUMERATION_CONSTANT 
 %token STRING_LITERAL 
@@ -20,8 +30,11 @@
 %start translation_unit
 
 
+
 %union {
+		int scalar;
 		
+
 	 	}
 
 %%
