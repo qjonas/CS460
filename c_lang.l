@@ -273,6 +273,197 @@
 			 yylval = atoi(yytext);
 			}
 
+/*token IDENTIFIER */
+/* INTEGER_CONSTANT FLOATING_CONSTANT CHARACTER_CONSTANT ENUMERATION_CONSTANT*/ 
+\"[^\"]*\" 	{
+			return STRING_LITERAL;
+			}
+ 
+"->"		{
+			return PTR_OP;
+			}
+ 
+"++"		{
+			return INC_OP;
+			}
+
+"--"		{
+			return DEC_OP;
+			}
+ 
+"<<"		{
+			return LEFT_OP;
+			}
+
+">>"		{
+			return RIGHT_OP;
+			}
+ 
+"<="		{
+			return LE_OP;
+			}
+
+">="		{
+			return GE_OP;
+			}
+
+"=="		{
+			return EQ_OP;
+			}
+
+"!="		{
+			return NE_OP;
+			}
+
+"&&"		{
+			return AND_OP;
+			}
+
+"||"		{
+			return OR_OP;
+			}
+ 
+"*=" 		{
+			return MUL_ASSIGN;
+			}
+
+"/="		{
+			return DIV_ASSIGN;
+			}
+
+"%="		{
+			return MOD_ASSIGN;
+			}
+
+"+="		{
+			return ADD_ASSIGN;
+			}
+"-="		{
+			return SUB_ASSIGN;
+			}
+ 
+"<<="		{
+			return LEFT_ASSIGN;
+			}
+
+">>="		{
+			return RIGHT_ASSIGN;
+			}
+
+"&="		{
+			return AND_ASSIGN;
+			}
+
+"^="		{
+			return XOR_ASSIGN;
+			}
+
+"|="		{
+			return OR_ASSIGN;
+			}
+ 
+/* TYPEDEF_NAME*/
+
+"..."		{
+			return ELIPSIS;
+			}
+/*RANGE*/
+
+";"		{
+			return SEMI;
+			}
+
+"{"		{
+			return OPEN_CURLY;
+			}
+
+"}"		{
+			return CLOSE_CURLY;
+			}
+
+","		{
+			return COMMA;
+			}
+
+"="		{
+			return EQUALS_SIGN;
+			}
+
+":"		{
+			return COLON;
+			}
+
+"("		{
+			return OPEN_PAREN;
+			} 
+")"		{
+			return CLOSE_PAREN;
+			}
+
+"["		{
+			return OPEN_SQUARE;
+			}
+
+"]"		{
+			return CLOSE_SQUARE;
+			}
+
+"*"		{
+			return ASTERISK;
+			}
+
+"&"		{
+			return AMPERSAND;
+			}
+
+"?"		{
+			return QUESTION;
+			}
+
+"|"		{
+			return PIPE;
+			}
+
+"^"		{
+			return CARAT;
+			}
+
+"<"		{
+			return LESSER;
+			}
+
+">"		{
+			return GREATER;
+			}
+
+"+"		{
+			return PLUS;
+			}
+
+"-"		{
+			return MINUS;
+			}
+
+"%"		{
+			return PERCENT;
+			}
+
+"/"		{
+			return FORWARD_SLASH;
+			} 
+
+"~"		{
+			return TILDE;
+			}
+
+"!"		{
+			return BANG;
+			} 
+
+"."		{
+			return DOT;
+			}
+
 %{
 /* comments */
 /* Comments handled as a seperate state */
