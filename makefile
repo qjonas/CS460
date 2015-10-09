@@ -13,20 +13,20 @@ LIBS	= -L/usr/local/lib -ll -std=c++11
 # Linux
 #LIBS	= -L/usr/local/lib -lfl -std=c++11 
 
-c_lang: c_lang.tab.o lex.yy.o SymbolTable.o FrontendFlags.o
-	$(CC) -o c_lang c_lang.tab.o lex.yy.o SymbolTable.o $(LIBS)
+CLanguage: CLanguage.tab.o lex.yy.o SymbolTable.o FrontendFlags.o
+	$(CC) -o CLanguage CLanguage.tab.o lex.yy.o SymbolTable.o $(LIBS)
 
-c_lang.tab.o: c_lang.tab.cc
-	$(CC) -c c_lang.tab.cc
+CLanguage.tab.o: CLanguage.tab.cc
+	$(CC) -c CLanguage.tab.cc
 
 lex.yy.o: lex.yy.cc
 	$(CC) -c lex.yy.cc
 
-c_lang.tab.cc: c_lang.y
-	$(YACC) -d -o c_lang.tab.cc c_lang.y
+CLanguage.tab.cc: CLanguage.y
+	$(YACC) -d -o CLanguage.tab.cc CLanguage.y
 
-lex.yy.cc: c_lang.l
-	$(LEX) -o lex.yy.cc c_lang.l
+lex.yy.cc: CLanguage.l
+	$(LEX) -o lex.yy.cc CLanguage.l
 
 SymbolTable.o: SymbolTable.cc
 	$(CC) -c SymbolTable.cc -std=c++11
@@ -35,4 +35,4 @@ FrontendFlags.o: FrontendFlags.cpp
 	$(CC) -c FrontendFlags.cpp
 
 clean:
-	rm c_lang.tab.* lex.yy.* *.o c_lang
+	rm *.o CLanguage.tab.cc CLanguage.tab.hh lex.yy.cc  CLanguage

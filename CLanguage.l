@@ -2,7 +2,7 @@
 %{
 #include	<stdio.h>
 #include	<stdlib.h>
-#include	"c_lang.tab.hh"
+#include	"CLanguage.tab.hh"
 #include 	"SymbolTable.h"
 
 // variable declarations
@@ -31,11 +31,6 @@
 "HARRIS!A"	{
 	
 			}
-
-"HARRIS!S"	{
-	
-			}
-
 
 "auto"		{
 			 if( printTokens > 0 )
@@ -272,9 +267,10 @@
 			 return INT;
 			 yylval = atoi(yytext);
 			}
-
+%{
 /*token IDENTIFIER */
 /* INTEGER_CONSTANT FLOATING_CONSTANT CHARACTER_CONSTANT ENUMERATION_CONSTANT*/ 
+%}
 \"[^\"]*\" 	{
 			return STRING_LITERAL;
 			}
@@ -362,12 +358,16 @@
 			return OR_ASSIGN;
 			}
  
+%{
 /* TYPEDEF_NAME*/
+%}
 
 "..."		{
 			return ELIPSIS;
 			}
+%{
 /*RANGE*/
+%}
 
 ";"		{
 			return SEMI;
