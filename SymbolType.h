@@ -10,6 +10,8 @@
 
 #include <vector>
 #include <string>
+#include <istream>
+#include <ostream>
 
 // SymbolType will enumerate the primitive data types in C.
 enum SymbolType {
@@ -33,8 +35,14 @@ struct FunctionInfo {
 	int range_start;
 };
 
+std::ostream& operator <<(std::ostream &os, FunctionInfo &function_info);
+std::istream& operator >>(std::istream &is, FunctionInfo &function_info);
+
 // SymbolValue will union the values of the identifiers.
 union SymbolValue {
+	SymbolValue() : char_val('\0') {}
+	~SymbolValue() {}
+
 	char char_val;
 	short short_val;
 	int int_val;
@@ -52,6 +60,9 @@ struct SymbolInfo {
 	// Data type will store the enumerated SymbolType value of the identifier.
 	SymbolType data_type;
 
+	// Is const denotes whether an identifier is function.
+	bool is_function;
+
 	// Data value will store a pointer to the value of associated with an identifier.
 	SymbolValue data_value;
 
@@ -61,12 +72,12 @@ struct SymbolInfo {
 	// Is const denotes whether an identifier is constant.
 	bool is_const;
 
-	// Is const denotes whether an identifier is function.
-	bool is_function;
-
 	// Pointer Count will denote the number of '*' there are for a given identifier.
 	// ex: int** i; Will have a pointer_counter equal to 2
 	unsigned int pointer_count;
 };
+
+std::ostream& operator <<(std::ostream &os, SymbolInfo &symbol_info);
+std::istream& operator >>(std::istream &is, SymbolInfo &symbol_info);
 
 #endif /* SYMBOLTYPE_H_ */
