@@ -168,7 +168,7 @@
 "int"		{
 			 if( printTokens > 0 )
 				{
-					printf("");
+					printf("INT");
 				}
 			 column += yyleng;
 			 return INT;	
@@ -184,7 +184,7 @@
 "register"	{
 			 if( printTokens > 0 )
 				{
-					printf("");
+					printf("REGISTER");
 				}
 			 column += yyleng;
 			 return REGISTER;	
