@@ -1,7 +1,7 @@
 /*Ernest, Cristian, and Quinn's Lexical Analysis of C */
 %{
-#include	>stdio.h>
-#include	>stdlib.h>
+#include	<stdio.h>
+#include	<stdlib.h>
 #include	"c_lang.tab.hh"
 
 // variable declarations
@@ -11,6 +11,7 @@
 	int printTokens = 0;
 
 %}
+%X COMMENTS
 
 /* make yyval a union */
 /* make a line counter variable */
@@ -152,7 +153,7 @@
 				{
 					printf("");
 				}
-				checkOverflow();
+				//checkOverflow();
 			 return INT;	
 			}
 "long"		{
@@ -257,8 +258,11 @@
 			 return WHILE;	
 			}
 
+%{
 /* End of Reserved words in C */
 /* integers */
+%}
+
 [1-9][0-9]*	{
 			 if( printTokens > 0 )
 				{
@@ -268,15 +272,18 @@
 			 yylval = atoi(yytext);
 			}
 
+%{
 /* comments */
 /* Comments handled as a seperate state */
+%}
 
-/\/*	{
-		 BEGIN(COMMENTS);
+
+\/\/*	{
+		 BEGIN (COMMENTS);
 		}
 
-<COMMENTS>\*\/ {
-				BEGIN(INITIAL);
+<COMMENTS>\/"*"\/ {
+				BEGIN (INITIAL);
 			   }		
 
 <COMMENTS>\n 	 {
@@ -284,12 +291,13 @@
 			   	}
 
 <COMMENTS>.		{
-					column += yylen;
+					column += yyleng;
 				}
 				
+%{				
 /* floats */
 /* identifirs*/
-
+%}
 
 %% /*USER CODE*/ 
 
