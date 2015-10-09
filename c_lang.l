@@ -3,6 +3,7 @@
 #include	<stdio.h>
 #include	<stdlib.h>
 #include	"c_lang.tab.hh"
+#include 	"SymbolTable.h"
 
 // variable declarations
 	int column = 1;
