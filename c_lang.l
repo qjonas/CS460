@@ -13,6 +13,8 @@
 
 %}
 %X COMMENTS
+long_suffix	[lL]([lL]?)
+int_suffix	([uU]{long_suffix}?|{long_suffix}[uU]?)
 
 /* make yyval a union */
 /* make a line counter variable */
@@ -264,17 +266,38 @@
 /* integers */
 %}
 
-[1-9][0-9]*	{
+
+//int
+[1-9][0-9]*{int_suffix}?	|
+//octal
+[0][0-7]*{int_suffix}?	|
+//hex
+[0][xX][0-9A-Fa-f]+{int_suffix}?
+		{
 			 if( printTokens > 0 )
 				{
 					printf("");
 				}
-			 return INT;
+			 return INTEGER_CONSTANT;
 			 yylval = atoi(yytext);
 			}
 
-/*token IDENTIFIER */
-/* INTEGER_CONSTANT FLOATING_CONSTANT CHARACTER_CONSTANT ENUMERATION_CONSTANT*/ 
+[A-Za-z][A-Za-z0-9_]*
+		{
+			return IDENTIFIER;
+			}
+
+[0-9]+"."[0-9]*([eE]["+"|"-"]?[0-9]+)?[flFL]?	|
+[0-9]+"."?([eE]["+"|"-"]?[0-9]+)?[flFL]?	|
+"."[0-9]+([eE]["+"|"-"]?[0-9]+)?[flFL]? 
+		{
+			return FLOATING_CONSTANT;
+			}
+ 
+\'\\?[^\']\'	{
+			return CHARACTER_CONSTANT;
+			}
+ /*ENUMERATION_CONSTANT*/ 
 \"[^\"]*\" 	{
 			return STRING_LITERAL;
 			}
