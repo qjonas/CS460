@@ -29,14 +29,10 @@ struct FunctionInfo {
 	// ex_2: int bar(...);
 	// range_start = 0
 	int range_start;
-
-	// Function body will hold the code for the function code.
-	void * function_body;
 };
 
 // SymbolValue will union the values of the identifiers.
 union SymbolValue {
-	// All of the values will be pointers to ensure that no space is wasted.
 	char char_val;
 	short short_val;
 	int int_val;
@@ -59,6 +55,9 @@ struct SymbolInfo {
 
 	// Is const denotes whether an identifier is constant.
 	bool is_const;
+
+	// Is const denotes whether an identifier is function.
+	bool is_function;
 
 	// Pointer Count will denote the number of '*' there are for a given identifier.
 	// ex: int** i; Will have a pointer_counter equal to 2

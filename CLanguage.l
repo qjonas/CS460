@@ -297,24 +297,22 @@ int_suffix	([uU]{long_suffix}?|{long_suffix}[uU]?)
 %}
 
 
+%{
 //int
+%}
 [1-9][0-9]*{int_suffix}?	|
+%{
 //octal
+%}
 [0][0-7]*{int_suffix}?	|
+%{
 //hex
+%}
 [0][xX][0-9A-Fa-f]+{int_suffix}?
 		{
-			 if( printTokens > 0 )
-				{
-					printf("");
-				}
-
-			 column += yyleng;
 			 return INTEGER_CONSTANT;
+		}
 
-			 yylval = atoi(yytext);
-			}
-<<<<<<< HEAD:CLanguage.l
 %{
 /*token IDENTIFIER */
 /* INTEGER_CONSTANT FLOATING_CONSTANT CHARACTER_CONSTANT ENUMERATION_CONSTANT*/ 
@@ -336,8 +334,7 @@ int_suffix	([uU]{long_suffix}?|{long_suffix}[uU]?)
 \'\\?[^\']\'	{
 			return CHARACTER_CONSTANT;
 			}
- /*ENUMERATION_CONSTANT*/ 
->>>>>>> c2ae102a97cdd7d6864afcb8b4a555c1a11ec56e:c_lang.l
+ %{/*ENUMERATION_CONSTANT*/ %}
 \"[^\"]*\" 	{
 			 if( printTokens > 0 )
 				{
@@ -776,7 +773,7 @@ int_suffix	([uU]{long_suffix}?|{long_suffix}[uU]?)
 \/\/*	{
 		 if(printTokens > 0)
 		 {
-	     pritnf("Comment begins");
+	     printf("Comment begins");
 	 	 }
 	     column += yyleng;
 		 BEGIN (COMMENTS);
@@ -800,7 +797,9 @@ int_suffix	([uU]{long_suffix}?|{long_suffix}[uU]?)
 					column += yyleng;
 				}
 
+%{
 /* Single Line Comments */
+%}
 "//"[^"\n"]		{
 					column += yyleng;
 				}
