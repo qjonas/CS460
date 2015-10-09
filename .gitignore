@@ -40,4 +40,4 @@ Thumbs.db
 ################################
 *.tab.*
 lex.yy.*
-c_lang
+CLanguage

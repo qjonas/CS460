@@ -13,7 +13,7 @@
 
 // SymbolType will enumerate the primitive data types in C.
 enum SymbolType {
-	CHAR, SHORT, INT, LONG, FLOAT, DOUBLE
+	CHAR, SHORT, INT, LONG, FLOAT, DOUBLE, TYPEDEF
 };
 
 // FunctionInfo will store information of function identifiers in C.
@@ -28,6 +28,8 @@ struct FunctionInfo {
 	// range_start = 2
 	// ex_2: int bar(...);
 	// range_start = 0
+	// ex_3: int baz();
+	// range_start = -1
 	int range_start;
 };
 
@@ -52,6 +54,9 @@ struct SymbolInfo {
 
 	// Data value will store a pointer to the value of associated with an identifier.
 	SymbolValue data_value;
+
+	// Denotes if the data value is still valid for value checking
+	bool data_is_valid;
 
 	// Is const denotes whether an identifier is constant.
 	bool is_const;

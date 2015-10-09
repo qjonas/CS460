@@ -50,7 +50,7 @@ bool SymbolTable::InsertSymbol(const string& name, SymbolType value) {
 		table_.front()[name] = value;
 		return true;
 	}
-	cout << "Identifier " << name << " has already been declared in this scope"
+	cerr << "Identifier " << name << " has already been declared in this scope"
 		 << endl;
 	return false;
 }
