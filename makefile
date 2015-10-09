@@ -13,7 +13,7 @@ LIBS	= -L/usr/local/lib -ll -std=c++11
 # Linux
 #LIBS	= -L/usr/local/lib -lfl -std=c++11 
 
-c_lang: c_lang.tab.o lex.yy.o SymbolTable.o
+c_lang: c_lang.tab.o lex.yy.o SymbolTable.o FrontendFlags.o
 	$(CC) -o c_lang c_lang.tab.o lex.yy.o SymbolTable.o $(LIBS)
 
 c_lang.tab.o: c_lang.tab.cc
@@ -30,6 +30,9 @@ lex.yy.cc: c_lang.l
 
 SymbolTable.o: SymbolTable.cc
 	$(CC) -c SymbolTable.cc -std=c++11
+
+FrontendFlags.o: FrontendFlags.cpp
+	$(CC) -c FrontendFlags.cpp
 
 clean:
 	rm c_lang.tab.* lex.yy.* *.o c_lang
