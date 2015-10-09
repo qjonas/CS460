@@ -24,6 +24,12 @@
 
 
 %start translation_unit
+
+%{
+#include <stdio.h>
+extern int yylex();
+void yyerror(const char * err);
+%}
 %%
 
 translation_unit
@@ -448,15 +454,11 @@ identifier
 	;
 %%
 
-#include <stdio.h>
+int main() {
+	return yyparse();
+}
 
-extern char yytext[];
-extern int column;
-
-yyerror(s)
-char *s;
-{
-	fflush(stdout);
-	printf("\n%*s\n%*s\n", column, "^", column, s);
+void yyerror(const char * err) {
+	printf("%s\n", err);
 }
 
