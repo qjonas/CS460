@@ -13,9 +13,10 @@
 #include <map>
 #include <stack>
 #include <string>
-using namespace std;
 
-typedef int SymbolType;
+#include "SymbolType.h"
+
+using namespace std;
 
 class SymbolTable {
 public:
@@ -26,11 +27,11 @@ public:
 	~SymbolTable();
 
 	// Insert a new identifier into the symbol table
-	bool InsertSymbol(const string& name, SymbolType value);
+	bool InsertSymbol(const string& name, SymbolInfo value);
 
 	// This will search for the symbol throughout the entire symbol table and return
 	// an iterator to the symbol that is the closest to the top of the stack.
-	map<string, SymbolType>::iterator SearchSymbol(const string& search_name);
+	map<string, SymbolInfo>::iterator SearchSymbol(const string& search_name);
 
 	// This will take the symbol table and turn it into a form that will be able to
 	// be read by the contruct from file constructor
@@ -43,7 +44,7 @@ public:
 	bool PopFrame();
 
 private:
-	list< map<string, SymbolType> > table_;
+	list< map<string, SymbolInfo> > table_;
 };
 
 #endif /* SYMBOLTABLE_H_ */

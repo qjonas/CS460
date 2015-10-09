@@ -14,6 +14,9 @@
 #include <map>
 #include <stack>
 #include <string>
+
+#include "SymbolType.h"
+
 using namespace std;
 
 SymbolTable::SymbolTable() {
@@ -25,10 +28,10 @@ SymbolTable::SymbolTable(const string& file_name) {
 	int num_identifiers_in_stack;
 	fin >> num_identifiers_in_stack;
 	while(fin.good()) {
-		table_.push_back(*(new map<string, SymbolType>()));
+		table_.push_back(*(new map<string, SymbolInfo>()));
 		for(int i = 0; i < num_identifiers_in_stack; i++) {
 			string identifier_name;
-			SymbolType value;
+			SymbolInfo value;
 			fin >> identifier_name;
 			fin >> value;
 			table_.back()[identifier_name] = value;
@@ -45,7 +48,7 @@ SymbolTable::~SymbolTable() {
 	}
 }
 
-bool SymbolTable::InsertSymbol(const string& name, SymbolType value) {
+bool SymbolTable::InsertSymbol(const string& name, SymbolInfo value) {
 	if(table_.front().find(name) == table_.front().end()){
 		table_.front()[name] = value;
 		return true;
@@ -55,10 +58,10 @@ bool SymbolTable::InsertSymbol(const string& name, SymbolType value) {
 	return false;
 }
 
-map<string, SymbolType>::iterator SymbolTable::SearchSymbol(
+map<string, SymbolInfo>::iterator SymbolTable::SearchSymbol(
 		const string& search_name) {
 	for(auto map_iter : table_) {
-		map<string, SymbolType>::iterator search_iter =
+		map<string, SymbolInfo>::iterator search_iter =
 				map_iter.find(search_name);
 		if(search_iter != map_iter.end()){
 			return search_iter;
@@ -69,9 +72,9 @@ map<string, SymbolType>::iterator SymbolTable::SearchSymbol(
 
 void SymbolTable::OutputToFile(const string& file_name) const {
 	ofstream ofs(file_name);
-	for(const auto table_map : table_) {
+	for(auto table_map : table_) {
 		ofs << table_map.size() << " ";
-		for(const auto map_value : table_map) {
+		for(auto map_value : table_map) {
 			ofs << map_value.first << " " << map_value.second << " ";
 		}
 		ofs << "\n";
@@ -80,7 +83,7 @@ void SymbolTable::OutputToFile(const string& file_name) const {
 }
 
 void SymbolTable::PushFrame() {
-	table_.push_front(*(new map<string, SymbolType>));
+	table_.push_front(*(new map<string, SymbolInfo>));
 }
 
 bool SymbolTable::PopFrame() {

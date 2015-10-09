@@ -11,7 +11,7 @@ using namespace std;
 std::ostream& operator <<(std::ostream &os, FunctionInfo &function_info) {
 	os << "{ ";
 	os << "parameter_types: {";
-	for(SymbolType type : function_info.parameters_types) os << ' ' << type;
+	for(SymbolTypes::SymbolType type : function_info.parameters_types) os << ' ' << type;
 	os << " } ";
 	os << "range_start: " << function_info.range_start;
 	os << " }";
@@ -27,7 +27,7 @@ std::istream& operator >>(std::istream &is, FunctionInfo &function_info) {
 	is >> dummy_str >> dummy_char;
 	do {
 		is >> dummy_str;
-		function_info.parameters_types.push_back( (SymbolType) (atoi(dummy_str.c_str())));
+		function_info.parameters_types.push_back( (SymbolTypes::SymbolType) (atoi(dummy_str.c_str())));
 	} while(dummy_str != "}");
 	is >> dummy_str >> function_info.range_start;
 	is >> dummy_char;
@@ -43,34 +43,34 @@ ostream& operator <<(ostream &os, SymbolInfo &symbol_info) {
 	os << "data_value: ";
 
 	if (symbol_info.is_function) {
-		os << symbol_info.data_value.function_info;
+		os << *(symbol_info.data_value.function_info);
 	} else {
 		switch(symbol_info.data_type) {
-			case CHAR:
+			case SymbolTypes::CHAR:
 				os << symbol_info.data_value.char_val;
 				break;
 
-			case SHORT:
+			case SymbolTypes::SHORT:
 				os << symbol_info.data_value.short_val;
 				break;
 
-			case INT:
+			case SymbolTypes::INT:
 				os << symbol_info.data_value.int_val;
 				break;
 
-			case LONG:
+			case SymbolTypes::LONG:
 				os << symbol_info.data_value.long_val;
 				break;
 
-			case FLOAT:
+			case SymbolTypes::FLOAT:
 				os << symbol_info.data_value.float_val;
 				break;
 
-			case DOUBLE:
+			case SymbolTypes::DOUBLE:
 				os << symbol_info.data_value.double_val;
 				break;
 
-			case TYPEDEF: //Fix Later
+			case SymbolTypes::TYPEDEF: //Fix Later
 				os << "none";
 				break;
 		}
@@ -92,39 +92,41 @@ istream& operator >>(istream &is, SymbolInfo &symbol_info) {
 	is >> dummy_char;
 	is >> dummy_str >> symbol_info.identifier_name;
 	is >> dummy_str >> enum_value;
-	symbol_info.data_type = SymbolType(enum_value);
+	symbol_info.data_type = SymbolTypes::SymbolType(enum_value);
 	is >> dummy_str >> symbol_info.is_function;
 	is >> dummy_str;
 
 	if (symbol_info.is_function) {
-		is >> symbol_info.data_value.function_info;
+		if(!symbol_info.data_value.function_info) delete symbol_info.data_value.function_info;
+		symbol_info.data_value.function_info = new FunctionInfo();
+		is >> *(symbol_info.data_value.function_info);
 	} else {
 		switch(symbol_info.data_type) {
-			case CHAR:
+			case SymbolTypes::CHAR:
 				is >> symbol_info.data_value.char_val;
 				break;
 
-			case SHORT:
+			case SymbolTypes::SHORT:
 				is >> symbol_info.data_value.short_val;
 				break;
 
-			case INT:
+			case SymbolTypes::INT:
 				is >> symbol_info.data_value.int_val;
 				break;
 
-			case LONG:
+			case SymbolTypes::LONG:
 				is >> symbol_info.data_value.long_val;
 				break;
 
-			case FLOAT:
+			case SymbolTypes::FLOAT:
 				is >> symbol_info.data_value.float_val;
 				break;
 
-			case DOUBLE:
+			case SymbolTypes::DOUBLE:
 				is >> symbol_info.data_value.double_val;
 				break;
 
-			case TYPEDEF: //Fix Later
+			case SymbolTypes::TYPEDEF: //Fix Later
 				is >> dummy_str;
 				break;
 		}

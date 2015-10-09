@@ -14,16 +14,18 @@
 #include <ostream>
 
 // SymbolType will enumerate the primitive data types in C.
+namespace SymbolTypes{
 enum SymbolType {
 	CHAR, SHORT, INT, LONG, FLOAT, DOUBLE, TYPEDEF
 };
+}
 
 // FunctionInfo will store information of function identifiers in C.
 struct FunctionInfo {
 	// Parameter types will list the parameter types of a function.
 	// ex: int foo(int i, char c, double d);
 	// parameter_types = {INT, CHAR, DOUBLE};
-	std::vector<SymbolType> parameters_types;
+	std::vector<SymbolTypes::SymbolType> parameters_types;
 
 	// Range start will denote which parameter holds the elipses.
 	// ex_1: int foo(int i, char c, ...);
@@ -49,7 +51,7 @@ union SymbolValue {
 	long long_val;
 	float float_val;
 	double double_val;
-	FunctionInfo function_info;
+	FunctionInfo * function_info;
 };
 
 // SymbolInfo will store all of the information of the identifier.
@@ -58,7 +60,7 @@ struct SymbolInfo {
 	std::string identifier_name;
 
 	// Data type will store the enumerated SymbolType value of the identifier.
-	SymbolType data_type;
+	SymbolTypes::SymbolType data_type;
 
 	// Is const denotes whether an identifier is function.
 	bool is_function;

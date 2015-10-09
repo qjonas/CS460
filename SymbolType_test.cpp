@@ -8,11 +8,11 @@ int main() {
 	SymbolInfo symbol_info;
 	FunctionInfo function_info;
 
-	function_info.parameters_types.push_back(INT);
-	function_info.parameters_types.push_back(CHAR);
+	function_info.parameters_types.push_back(SymbolTypes::INT);
+	function_info.parameters_types.push_back(SymbolTypes::CHAR);
 
 	symbol_info.identifier_name = "j";
-	symbol_info.data_type = INT;
+	symbol_info.data_type = SymbolTypes::INT;
 	symbol_info.is_function = false;
 	symbol_info.data_value.int_val = 1234;
 	symbol_info.data_is_valid = true;
