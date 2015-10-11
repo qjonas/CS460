@@ -7,6 +7,7 @@
 #include <vector>		
 #include <string>
 #include <iostream>
+#include "../TokenReductionsLogger.h"
 
 using namespace std;
 
@@ -19,61 +20,67 @@ vector<string> source_words;
 // Tokens and Actions
 ///////////////////////////////////////////////////////////////////////////////
 %}
-[ \t]+  {source_words.push_back(string(yytext));}					// Whitespace
-\+      {
-
-			printf("Token : PLUS\n");
-			source_words.push_back(string("+"));
-			return PLUS; 
-		}			// Plus Sign
-\-      { 
-			printf("Token : MINUS\n");
-			source_words.push_back(string("-"));
-			return MINUS; 
-		}			// Minus Sign
-\*      { 
-			printf("Token : MULT\n");
-			source_words.push_back(string("*"));
-			return MULT; 
-		}			// Multiplication Sign
-\/      { 
-			printf("Token : DIV\n");
-			source_words.push_back(string("/"));
-			return DIV; 
-		}				// Division Sign
-\(      { 
-			printf("Token : OPEN\n");
-			source_words.push_back(string("("));
-			return OPEN; 
-		}			// Open Parenthesis
-\)      { 
-			printf("Token : CLOSE\n");
-			source_words.push_back(string(")"));
-			return CLOSE; 
-		}			// Close Parenthesis
-\;      { 
-			printf("Token : SEMI\n");
-			source_words.push_back(string(";"));
-			return SEMI; 
-		}			// Semicolon
-[0-9]+  {   						// Numbers
-          	printf("Token : INTEGER\n");
-          	yylval.int_val = atoi(yytext);	
-          	source_words.push_back(string(yytext));
-          	return INTEGER;
-        }
-\n 		{
-	printf("Source: ");
-	for(string word : source_words) {
-		cout << word;
-	}
-	cout << endl;
-	source_words.clear();
+[ \t]+  {
+	TokenReductionsLogger::GetInstance().PushSourceWord(string(yytext));
 }
-.		{ 
-			printf("Token : ERROR\n");
-			return ERROR; 
-		}			// Any other char should return an error
+
+\+ { 
+	TokenReductionsLogger::GetInstance().PushSourceWord(string(yytext));
+	TokenReductionsLogger::GetInstance().PushToken("PLUS");
+	return PLUS; 
+}			
+
+\- { 
+	TokenReductionsLogger::GetInstance().PushSourceWord(string(yytext));
+	TokenReductionsLogger::GetInstance().PushToken("MINUS");
+	return MINUS; 
+}
+
+\* { 
+	TokenReductionsLogger::GetInstance().PushSourceWord(string(yytext));
+	TokenReductionsLogger::GetInstance().PushToken("MULT");
+	return MULT; 
+}		
+
+\/ { 
+	TokenReductionsLogger::GetInstance().PushSourceWord(string(yytext));
+	TokenReductionsLogger::GetInstance().PushToken("DIV");
+	return DIV; 
+}				
+
+\( {
+	TokenReductionsLogger::GetInstance().PushSourceWord(string(yytext)); 
+	TokenReductionsLogger::GetInstance().PushToken("OPEN");
+	return OPEN; 
+}
+\) { 
+	TokenReductionsLogger::GetInstance().PushSourceWord(string(yytext));
+	TokenReductionsLogger::GetInstance().PushToken("CLOSE");
+	return CLOSE; 
+}			
+
+\; {
+	TokenReductionsLogger::GetInstance().PushSourceWord(string(yytext)); 
+	TokenReductionsLogger::GetInstance().PushToken("SEMI");
+	return SEMI; 
+}
+
+[0-9]+ {
+	TokenReductionsLogger::GetInstance().PushSourceWord(string(yytext));
+	TokenReductionsLogger::GetInstance().PushToken("INTEGER");
+	yylval.int_val = atoi(yytext);	
+	return INTEGER;
+}
+
+\n {
+	TokenReductionsLogger::GetInstance().LogSourceLine();
+	TokenReductionsLogger::GetInstance().LogTokenReductions();
+}
+. { 
+	TokenReductionsLogger::GetInstance().PushSourceWord(string(yytext));
+	TokenReductionsLogger::GetInstance().PushToken("ERROR");
+	return ERROR; 
+}
 %%
 ///////////////////////////////////////////////////////////////////////////////
 // User Written Code

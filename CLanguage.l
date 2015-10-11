@@ -4,6 +4,7 @@
 #include	<stdlib.h>
 #include	"CLanguage.tab.hh"
 #include 	"SymbolTable.h"
+#include 	"../TokenReductionsLogger.h"
 
 // variable declarations
 	int column = 1;

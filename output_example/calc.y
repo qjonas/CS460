@@ -5,6 +5,7 @@
 	// Included files
 	#include <stdio.h>
 	#include <stdlib.h>
+	#include "../TokenReductionsLogger.h"
 
 	// Function Declarations
 	int yyparse();
@@ -38,58 +39,62 @@
 /*****************************************************************************/
 /* Grammar */
 /*****************************************************************************/
-line		:					{	printf("\tline -> \n"); }
-			|	calculation line{	printf("\tline -> calculation line\n"); }
+line		:	 {	
+					TokenReductionsLogger::GetInstance().PushReduction("line-> ");
+				}
+			|	calculation line {	
+					TokenReductionsLogger::GetInstance().PushReduction("line-> calculation line");
+				}
 			;
 
 calculation	:	expression SEMI	{
-									printf("\tcalculation -> expression SEMI\n");	
-									printf("Answer: %d\n", $1);
-								}
+					TokenReductionsLogger::GetInstance().PushReduction("calculation -> expression SEMI");	
+					printf("Answer: %d\n", $1);
+				}
 			;
 
 expression	:	term { 	
-					printf("\texpression -> term\n");
+					TokenReductionsLogger::GetInstance().PushReduction("expression -> term");
 					$$ = $1; 
 				}
 			|	expression PLUS term { 
-					printf("\texpression -> expression PLUS term\n");
+					TokenReductionsLogger::GetInstance().PushReduction("expression -> expression PLUS term");
 					$$ = $1 + $3; 
 				}
 			|	expression MINUS term { 
-				printf("\texpression -> expression MINUS term\n");
+				TokenReductionsLogger::GetInstance().PushReduction("expression -> expression MINUS term");
 				$$ = $1 - $3; 
 				}
 			;
 
 term		:	factor { 
-					printf("\tterm -> factor\n");
+					TokenReductionsLogger::GetInstance().PushReduction("term -> factor");
 					$$ = $1; 
 				}
 			|	term MULT factor { 
-					printf("\tterm -> term MULT factor\n");
+					TokenReductionsLogger::GetInstance().PushReduction("term -> term MULT factor");
 					$$ = $1 * $3; 
 				}
 			|	term DIV factor { 
-					printf("\tterm -> term DIV factor\n");
+					TokenReductionsLogger::GetInstance().PushReduction("term -> term DIV factor");
 					$$ = $1 / $3; 
 				}
 			|	term ERROR {
-					printf("\tterm -> term ERROR\n");
+					TokenReductionsLogger::GetInstance().PushReduction("term -> term ERROR");
 					exit(0);
 				}
 			;
 
 factor		: 	INTEGER { 
-					printf("\tfactor -> INTEGER\n");
+					TokenReductionsLogger::GetInstance().PushReduction("factor -> INTEGER");
 					$$ = $1; 
 				}
 			| 	OPEN expression CLOSE { 
-					printf("\tfactor -> OPEN expression CLOSE\n");
+					TokenReductionsLogger::GetInstance().PushReduction("factor -> OPEN expression CLOSE");
 					$$ = $2; 
 				}
 			| 	ERROR {
-					printf("\tfactor -> ERROR\n");
+					TokenReductionsLogger::GetInstance().PushReduction("factor -> ERROR");
 					exit(0);}
 			;
 

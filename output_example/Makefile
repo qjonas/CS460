@@ -1,16 +1,19 @@
 CC	= g++
 LEX	= flex
 YACC	= bison
-LIBS	= -L/usr/local/lib -ll 
+LIBS	= -L/usr/local/lib -ll -std=c++11
 
-OBJS	= lex.yy.o calc.tab.o
-TESTOBJS	= driver.o lex.yy.o
+calc: lex.yy.o calc.tab.o
+	$(CC) -o calc lex.yy.o calc.tab.o TokenReductionsLogger.o $(LIBS) 
 
-calc: $(OBJS)
-	$(CC) -o $@ $(OBJS) $(LIBS) -std=c++11
+lex.yy.o: lex.yy.c TokenReductionsLogger.o
+	$(CC) -c lex.yy.c $(LIBS)
 
-testscan: $(TESTOBJS) calc.tab.h
-	$(CC) -o $@ $(TESTOBJS) $(LIBS) -std=c++11
+calc.tab.o: calc.tab.c TokenReductionsLogger.o
+	$(CC) -c calc.tab.c $(LIBS)
+
+TokenReductionsLogger.o:
+	$(CC) -c ../TokenReductionsLogger.cpp $(LIBS)
 
 calc.tab.c: calc.y
 	$(YACC) -d $<
@@ -20,8 +23,3 @@ lex.yy.c: calc.lex calc.tab.c
 
 clean:
 	-rm -f lex.yy.* calc.tab.* *.o calc testscan *~
-
-.SUFFIXES: .c .o
-
-.c.o:
-	$(CC) -c $< -o $@
