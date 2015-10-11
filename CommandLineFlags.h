@@ -17,6 +17,7 @@ public:
 	CommandLineFlags();
 	bool InitializeFlags(int argc, char** argv);
 	DebugType GetDebugType();
+	std::string GetInputFile();
 	std::string GetOutputFile();
 	void Print();
 
