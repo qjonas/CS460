@@ -38,58 +38,58 @@
 /*****************************************************************************/
 /* Grammar */
 /*****************************************************************************/
-line		:					{	printf("line -> \n"); }
-			|	calculation line{	printf("line -> calculation line\n"); }
+line		:					{	printf("\tline -> \n"); }
+			|	calculation line{	printf("\tline -> calculation line\n"); }
 			;
 
 calculation	:	expression SEMI	{
-									printf("calculation -> expression SEMI\n");	
-									printf("%d\n", $1);
+									printf("\tcalculation -> expression SEMI\n");	
+									printf("Answer: %d\n", $1);
 								}
 			;
 
 expression	:	term { 	
-					printf("expression -> term\n");
+					printf("\texpression -> term\n");
 					$$ = $1; 
 				}
 			|	expression PLUS term { 
-					printf("expression -> expression PLUS term\n");
+					printf("\texpression -> expression PLUS term\n");
 					$$ = $1 + $3; 
 				}
 			|	expression MINUS term { 
-				printf("expression -> expression MINUS term\n");
+				printf("\texpression -> expression MINUS term\n");
 				$$ = $1 - $3; 
 				}
 			;
 
 term		:	factor { 
-					printf("term -> factor\n");
+					printf("\tterm -> factor\n");
 					$$ = $1; 
 				}
 			|	term MULT factor { 
-					printf("term -> term MULT factor\n");
+					printf("\tterm -> term MULT factor\n");
 					$$ = $1 * $3; 
 				}
 			|	term DIV factor { 
-					printf("term -> term DIV factor\n");
+					printf("\tterm -> term DIV factor\n");
 					$$ = $1 / $3; 
 				}
 			|	term ERROR {
-					printf("term -> term ERROR\n");
+					printf("\tterm -> term ERROR\n");
 					exit(0);
 				}
 			;
 
 factor		: 	INTEGER { 
-					printf("factor -> INTEGER\n");
+					printf("\tfactor -> INTEGER\n");
 					$$ = $1; 
 				}
 			| 	OPEN expression CLOSE { 
-					printf("factor -> OPEN expression CLOSE\n");
+					printf("\tfactor -> OPEN expression CLOSE\n");
 					$$ = $2; 
 				}
 			| 	ERROR {
-					printf("factor -> ERROR\n");
+					printf("\tfactor -> ERROR\n");
 					exit(0);}
 			;
 
