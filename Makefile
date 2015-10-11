@@ -13,7 +13,7 @@ LIBS	= -L/usr/local/lib -ll -std=c++11
 # Linux
 #LIBS	= -L/usr/local/lib -lfl -std=c++11 
 
-CLanguage: CLanguage.tab.o lex.yy.o SymbolTable.o CommandLineFlags.o SymbolType.o
+CLanguage: CLanguage.tab.o lex.yy.o SymbolTable.o CommandLineFlags.o SymbolType.o Globals.o
 	$(CC) -o CLanguage CLanguage.tab.o lex.yy.o SymbolTable.o SymbolType.o $(LIBS)
 
 CLanguage.tab.o: CLanguage.tab.cc
@@ -36,6 +36,9 @@ CommandLineFlags.o: CommandLineFlags.cpp
 
 SymbolType.o: SymbolType.cpp
 	$(CC) -c SymbolType.cpp -std=c++11
+
+Globals.o: Globals.cpp
+	$(CC) -c Globals.cpp
 
 clean:
 	rm *.o CLanguage.tab.cc CLanguage.tab.hh lex.yy.cc  CLanguage

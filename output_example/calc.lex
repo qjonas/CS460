@@ -11,7 +11,8 @@
 
 using namespace std;
 
-vector<string> source_words;
+extern TokenReductionsLogger TR_LOGGER;
+
 %}
 
 %%
@@ -21,64 +22,64 @@ vector<string> source_words;
 ///////////////////////////////////////////////////////////////////////////////
 %}
 [ \t]+  {
-	TokenReductionsLogger::GetInstance().PushSourceWord(string(yytext));
+	TR_LOGGER.PushSourceWord(string(yytext));
 }
 
 \+ { 
-	TokenReductionsLogger::GetInstance().PushSourceWord(string(yytext));
-	TokenReductionsLogger::GetInstance().PushToken("PLUS");
+	TR_LOGGER.PushSourceWord(string(yytext));
+	TR_LOGGER.PushToken("PLUS");
 	return PLUS; 
 }			
 
 \- { 
-	TokenReductionsLogger::GetInstance().PushSourceWord(string(yytext));
-	TokenReductionsLogger::GetInstance().PushToken("MINUS");
+	TR_LOGGER.PushSourceWord(string(yytext));
+	TR_LOGGER.PushToken("MINUS");
 	return MINUS; 
 }
 
 \* { 
-	TokenReductionsLogger::GetInstance().PushSourceWord(string(yytext));
-	TokenReductionsLogger::GetInstance().PushToken("MULT");
+	TR_LOGGER.PushSourceWord(string(yytext));
+	TR_LOGGER.PushToken("MULT");
 	return MULT; 
 }		
 
 \/ { 
-	TokenReductionsLogger::GetInstance().PushSourceWord(string(yytext));
-	TokenReductionsLogger::GetInstance().PushToken("DIV");
+	TR_LOGGER.PushSourceWord(string(yytext));
+	TR_LOGGER.PushToken("DIV");
 	return DIV; 
 }				
 
 \( {
-	TokenReductionsLogger::GetInstance().PushSourceWord(string(yytext)); 
-	TokenReductionsLogger::GetInstance().PushToken("OPEN");
+	TR_LOGGER.PushSourceWord(string(yytext)); 
+	TR_LOGGER.PushToken("OPEN");
 	return OPEN; 
 }
 \) { 
-	TokenReductionsLogger::GetInstance().PushSourceWord(string(yytext));
-	TokenReductionsLogger::GetInstance().PushToken("CLOSE");
+	TR_LOGGER.PushSourceWord(string(yytext));
+	TR_LOGGER.PushToken("CLOSE");
 	return CLOSE; 
 }			
 
 \; {
-	TokenReductionsLogger::GetInstance().PushSourceWord(string(yytext)); 
-	TokenReductionsLogger::GetInstance().PushToken("SEMI");
+	TR_LOGGER.PushSourceWord(string(yytext)); 
+	TR_LOGGER.PushToken("SEMI");
 	return SEMI; 
 }
 
 [0-9]+ {
-	TokenReductionsLogger::GetInstance().PushSourceWord(string(yytext));
-	TokenReductionsLogger::GetInstance().PushToken("INTEGER");
+	TR_LOGGER.PushSourceWord(string(yytext));
+	TR_LOGGER.PushToken("INTEGER");
 	yylval.int_val = atoi(yytext);	
 	return INTEGER;
 }
 
 \n {
-	TokenReductionsLogger::GetInstance().LogSourceLine();
-	TokenReductionsLogger::GetInstance().LogTokenReductions();
+	TR_LOGGER.LogSourceLine();
+	TR_LOGGER.LogTokenReductions();
 }
 . { 
-	TokenReductionsLogger::GetInstance().PushSourceWord(string(yytext));
-	TokenReductionsLogger::GetInstance().PushToken("ERROR");
+	TR_LOGGER.PushSourceWord(string(yytext));
+	TR_LOGGER.PushToken("ERROR");
 	return ERROR; 
 }
 %%

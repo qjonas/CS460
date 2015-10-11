@@ -10,6 +10,11 @@
 #include <fstream>
 using namespace std;
 
+CommandLineFlags& CommandLineFlags::GetInstance() {
+	static CommandLineFlags instance;
+	return instance;
+}
+
 CommandLineFlags::CommandLineFlags() :
 		flag_debug(NO_DEBUGGING),
 		flag_output_file("PA6_Driver_Output.txt"),

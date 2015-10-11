@@ -1,16 +1,26 @@
-/*Ernest, Cristian, and Quinn's Lexical Analysis of C */
+
 %{
+///////////////////////////////////////////////////////////////////////////////
+// Definitions 
+///////////////////////////////////////////////////////////////////////////////
+// Included Libraries
 #include	<stdio.h>
 #include	<stdlib.h>
+
 #include	"CLanguage.tab.hh"
+#include 	"CommandLineFlags.h"
 #include 	"SymbolTable.h"
-#include 	"../TokenReductionsLogger.h"
+#include 	"TokenReductionsLogger.h"
 
-// variable declarations
-	int column = 1;
-	int line = 1;
+// Globals between flex and lex. These are declared in Globals.h.
+extern CommandLineFlags CL_FLAGS;
+extern SymbolTable S_TABLE;
+extern TokenReductionsLogger TR_LOGGER;
 
-	int printTokens = 0;
+// Global variables for flex.
+int column = 1;
+int line = 1;
+int printTokens = 1;
 
 %}
 %X COMMENTS

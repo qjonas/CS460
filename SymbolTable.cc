@@ -19,33 +19,13 @@
 
 using namespace std;
 
+SymbolTable& SymbolTable::GetInstance() {
+	static SymbolTable instance;
+	return instance;
+}
+
 SymbolTable::SymbolTable() {
 	PushFrame();
-}
-
-SymbolTable::SymbolTable(const string& file_name) {
-	ifstream fin(file_name);
-	int num_identifiers_in_stack;
-	fin >> num_identifiers_in_stack;
-	while(fin.good()) {
-		table_.push_back(*(new map<string, SymbolInfo>()));
-		for(int i = 0; i < num_identifiers_in_stack; i++) {
-			string identifier_name;
-			SymbolInfo value;
-			fin >> identifier_name;
-			fin >> value;
-			table_.back()[identifier_name] = value;
-		}
-		fin >> num_identifiers_in_stack;
-	}
-	fin.close();
-}
-
-SymbolTable::~SymbolTable() {
-	while(!table_.empty()) {
-		table_.front().clear();
-		table_.pop_front();
-	}
 }
 
 bool SymbolTable::InsertSymbol(const string& name, SymbolInfo value) {
@@ -92,4 +72,31 @@ bool SymbolTable::PopFrame() {
 		return true;
 	}
 	return false;
+}
+
+void SymbolTable::Reset() {
+	while(!table_.empty()) {
+		table_.front().clear();
+		table_.pop_front();
+	}
+	PushFrame();
+}
+
+void SymbolTable::CopyFromFile(const string& file_name) {
+	Reset();
+	ifstream fin(file_name);
+	int num_identifiers_in_stack;
+	fin >> num_identifiers_in_stack;
+	while(fin.good()) {
+		table_.push_back(*(new map<string, SymbolInfo>()));
+		for(int i = 0; i < num_identifiers_in_stack; i++) {
+			string identifier_name;
+			SymbolInfo value;
+			fin >> identifier_name;
+			fin >> value;
+			table_.back()[identifier_name] = value;
+		}
+		fin >> num_identifiers_in_stack;
+	}
+	fin.close();
 }

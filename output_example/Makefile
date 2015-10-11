@@ -3,8 +3,8 @@ LEX	= flex
 YACC	= bison
 LIBS	= -L/usr/local/lib -ll -std=c++11
 
-calc: lex.yy.o calc.tab.o
-	$(CC) -o calc lex.yy.o calc.tab.o TokenReductionsLogger.o $(LIBS) 
+calc: lex.yy.o calc.tab.o Globals.o
+	$(CC) -o calc lex.yy.o calc.tab.o TokenReductionsLogger.o Globals.o $(LIBS) 
 
 lex.yy.o: lex.yy.c TokenReductionsLogger.o
 	$(CC) -c lex.yy.c $(LIBS)
@@ -20,6 +20,9 @@ calc.tab.c: calc.y
 
 lex.yy.c: calc.lex calc.tab.c
 	$(LEX) $<
+
+Globals.o:
+	$(CC) -c Globals.cpp
 
 clean:
 	-rm -f lex.yy.* calc.tab.* *.o calc testscan *~

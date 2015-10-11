@@ -20,11 +20,8 @@ using namespace std;
 
 class SymbolTable {
 public:
-	// Constructors
-	SymbolTable();
-	SymbolTable(const SymbolTable& other);
-	SymbolTable(const string& file_name); // Construct from a file
-	~SymbolTable();
+	// Singleton getter
+	static SymbolTable& GetInstance();
 
 	// Insert a new identifier into the symbol table
 	bool InsertSymbol(const string& name, SymbolInfo value);
@@ -43,7 +40,15 @@ public:
 	// Removes a stack frame. Will return false if already at the global scope.
 	bool PopFrame();
 
+	// Makes it such that the instance is like it is freshly instantiated.
+	void Reset();
+
+	// Copies the output of a previous symbol table.
+	void CopyFromFile(const string& file_name);
+
 private:
+	// Constructors
+	SymbolTable();
 	list< map<string, SymbolInfo> > table_;
 };
 

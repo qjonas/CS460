@@ -14,7 +14,7 @@ enum DebugType {NO_DEBUGGING, LEXER, SYMBOL_TABLE, LEXER_AND_SYMBOL_TABLE};
 
 class CommandLineFlags {
 public:
-	CommandLineFlags();
+	static CommandLineFlags& GetInstance();
 	bool InitializeFlags(int argc, char** argv);
 	DebugType GetDebugType();
 	std::string GetInputFile();
@@ -22,6 +22,7 @@ public:
 	void Print();
 
 private:
+  CommandLineFlags();
 	DebugType flag_debug;
 	std::string flag_output_file;
 	std::string flag_input_file;
