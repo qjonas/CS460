@@ -1,4 +1,4 @@
-/*
+ /*
  * SymbolType.h
  *
  *  Created on: Oct 9, 2015

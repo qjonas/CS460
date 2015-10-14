@@ -1,3 +1,16 @@
+/******************************************************************************/
+/* Definitions */
+/******************************************************************************/
+%{
+/* Included C/C++ Libraries */
+#include <stdio.h>
+
+/* Functions from Flex */
+extern int yylex();
+void yyerror(const char * err);
+%}
+
+/* Token Declarations */
 %token IDENTIFIER 
 %token INTEGER_CONSTANT FLOATING_CONSTANT CHARACTER_CONSTANT ENUMERATION_CONSTANT 
 %token STRING_LITERAL 
@@ -13,7 +26,7 @@
 
 %token TYPEDEF EXTERN STATIC AUTO REGISTER
 %token CHAR SHORT INT LONG SIGNED UNSIGNED FLOAT DOUBLE CONST VOLATILE VOID
-%token STRUCT UNION ENUM ELIPSIS RANGE
+%token STRUCT UNION ENUM ELLIPSIS RANGE
 
 %token CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN
 
@@ -25,11 +38,9 @@
 
 %start translation_unit
 
-%{
-#include <stdio.h>
-extern int yylex();
-void yyerror(const char * err);
-%}
+/******************************************************************************/
+/* Grammar and Actions */
+/******************************************************************************/
 %%
 
 translation_unit
@@ -189,7 +200,7 @@ type_qualifier_list
 
 parameter_type_list
 	: parameter_list
-	| parameter_list COMMA ELIPSIS
+	| parameter_list COMMA ELLIPSIS
 	;
 
 parameter_list
@@ -452,10 +463,17 @@ string
 identifier
 	: IDENTIFIER
 	;
-%%
 
+%%
+/******************************************************************************/
+/* User Written Code */
+/******************************************************************************/
 int main() {
-	return yyparse();
+	while(true) {
+		yylex();
+	}
+	// Commented out to debug Lexer
+	// return yyparse(); 
 }
 
 void yyerror(const char * err) {

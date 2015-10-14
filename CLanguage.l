@@ -1,840 +1,717 @@
-
+/******************************************************************************/
+/* Definitions */
+/******************************************************************************/
 %{
-///////////////////////////////////////////////////////////////////////////////
-// Definitions 
-///////////////////////////////////////////////////////////////////////////////
-// Included Libraries
-#include	<stdio.h>
-#include	<stdlib.h>
+/* Included C/C++ Libraries */
+#include  <stdio.h>
+#include  <stdlib.h>
 
-#include	"CLanguage.tab.hh"
-#include 	"CommandLineFlags.h"
-#include 	"SymbolTable.h"
-#include 	"TokenReductionsLogger.h"
+/* Included Headers */
+#include  "CLanguage.tab.hh"
+#include  "CommandLineFlags.h"
+#include  "SymbolTable.h"
+#include  "TokenReductionsLogger.h"
 
-// Globals between flex and lex. These are declared in Globals.h.
+/* Globals between flex and lex. These are declared in Globals.cpp. */
 extern CommandLineFlags CL_FLAGS;
 extern SymbolTable S_TABLE;
 extern TokenReductionsLogger TR_LOGGER;
 
-// Global variables for flex.
+/* Global variables for flex. */
 int column = 1;
 int line = 1;
-int printTokens = 1;
-
 %}
-%X COMMENTS
-long_suffix	[lL]([lL]?)
-int_suffix	([uU]{long_suffix}?|{long_suffix}[uU]?)
 
-/* make yyval a union */
-/* make a line counter variable */
-/* igonore comments */
+/* Explicitely Declared States */
+%X COMMENTS
+
+/* Useful Regexs */
+long_suffix [lL]([lL]?)
+int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
+
+/******************************************************************************/
+/* Rules and Actions */
+/******************************************************************************/
 %%
 
+%{
+/* Reserved Words */
+%}
+"auto"	{
+	TR_LOGGER.PushToken("AUTO");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return AUTO;
+}
 
-"HARRIS!S"	{
-				// dump symbol Table
-			}
+"break"	{
+	TR_LOGGER.PushToken("BREAK");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return BREAK;
+}
 
-"HARRIS!P"	{
-	
-			}
+"case"	{
+	TR_LOGGER.PushToken("CASE");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return CASE;
+}
 
-"HARRIS!A"	{
-	
-			}
+"char"	{
+	TR_LOGGER.PushToken("CHAR");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return CHAR;
+}
 
-"auto"		{
-			 if( printTokens > 0 )
-				{
-					printf("AUTO");
-				}
-			 column += yyleng;
-			 return AUTO;
-			}
-"break"		{
-			 if( printTokens > 0 )
-				{
-					printf("BREAK");
-				}
-			 column += yyleng;
-			 return BREAK;
-			}
-"case"		{
-			 if( printTokens > 0 )
-				{
-					printf("CASE");
-				}
-			 column += yyleng;
-			 return CASE;	
-			}
-"char"		{
-			 if( printTokens > 0 )
-				{
-					printf("CHAR");
-				}
-			 column += yyleng;
-			 return CHAR;	
-			}
-"const"		{
-			 if( printTokens > 0 )
-				{
-					printf("CONST");
-				}
-			 column += yyleng;
-			 return CONST;	
-			}
+"const"	{
+	TR_LOGGER.PushToken("CONST");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return CONST;
+}
+
 "continue"	{
-			 if( printTokens > 0 )
-				{
-					printf("CONTINUE");
-				}
-			 column += yyleng;
-			 return CONTINUE;	
-			}
+	TR_LOGGER.PushToken("CONTINUE");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return CONTINUE;
+}
+
 "default"	{
-			 if( printTokens > 0 )
-				{
-					printf("DEFAULT");
-				}
-			 column += yyleng;
-			 return DEFAULT;	
-			}
-"do"		{
-			 if( printTokens > 0 )
-				{
-					printf("DO");
-				}
-			 column += yyleng;
-			 return DO;	
-			}
+	TR_LOGGER.PushToken("DEFAULT");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return DEFAULT;
+}
+
+"do"	{
+	TR_LOGGER.PushToken("DO");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return DO;
+}
+
 "double"	{
-			 if( printTokens > 0 )
-				{
-					printf("DOUBLE");
-				}
-			 column += yyleng;
-			 return DOUBLE;	
-			}
-"else"		{
-			 if( printTokens > 0 )
-				{
-					printf("ELSE");
-				}
-			 column += yyleng;
-			 return ELSE;	
-			}
-"enum"		{
-			 if( printTokens > 0 )
-				{
-					printf("ENUM");
-				}
-			 column += yyleng;
-			 return ENUM;	
-			}
+	TR_LOGGER.PushToken("DOUBLE");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return DOUBLE;
+}
+
+"else"	{
+	TR_LOGGER.PushToken("ELSE");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return ELSE;
+}
+
+"enum"	{
+	TR_LOGGER.PushToken("ENUM");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return ENUM;
+}
+
 "extern"	{
-			 if( printTokens > 0 )
-				{
-					printf("EXTERN");
-				}
-			 column += yyleng;
-			 return EXTERN;	
-			}
-"float"		{
-			 if( printTokens > 0 )
-				{
-					printf("FLOAT");
-				}
-			 column += yyleng;
-			 return FLOAT;	
-			}
-"for"		{
-			 if( printTokens > 0 )
-				{
-					printf("FLOAT");
-				}
-			 column += yyleng;
-			 return FOR;	
-			}
-"goto"		{
-			 if( printTokens > 0 )
-				{
-					printf("GOTO");
-				}
-			 column += yyleng;
-			 return GOTO;	
-			}
-"if"		{
-			 if( printTokens > 0 )
-				{
-					printf("IF");
-				}
-			 column += yyleng;
-			 return IF;	
-			}
-"int"		{
-			 if( printTokens > 0 )
-				{
-					printf("INT");
-				}
-			 column += yyleng;
-			 return INT;	
-			}
-"long"		{
-			 if( printTokens > 0 )
-				{
-					printf("LONG");
-				}
-			 column += yyleng;
-			 return LONG;	
-			}
+	TR_LOGGER.PushToken("EXTERN");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return EXTERN;
+}
+
+"float"	{
+	TR_LOGGER.PushToken("FLOAT");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return FLOAT;
+}
+
+"for"	{
+	TR_LOGGER.PushToken("FOR");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return FOR;
+}
+
+"goto"	{
+	TR_LOGGER.PushToken("GOTO");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return GOTO;
+}
+
+"if"	{
+	TR_LOGGER.PushToken("IF");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return IF;
+}
+
+"int"	{
+	TR_LOGGER.PushToken("INT");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return INT;
+}
+
+"long"	{
+	TR_LOGGER.PushToken("LONG");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return LONG;
+}
+
 "register"	{
-			 if( printTokens > 0 )
-				{
-					printf("REGISTER");
-				}
-			 column += yyleng;
-			 return REGISTER;	
-			}
+	TR_LOGGER.PushToken("REGISTER");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return REGISTER;
+}
+
 "return"	{
-			 if( printTokens > 0 )
-				{
-					printf("RETURN");
-				}
-			 column += yyleng;
-			 return AUTO;	
-			}
-"short"		{
-			 if( printTokens > 0 )
-				{
-					printf("SHORT");
-				}
-			 column += yyleng;
-			 return SHORT;	
-			}	
+	TR_LOGGER.PushToken("RETURN");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return RETURN;
+}
+
+"short"	{
+	TR_LOGGER.PushToken("SHORT");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return SHORT;
+}
+
 "signed"	{
-			 if( printTokens > 0 )
-				{
-					printf("SIGNED");
-				}
-			 column += yyleng;
-			 return SIGNED;	
-			}
+	TR_LOGGER.PushToken("SIGNED");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return SIGNED;
+}
+
 "sizeof"	{
-			 if( printTokens > 0 )
-				{
-					printf("SIZEOF");
-				}
-			 column += yyleng;
-			 return SIZEOF;	
-			}
+	TR_LOGGER.PushToken("SIZEOF");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return SIZEOF;
+}
+
 "static"	{
-			 if( printTokens > 0 )
-				{
-					printf("STATIC");
-				}
-			 column += yyleng;
-			 return STATIC;	
-			}
+	TR_LOGGER.PushToken("STATIC");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return STATIC;
+}
+
 "struct"	{
-			 if( printTokens > 0 )
-				{
-					printf("STRUCT");
-				}
-			 column += yyleng;
-			 return STRUCT;	
-			}
+	TR_LOGGER.PushToken("STRUCT");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return STRUCT;
+}
+
 "switch"	{
-			 if( printTokens > 0 )
-				{
-					printf("SWITCH");
-				}
-			 column += yyleng;
-			 return SWITCH;	
-			}
+	TR_LOGGER.PushToken("SWITCH");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return SWITCH;
+}
+
 "typedef"	{
-			 if( printTokens > 0 )
-				{
-					printf("TYPEDEF");
-				}
-			 column += yyleng;
-			 return TYPEDEF;	
-			}
-"union"		{
-			 if( printTokens > 0 )
-				{
-					printf("UNION");
-				}
-			 column += yyleng;
-			 return UNION;	
-			}
+	TR_LOGGER.PushToken("TYPEDEF");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return TYPEDEF;
+}
+
+"union"	{
+	TR_LOGGER.PushToken("UNION");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return UNION;
+}
+
 "unsigned"	{
-			 if( printTokens > 0 )
-				{
-					printf("UNSIGNED");
-				}
-			 column += yyleng;
-			 return UNSIGNED;	
-			}
-"void"		{
-			 if( printTokens > 0 )
-				{
-					printf("VOID");
-				}
-			 column += yyleng;
-			 return VOID;	
-			}
+	TR_LOGGER.PushToken("UNSIGNED");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return UNSIGNED;
+}
+
+"void"	{
+	TR_LOGGER.PushToken("VOID");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return VOID;
+}
+
 "volatile"	{
-			 if( printTokens > 0 )
-				{
-					printf("VOLATILE");
-				}
-			 column += yyleng;
-			 return VOLATILE;	
-			}
-"while"		{
-			 if( printTokens > 0 )
-				{
-					printf("VWHILE");
-				}
-			 column += yyleng;
-			 return WHILE;	
-			}
+	TR_LOGGER.PushToken("VOLATILE");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return VOLATILE;
+}
+
+"while"	{
+	TR_LOGGER.PushToken("WHILE");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return WHILE;
+}
 
 %{
-/* End of Reserved words in C */
-/* integers */
+/* Identifiers */
 %}
 
+[A-Za-z][A-Za-z0-9_]* {
+	// TODO: Set lval
+	TR_LOGGER.PushToken("IDENTIFIER");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return IDENTIFIER;
+}
 
 %{
-//int
+/* Constant Values */
 %}
-[1-9][0-9]*{int_suffix}?	|
-%{
-//octal
-%}
-[0][0-7]*{int_suffix}?	|
-%{
-//hex
-%}
-[0][xX][0-9A-Fa-f]+{int_suffix}?
-		{
-			 return INTEGER_CONSTANT;
-		}
+[1-9][0-9]*{int_suffix}? { // Regular Integer
+	// TODO: Set lval
+	// TODO: Overflow checking
+	TR_LOGGER.PushToken("INTEGER_CONSTANT");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return INTEGER_CONSTANT;
+}
 
-%{
-/*token IDENTIFIER */
-/* INTEGER_CONSTANT FLOATING_CONSTANT CHARACTER_CONSTANT ENUMERATION_CONSTANT*/ 
-%}
-=======
+[0][0-7]*{int_suffix}? { // Octal Integer
+	// TODO: Set lval
+	// TODO: Overflow checking
+	TR_LOGGER.PushToken("INTEGER_CONSTANT");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return INTEGER_CONSTANT;
+}
 
-[A-Za-z][A-Za-z0-9_]*
-		{
-			return IDENTIFIER;
-			}
+[0][xX][0-9A-Fa-f]+{int_suffix}? { // Octal Integer
+	// TODO: Set lval
+	// TODO: Overflow checking
+	TR_LOGGER.PushToken("INTEGER_CONSTANT");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return INTEGER_CONSTANT;
+}
 
-[0-9]+"."[0-9]*([eE]["+"|"-"]?[0-9]+)?[flFL]?	|
-[0-9]+"."?([eE]["+"|"-"]?[0-9]+)?[flFL]?	|
-"."[0-9]+([eE]["+"|"-"]?[0-9]+)?[flFL]? 
-		{
-			return FLOATING_CONSTANT;
-			}
- 
-\'\\?[^\']\'	{
-			return CHARACTER_CONSTANT;
-			}
- %{/*ENUMERATION_CONSTANT*/ %}
-\"[^\"]*\" 	{
-			 if( printTokens > 0 )
-				{
-					printf("STRING_LITERAL");
-				}
-			column += yyleng;
-			return STRING_LITERAL;
-			}
- 
-"->"		{
-			 if( printTokens > 0 )
-				{
-					printf("PTR_OP");
-				}
-			column += yyleng;
-			return PTR_OP;
-			}
- 
-"++"		{
-			 if( printTokens > 0 )
-				{
-					printf("INC_OP");
-				}
-			column += yyleng;
-			return INC_OP;
-			}
+[0-9]+"."[0-9]*([eE]["+"|"-"]?[0-9]+)?[flFL]? |
+[0-9]+"."?([eE]["+"|"-"]?[0-9]+)?[flFL]?  |
+"."[0-9]+([eE]["+"|"-"]?[0-9]+)?[flFL]? {
+	// TODO: Set lval
+	// TODO: Overflow checking
+	TR_LOGGER.PushToken("FLOATING_CONSTANT");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return FLOATING_CONSTANT;
+}
 
-"--"		{
-			 if( printTokens > 0 )
-				{
-					printf("DEC_OP");
-				}
-			column += yyleng;
-			return DEC_OP;
-			}
- 
-"<<"		{
-			 if( printTokens > 0 )
-				{
-					printf("LEFT_OP");
-				}
-			column += yyleng;
-			return LEFT_OP;
-			}
+\'\\?[^\']\' {
+	// TODO: Set lval
+	TR_LOGGER.PushToken("CHARACTER_CONSTANT");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return CHARACTER_CONSTANT;
+}
 
-">>"		{
-			 if( printTokens > 0 )
-				{
-					printf("RIGHT_OP");
-				}
-			column += yyleng;
-			return RIGHT_OP;
-			}
- 
-"<="		{
-			 if( printTokens > 0 )
-				{
-					printf("LE_OP");
-				}
-			column += yyleng;
-			return LE_OP;
-			}
-
-">="		{
-			 if( printTokens > 0 )
-				{
-					printf("GE_OP");
-				}
-			column += yyleng;
-			return GE_OP;
-			}
-
-"=="		{
-			 if( printTokens > 0 )
-				{
-					printf("EQ_OP");
-				}
-			column += yyleng;
-			return EQ_OP;
-			}
-
-"!="		{
-			 if( printTokens > 0 )
-				{
-					printf("NE_OP");
-				}
-			column += yyleng;
-			return NE_OP;
-			}
-
-"&&"		{
-			 if( printTokens > 0 )
-				{
-					printf("AND_OP");
-				}
-			column += yyleng;
-			return AND_OP;
-			}
-
-"||"		{
-			 if( printTokens > 0 )
-				{
-					printf("OR_OP");
-				}
-			column += yyleng;
-			return OR_OP;
-			}
- 
-"*=" 		{
-			 if( printTokens > 0 )
-				{
-					printf("MUL_ASSIGN");
-				}
-			column += yyleng;
-			return MUL_ASSIGN;
-			}
-
-"/="		{
-			 if( printTokens > 0 )
-				{
-					printf("DIV_ASSIGN");
-				}
-			column += yyleng;
-			return DIV_ASSIGN;
-			}
-
-"%="		{
-			 if( printTokens > 0 )
-				{
-					printf("MOD_ASSIGN");
-				}
-			column += yyleng;
-			return MOD_ASSIGN;
-			}
-
-"+="		{
-			 if( printTokens > 0 )
-				{
-					printf("ADD_ASSIGN");
-				}
-			column += yyleng;
-			return ADD_ASSIGN;
-			}
-"-="		{
-			 if( printTokens > 0 )
-				{
-					printf("SUB_ASSIGN");
-				}
-			column += yyleng;
-			return SUB_ASSIGN;
-			}
- 
-"<<="		{
-			 if( printTokens > 0 )
-				{
-					printf("LEFT_ASSIGN");
-				}
-			column += yyleng;
-			return LEFT_ASSIGN;
-			}
-
-">>="		{
-			 if( printTokens > 0 )
-				{
-					printf("RIGHT_ASSIGN");
-				}
-			column += yyleng;
-			return RIGHT_ASSIGN;
-			}
-
-"&="		{
-			 if( printTokens > 0 )
-				{
-					printf("AND_ASSIGN");
-				}
-			column += yyleng;
-			return AND_ASSIGN;
-			}
-
-"^="		{
-			 if( printTokens > 0 )
-				{
-					printf("XOR_ASSIGN");
-				}
-			column += yyleng;
-			return XOR_ASSIGN;
-			}
-
-"|="		{
-			 if( printTokens > 0 )
-				{
-					printf("OR_ASSIGN");
-				}
-			column += yyleng;
-			return OR_ASSIGN;
-			}
- 
-%{
-/* TYPEDEF_NAME*/
-%}
-
-"..."		{
-			 if( printTokens > 0 )
-				{
-					printf("ELIPSIS");
-				}
-			column += yyleng;
-			return ELIPSIS;
-			}
-%{
-/*RANGE*/
-%}
-
-";"		{
-		 if( printTokens > 0 )
-			{
-				printf("SEMI");
-			}
-		 column += yyleng;
-		 return SEMI;
-		}
-
-"{"		{
-		 if( printTokens > 0 )
-				{
-					printf("OPEN_CURLY");
-				}
-			column += yyleng;
-			return OPEN_CURLY;
-		}
-
-"}"		{
-			 if( printTokens > 0 )
-				{
-					printf("CLOSE_CURLY");
-				}
-			column += yyleng;
-			return CLOSE_CURLY;
-		}
-
-","		{
-			 if( printTokens > 0 )
-				{
-					printf("COMMA");
-				}
-			column += yyleng;
-			return COMMA;
-		}
-
-"="		{
-		 if( printTokens > 0)
-		 {
-		 	printf("EQUALS_SIGN");
-		 }
-		    column += yyleng;
-			return EQUALS_SIGN;
-		}
-
-":"		{
-		 if( printTokens > 0)
-		 {
-		 	printf("COLON");
-		 }
-		    column += yyleng;
-			return COLON;
-		}
-
-"("		{
-		 if( printTokens > 0)
-		 {
-		 	printf("OPEN_PAREN");
-		 }
-		    column += yyleng;
-			return OPEN_PAREN;
-		} 
-
-")"		{
-		 if( printTokens > 0)
-		 {
-		 	printf("CLOSE_PAREN");
-		 }
-		    column += yyleng;
-			return CLOSE_PAREN;
-		}
-
-"["		{
-		 if( printTokens > 0)
-		 {
-		 	printf("");
-		 }
-		    column += yyleng;
-			return OPEN_SQUARE;
-		}
-
-"]"		{
-		 if( printTokens > 0)
-		 {
-		 	printf("CLOSE_SQUARE");
-		 }
-		    column += yyleng;
-			return CLOSE_SQUARE;
-		}
-
-"*"		{
-		 if( printTokens > 0)
-		 {
-		 	printf("ASTERISK");
-		 }
-		    column += yyleng;
-			return ASTERISK;
-		}
-
-"&"		{
-			 if( printTokens > 0 )
-				{
-					printf("AMPERSAND");
-				}
-			column += yyleng;
-			return AMPERSAND;
-		}
-
-"?"		{
-			 if( printTokens > 0 )
-				{
-					printf("QUESTION");
-				}
-			column += yyleng;
-			return QUESTION;
-		}
-
-"|"		{
-			 if( printTokens > 0 )
-				{
-					printf("PIPE");
-				}
-			column += yyleng;
-			return PIPE;
-		}
-
-"^"		{
-		 if( printTokens > 0)
-		 {
-		 	printf("CARAT");
-		 }
-		    column += yyleng;
-			return CARAT;
-		}
-
-"<"		{
-		 if( printTokens > 0)
-		 {
-		 	printf("LESSER");
-		 }
-		    column += yyleng;
-			return LESSER;
-		}
-
-">"		{
-		 if( printTokens > 0)
-		 {
-		 	printf("GREATER");
-		 }
-		    column += yyleng;
-			return GREATER;
-		}
-
-"+"		{
-		 if( printTokens > 0)
-		 {
-		 	printf("PLUS");
-		 }
-		    column += yyleng;
-			return PLUS;
-		}
-
-"-"		{
-		 if( printTokens > 0)
-		 {
-		 	printf("");
-		 }
-		    column += yyleng;
-			return MINUS;
-		}
-
-"%"		{
-		 if( printTokens > 0)
-		 {
-		 	printf("PERCENT");
-		 }
-		    column += yyleng;
-			return PERCENT;
-		}
-
-"/"		{
-		 if( printTokens > 0)
-		 {
-		 	printf("");
-		 }
-		    column += yyleng;
-			return FORWARD_SLASH;
-		} 
-
-"~"		{
-		 if( printTokens > 0)
-		 {
-		 	printf("TILDE");
-		 }
-		    column += yyleng;
-			return TILDE;
-		}
-
-"!"		{
-		 if( printTokens > 0)
-		 {
-		 	printf("BANG");
-		 }
-	     column += yyleng;
-			return BANG;
-		} 
-
-"."		{
-		 if( printTokens > 0)
-		 {
-		 	printf("DOT");
-		 }
-	     column += yyleng;
-			return DOT;
-		}
+\"[^\"]*\" {
+	// TODO: Set lval
+	TR_LOGGER.PushToken("STRING_LITERAL");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return STRING_LITERAL;
+}
 
 %{
-/* comments */
-/* Comments handled as a seperate state */
+/* Operator Symbols */
 %}
 
+"->" {
+	TR_LOGGER.PushToken("PTR_OP");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return PTR_OP;
+}
 
-\/\/*	{
-		 if(printTokens > 0)
-		 {
-	     printf("Comment begins");
-	 	 }
-	     column += yyleng;
-		 BEGIN (COMMENTS);
-		}
+"++" {
+	TR_LOGGER.PushToken("INC_OP");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return INC_OP;
+}
 
-<COMMENTS>\/"*"\/ 	{
-						if(printTokens > 0)
-						{
-						printf("Comment Ended");
-		    			column += yyleng;
-						BEGIN (INITIAL);
-						}
-			   		}		
+"--" {
+	TR_LOGGER.PushToken("DEC_OP");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return DEC_OP;
+}
 
-<COMMENTS>\n 		{
-					line++;
-					column = 1;
-			   		}
+"<<" {
+	TR_LOGGER.PushToken("LEFT_OP");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return LEFT_OP;
+}
 
-<COMMENTS>.		{
-					column += yyleng;
-				}
+">>" {
+	TR_LOGGER.PushToken("RIGHT_OP");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return RIGHT_OP;
+}
+
+"<=" {
+	TR_LOGGER.PushToken("LE_OP");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return LE_OP;
+}
+
+">=" {
+	TR_LOGGER.PushToken("GE_OP");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return GE_OP;
+}
+
+"==" {
+	TR_LOGGER.PushToken("EQ_OP");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return EQ_OP;
+}
+
+"!=" {
+	TR_LOGGER.PushToken("NE_OP");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return EQ_OP;
+}
+
+"&&" {
+	TR_LOGGER.PushToken("AND_OP");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return AND_OP;
+}
+
+"||" {
+	TR_LOGGER.PushToken("OR_OP");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return OR_OP;
+}
+
+"*=" {
+	TR_LOGGER.PushToken("MUL_ASSIGN");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return AND_OP;
+}
+
+"/=" {
+	TR_LOGGER.PushToken("DIV_ASSIGN");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return DIV_ASSIGN;
+}
+
+"%=" {
+	TR_LOGGER.PushToken("MOD_ASSIGN");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return MOD_ASSIGN;
+}
+
+"+=" {
+	TR_LOGGER.PushToken("ADD_ASSIGN");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return ADD_ASSIGN;
+}
+
+"-=" {
+	TR_LOGGER.PushToken("SUB_ASSIGN");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return SUB_ASSIGN;
+}
+
+"<<=" {
+	TR_LOGGER.PushToken("LEFT_ASSIGN");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return LEFT_ASSIGN;
+}
+
+">>=" {
+	TR_LOGGER.PushToken("RIGHT_ASSIGN");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return RIGHT_ASSIGN;
+}
+
+"&=" {
+	TR_LOGGER.PushToken("AND_ASSIGN");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return AND_ASSIGN;
+}
+
+"^=" {
+	TR_LOGGER.PushToken("XOR_ASSIGN");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return XOR_ASSIGN;
+}
+
+"|=" {
+	TR_LOGGER.PushToken("OR_ASSIGN");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return OR_ASSIGN;
+}
 
 %{
-/* Single Line Comments */
+/* Punctuation */
 %}
-"//"[^"\n"]		{
-					column += yyleng;
-				}
-				
-%{				
-/* floats */
-/* identifirs*/
+"..." {
+	TR_LOGGER.PushToken("ELLIPSIS");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return ELLIPSIS;
+}
+
+";" {
+	TR_LOGGER.PushToken("SEMI");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return SEMI;
+}
+
+"{" {
+	TR_LOGGER.PushToken("OPEN_CURLY");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return OPEN_CURLY;
+}
+
+"}" {
+	TR_LOGGER.PushToken("CLOSE_CURLY");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return CLOSE_CURLY;
+}
+
+"," {
+	TR_LOGGER.PushToken("COMMA");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return COMMA;
+}
+
+"=" {
+	TR_LOGGER.PushToken("EQUALS_SIGN");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return EQUALS_SIGN;
+}
+
+":" {
+	TR_LOGGER.PushToken("COLON");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return COLON;
+}
+
+"(" {
+	TR_LOGGER.PushToken("OPEN_PAREN");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return OPEN_PAREN;
+}
+
+")" {
+	TR_LOGGER.PushToken("CLOSE_PAREN");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return CLOSE_PAREN;
+}
+
+"[" {
+	TR_LOGGER.PushToken("OPEN_SQUARE");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return OPEN_SQUARE;
+}
+
+"]" {
+	TR_LOGGER.PushToken("CLOSE_SQUARE");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return CLOSE_SQUARE;
+}
+
+"*" {
+	TR_LOGGER.PushToken("ASTERISK");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return ASTERISK;
+}
+
+"&" {
+	TR_LOGGER.PushToken("AMPERSAND");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return AMPERSAND;
+}
+
+"?" {
+	TR_LOGGER.PushToken("QUESTION");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return QUESTION;
+}
+
+"|" {
+	TR_LOGGER.PushToken("PIPE");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return PIPE;
+}
+
+"^" {
+	TR_LOGGER.PushToken("CARAT");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return CARAT;
+}
+
+"<" {
+	TR_LOGGER.PushToken("LESSER");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return LESSER;
+}
+
+">" {
+	TR_LOGGER.PushToken("GREATER");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return GREATER;
+}
+
+"+" {
+	TR_LOGGER.PushToken("PLUS");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return PLUS;
+}
+
+"-" {
+	TR_LOGGER.PushToken("MINUS");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return MINUS;
+}
+
+"%" {
+	TR_LOGGER.PushToken("PERCENT");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return PERCENT;
+}
+
+"/" {
+	TR_LOGGER.PushToken("FORWARD_SLASH");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return FORWARD_SLASH;
+}
+
+"~" {
+	TR_LOGGER.PushToken("TILDE");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return TILDE;
+}
+
+"!" {
+	TR_LOGGER.PushToken("BANG");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return BANG;
+}
+
+"." {
+	TR_LOGGER.PushToken("DOT");
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	return DOT;
+}
+
+%{
+/* Comments */
+%}
+\/\/* {
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+	BEGIN (COMMENTS);
+}
+
+<COMMENTS>\/"*"\/ {
+	TR_LOGGER.PushSourceWord(yytext);
+	BEGIN (INITIAL);
+}   
+
+<COMMENTS>\n {
+	TR_LOGGER.PushSourceWord(yytext);
+	line++;
+	column = 1;
+}
+
+<COMMENTS>. {
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+}
+
+"//"[^"\n"] {
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+}
+
+%{
+/* Whitespace */
 %}
 
-%% /*USER CODE*/ 
+[ \t]* {
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+}
 
-/*****************************************************************************/
-/*                                                                           */
-/*FUNCTION:install_num()*/
-/*PURPOSE: places current number into */
-/**/
-/*                                                                           */
-/*****************************************************************************/
+"\n" {
+	TR_LOGGER.LogSourceLine();
+	TR_LOGGER.LogTokenReductions();
+	line++;
+	column = 1;
+}
 
-/*****************************************************************************/
-/*                                                                           */
-/*FUNCTION: install_id() */
-/*PURPOSE:	places current lexeme into the Symbol Table */
-/**/
-/*                                                                           */
-/*****************************************************************************/
+. {
+	TR_LOGGER.PushSourceWord(yytext);
+	column += yyleng;
+}
+
+%%
+/******************************************************************************/
+/* User Written Code */
+/******************************************************************************/
 
