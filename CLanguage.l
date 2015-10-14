@@ -266,10 +266,23 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 %}
 
 [A-Za-z][A-Za-z0-9_]* {
-	// TODO: Set lval
-	TR_LOGGER.PushToken("IDENTIFIER");
 	TR_LOGGER.PushSourceWord(yytext);
 	column += yyleng;
+
+	// TODO: Set lval
+	// TODO: Check if the identifier is a typedef
+	/*
+	SymbolInfo info = *(S_TABLE.SearchSymbol(yytext));
+	switch (info.data_type) {
+		case TYPEDEF:
+			TR_LOGGER.PushToken("IDENTIFIER");
+			return TYPDEF_NAME;
+		default:
+			TR_LOGGER.PushToken("IDENTIFIER");
+			return IDENTIFIER;
+	} 
+	*/
+	TR_LOGGER.PushToken("IDENTIFIER");
 	return IDENTIFIER;
 }
 
