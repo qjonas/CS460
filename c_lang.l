@@ -1,60 +1,41 @@
-
+/*Ernest, Cristian, and Quinn's Lexical Analysis of C */
 %{
-///////////////////////////////////////////////////////////////////////////////
-// Definitions 
-///////////////////////////////////////////////////////////////////////////////
-// Included Libraries
 #include	<stdio.h>
 #include	<stdlib.h>
-
- #include	"CLanguage.tab.h"
-#include 	"CommandLineFlags.h"
+#include	"c_lang.tab.hh"
 #include 	"SymbolTable.h"
-#include 	"TokenReductionsLogger.h"
 
-// Globals between flex and lex. These are declared in Globals.h.
-extern CommandLineFlags CL_FLAGS;
-extern SymbolTable S_TABLE;
-extern TokenReductionsLogger TR_LOGGER;
+// variable declarations
+	int column = 1;
+	int line = 1;
 
-// Global variables for flex.
-int column = 1;
-int line = 1;
-int printTokens = 1;
+	int printTokens = 0;
 
 %}
 %X COMMENTS
-long_suffix	[lL]([lL]?)
-int_suffix	([uU]{long_suffix}?|{long_suffix}[uU]?)
 
-	/* make yyval a union */
-	/* make a line counter variable */
-	/* igonore comments */
+/* make yyval a union */
+/* make a line counter variable */
+/* igonore comments */
 %%
 
 
 "HARRIS!S"	{
-			 if( printTokens > 0 )
-				{
-					printf("Harris S");
-				}
+				// dump symbol Table
 			}
 
 "HARRIS!P"	{
-				 if( printTokens > 0 )
-				{
-					printf("Harris P");
-				}
 	
 			}
 
 "HARRIS!A"	{
-				 if( printTokens > 0 )
-				{
-					printf("HARRIS A");
-				}
 	
 			}
+
+"HARRIS!S"	{
+	
+			}
+
 
 "auto"		{
 			 if( printTokens > 0 )
@@ -307,47 +288,30 @@ int_suffix	([uU]{long_suffix}?|{long_suffix}[uU]?)
 "while"		{
 			 if( printTokens > 0 )
 				{
-					printf("WHILE");
+					printf("VWHILE");
 				}
 			 column += yyleng;
 			 return WHILE;	
 			}
 
+%{
+/* End of Reserved words in C */
+/* integers */
+%}
 
-
-
-[A-Za-z][A-Za-z0-9_]* 	{
-						column += yyleng;
-						return IDENTIFIER;
-						}
-
-
-([1-9][0-9]*{int_suffix}?)	|
-([0][0-7]*{int_suffix}?)	|
-([0][xX][0-9A-Fa-f]+{int_suffix}?) {
-			 column += yyleng;
-			 return INTEGER_CONSTANT;
-		}
-
-
-
-[0-9]+"."[0-9]*([eE]["+"|"-"]?[0-9]+)?[flFL]?	|
-[0-9]+"."?([eE]["+"|"-"]?[0-9]+)?[flFL]?	|
-"."[0-9]+([eE]["+"|"-"]?[0-9]+)?[flFL]? {
-			column += yyleng;
-			return FLOATING_CONSTANT;
-		}
- 
-\'\\?[^\']\'	{
-			
-					column += yyleng;
-					return CHARACTER_CONSTANT;
+[1-9][0-9]*	{
+			 if( printTokens > 0 )
+				{
+					printf("");
 				}
+			 column += yyleng;
+			 return INT;
+			 yylval = atoi(yytext);
+			}
 
- %{
- 	/*ENUMERATION_CONSTANT*/ 
- %}
-\"[^\"]*\" 	{
+/*token IDENTIFIER */
+/* INTEGER_CONSTANT FLOATING_CONSTANT CHARACTER_CONSTANT ENUMERATION_CONSTANT*/ 
+\"[^\"]* \" 	{
 			 if( printTokens > 0 )
 				{
 					printf("STRING_LITERAL");
@@ -544,9 +508,7 @@ int_suffix	([uU]{long_suffix}?|{long_suffix}[uU]?)
 			return OR_ASSIGN;
 			}
  
-%{
 /* TYPEDEF_NAME*/
-%}
 
 "..."		{
 			 if( printTokens > 0 )
@@ -556,9 +518,7 @@ int_suffix	([uU]{long_suffix}?|{long_suffix}[uU]?)
 			column += yyleng;
 			return ELIPSIS;
 			}
-%{
 /*RANGE*/
-%}
 
 ";"		{
 		 if( printTokens > 0 )
@@ -635,7 +595,7 @@ int_suffix	([uU]{long_suffix}?|{long_suffix}[uU]?)
 "["		{
 		 if( printTokens > 0)
 		 {
-		 	printf("OPEN_SQUARE");
+		 	printf("");
 		 }
 		    column += yyleng;
 			return OPEN_SQUARE;
@@ -725,7 +685,7 @@ int_suffix	([uU]{long_suffix}?|{long_suffix}[uU]?)
 "-"		{
 		 if( printTokens > 0)
 		 {
-		 	printf("MINUS");
+		 	printf("");
 		 }
 		    column += yyleng;
 			return MINUS;
@@ -743,7 +703,7 @@ int_suffix	([uU]{long_suffix}?|{long_suffix}[uU]?)
 "/"		{
 		 if( printTokens > 0)
 		 {
-		 	printf("FORWARD_SLASH");
+		 	printf("");
 		 }
 		    column += yyleng;
 			return FORWARD_SLASH;
@@ -777,15 +737,15 @@ int_suffix	([uU]{long_suffix}?|{long_suffix}[uU]?)
 		}
 
 %{
-	/* comments */
-	/* Comments handled as a seperate state */
+/* comments */
+/* Comments handled as a seperate state */
 %}
 
 
 \/\/*	{
 		 if(printTokens > 0)
 		 {
-	     printf("Comment begins");
+	     pritnf("Comment begins");
 	 	 }
 	     column += yyleng;
 		 BEGIN (COMMENTS);
@@ -809,9 +769,7 @@ int_suffix	([uU]{long_suffix}?|{long_suffix}[uU]?)
 					column += yyleng;
 				}
 
-%{
 /* Single Line Comments */
-%}
 "//"[^"\n"]		{
 					column += yyleng;
 				}

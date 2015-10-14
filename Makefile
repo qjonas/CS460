@@ -8,10 +8,10 @@ LEX		= flex
 YACC	= bison 
 
 # Mac Users Library
-LIBS	= -L/usr/local/lib -ll -std=c++11 
+# LIBS	= -L/usr/local/lib -ll -std=c++11 
 
 # Linux
-#LIBS	= -L/usr/local/lib -lfl -std=c++11 
+LIBS	= -L/usr/local/lib -lfl -std=c++11 
 
 CLanguage: CLanguage.tab.o lex.yy.o SymbolTable.o CommandLineFlags.o SymbolType.o Globals.o
 	$(CC) -o CLanguage CLanguage.tab.o lex.yy.o SymbolTable.o SymbolType.o $(LIBS)
