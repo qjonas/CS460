@@ -1143,7 +1143,7 @@ string
 
 identifier
 	: IDENTIFIER {
-		TR_LOGGER.PushReduction("IDENTIFIEr -> identifier");
+		TR_LOGGER.PushReduction("IDENTIFIER -> identifier");
 	}
 	;
 
