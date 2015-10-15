@@ -12,7 +12,7 @@
 #include  "SymbolTable.h"
 #include  "TokenReductionsLogger.h"
 
-/* Globals between flex and lex. These are declared in Globals.cpp. */
+/* Globals between flex and bison. These are declared in Globals.cpp. */
 extern CommandLineFlags CL_FLAGS;
 extern SymbolTable S_TABLE;
 extern TokenReductionsLogger TR_LOGGER;
