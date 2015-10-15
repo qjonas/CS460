@@ -5,6 +5,7 @@
 /* Included C/C++ Libraries */
 #include  "CommandLineFlags.h"
 #include  "SymbolTable.h"
+#include 	"SymbolType.h"
 #include  "TokenReductionsLogger.h"
 
 /* Globals between flex and bison. These are declared in Globals.cpp. */
@@ -15,10 +16,10 @@ extern TokenReductionsLogger TR_LOGGER;
 /* Functions from Flex */
 extern int yylex();
 void yyerror(const char * err);
-%}
 
-/* Defining lval type */
-/* TODO: Define lval to be the SymbolInfo type */
+/* Define YYSTYPE */
+#define YYSTYPE SymbolInfo
+%}
 
 /* Token Declarations */
 /* Reserved Words */

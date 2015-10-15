@@ -10,7 +10,11 @@
 #include  "CLanguage.tab.hh"
 #include  "CommandLineFlags.h"
 #include  "SymbolTable.h"
+#include 	"SymbolType.h"
 #include  "TokenReductionsLogger.h"
+
+/* Define YYSTYPE */
+#define YYSTYPE SymbolInfo
 
 /* Globals between flex and bison. These are declared in Globals.cpp. */
 extern CommandLineFlags CL_FLAGS;

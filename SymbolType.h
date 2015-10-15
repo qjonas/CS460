@@ -42,9 +42,6 @@ std::istream& operator >>(std::istream &is, FunctionInfo &function_info);
 
 // SymbolValue will union the values of the identifiers.
 union SymbolValue {
-	SymbolValue() : char_val('\0') {}
-	~SymbolValue() {}
-
 	char char_val;
 	short short_val;
 	int int_val;
@@ -55,7 +52,7 @@ union SymbolValue {
 };
 
 // SymbolInfo will store all of the information of the identifier.
-struct SymbolInfo {
+typedef struct SymbolInfo {
 	// Identifier name will store the name of the identifier.
 	std::string identifier_name;
 
@@ -77,7 +74,7 @@ struct SymbolInfo {
 	// Pointer Count will denote the number of '*' there are for a given identifier.
 	// ex: int** i; Will have a pointer_counter equal to 2
 	unsigned int pointer_count;
-};
+} SymbolInfo;
 
 std::ostream& operator <<(std::ostream &os, SymbolInfo &symbol_info);
 std::istream& operator >>(std::istream &is, SymbolInfo &symbol_info);
