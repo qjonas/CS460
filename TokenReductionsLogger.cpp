@@ -28,7 +28,11 @@ void TokenReductionsLogger::OutputToConsole(bool yes_or_no) {
 }
 
 void TokenReductionsLogger::PushToken(const string& token) {
-	token_reductions_.push_back( (new string("Token : "))->append(token) );
+	if(!token_reductions_.empty() && token_reductions_.back() == "Reductions: ") {
+		token_reductions_.pop_back();
+	}
+	token_reductions_.push_back((new string("Token : "))->append(token));
+	token_reductions_.push_back("Reductions: ");
 }
 
 void TokenReductionsLogger::PushReduction(const string& reduct) {
