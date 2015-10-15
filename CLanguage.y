@@ -17,6 +17,9 @@ extern int yylex();
 void yyerror(const char * err);
 %}
 
+/* Defining lval type */
+/* TODO: Define lval to be the SymbolInfo type */
+
 /* Token Declarations */
 /* Reserved Words */
 %token AUTO
