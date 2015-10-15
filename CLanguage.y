@@ -5,9 +5,15 @@
 /* Included C/C++ Libraries */
 #include  "CommandLineFlags.h"
 #include  "SymbolTable.h"
-#include 	"SymbolType.h"
 #include  "TokenReductionsLogger.h"
+%}
 
+%code requires {
+	#include 	"SymbolType.h"
+	#define YYSTYPE SymbolInfo
+}
+
+%{
 /* Globals between flex and bison. These are declared in Globals.cpp. */
 extern CommandLineFlags CL_FLAGS;
 extern SymbolTable S_TABLE;
@@ -16,10 +22,8 @@ extern TokenReductionsLogger TR_LOGGER;
 /* Functions from Flex */
 extern int yylex();
 void yyerror(const char * err);
-
-/* Define YYSTYPE */
-#define YYSTYPE SymbolInfo
 %}
+
 
 /* Token Declarations */
 /* Reserved Words */

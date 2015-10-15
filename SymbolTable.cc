@@ -50,6 +50,17 @@ map<string, SymbolInfo>::iterator SymbolTable::SearchSymbol(
 	return table_.front().end();
 }
 
+bool SymbolTable::Has(const string& search_name) {
+	for(auto map_iter : table_) {
+		map<string, SymbolInfo>::iterator search_iter =
+				map_iter.find(search_name);
+		if(search_iter != map_iter.end()){
+			return true;
+		}
+	}
+	return false;
+}
+
 void SymbolTable::OutputToFile(const string& file_name) const {
 	ofstream ofs(file_name);
 	for(auto table_map : table_) {

@@ -21,6 +21,7 @@ public:
 	void PushToken(const std::string& token);
 	void PushReduction(const std::string& reduct);
 	void PushSourceWord(const std::string& word);
+	void Error(const std::string& error, int line, int column);
 	void LogTokenReductions();
 	void LogSourceLine();
 

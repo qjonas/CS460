@@ -16,7 +16,7 @@
 // SymbolType will enumerate the primitive data types in C.
 namespace SymbolTypes{
 enum SymbolType {
-	CHAR, SHORT, INT, LONG, FLOAT, DOUBLE, TYPEDEF
+	CHAR, SHORT, INT, LONG, FLOAT, DOUBLE, TYPEDEF, STRING
 };
 }
 
@@ -43,11 +43,10 @@ std::istream& operator >>(std::istream &is, FunctionInfo &function_info);
 // SymbolValue will union the values of the identifiers.
 union SymbolValue {
 	char char_val;
-	short short_val;
-	int int_val;
-	long long_val;
-	float float_val;
+	long long long_long_val;
+	unsigned long long unsigned_long_long_val;
 	double double_val;
+	std::string * string_val;
 	FunctionInfo * function_info;
 };
 
@@ -70,6 +69,15 @@ typedef struct SymbolInfo {
 
 	// Is const denotes whether an identifier is constant.
 	bool is_const;
+
+	// Is unsigned denotes whether an identifier is an unsigned.
+	bool is_unsigned;
+
+	enum Longs{
+		NO_LONG, ONE_LONG, TWO_LONG
+	};
+
+	Longs num_longs;
 
 	// Pointer Count will denote the number of '*' there are for a given identifier.
 	// ex: int** i; Will have a pointer_counter equal to 2

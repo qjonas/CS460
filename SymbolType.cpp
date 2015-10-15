@@ -40,6 +40,8 @@ ostream& operator <<(ostream &os, SymbolInfo &symbol_info) {
 	os << "identifier_name: " << symbol_info.identifier_name << endl;
 	os << "data_type: " << symbol_info.data_type << endl;
 	os << "is_function: " << symbol_info.is_function << endl;
+	os << "is_unsigned: " << symbol_info.is_unsigned << endl;
+	os << "num_longs: " << symbol_info.num_longs << endl;
 	os << "data_value: ";
 
 	if (symbol_info.is_function) {
@@ -50,22 +52,23 @@ ostream& operator <<(ostream &os, SymbolInfo &symbol_info) {
 				os << symbol_info.data_value.char_val;
 				break;
 
+			case SymbolTypes::STRING:
+				if(symbol_info.data_value.string_val != NULL) {
+					// There could be an error here if string is not set well.
+					os << *(symbol_info.data_value.string_val);
+				}
+
 			case SymbolTypes::SHORT:
-				os << symbol_info.data_value.short_val;
-				break;
-
 			case SymbolTypes::INT:
-				os << symbol_info.data_value.int_val;
-				break;
-
 			case SymbolTypes::LONG:
-				os << symbol_info.data_value.long_val;
+				if(symbol_info.is_unsigned) {
+					os << symbol_info.data_value.unsigned_long_long_val;
+				} else {
+					os << symbol_info.data_value.long_long_val;
+				}
 				break;
 
 			case SymbolTypes::FLOAT:
-				os << symbol_info.data_value.float_val;
-				break;
-
 			case SymbolTypes::DOUBLE:
 				os << symbol_info.data_value.double_val;
 				break;
@@ -94,6 +97,9 @@ istream& operator >>(istream &is, SymbolInfo &symbol_info) {
 	is >> dummy_str >> enum_value;
 	symbol_info.data_type = SymbolTypes::SymbolType(enum_value);
 	is >> dummy_str >> symbol_info.is_function;
+	is >> dummy_str >> symbol_info.is_unsigned;
+	is >> dummy_str >> enum_value;
+	symbol_info.num_longs = SymbolInfo::Longs(enum_value);
 	is >> dummy_str;
 
 	if (symbol_info.is_function) {
@@ -106,22 +112,25 @@ istream& operator >>(istream &is, SymbolInfo &symbol_info) {
 				is >> symbol_info.data_value.char_val;
 				break;
 
+			case SymbolTypes::STRING:
+				if(symbol_info.data_value.string_val != NULL) {
+					// There could be an error here if string is not set well.
+					string * temp = new string();
+					is >> *temp;
+					symbol_info.data_value.string_val = temp;
+				}
+
 			case SymbolTypes::SHORT:
-				is >> symbol_info.data_value.short_val;
-				break;
-
 			case SymbolTypes::INT:
-				is >> symbol_info.data_value.int_val;
-				break;
-
 			case SymbolTypes::LONG:
-				is >> symbol_info.data_value.long_val;
+				if(symbol_info.is_unsigned) {
+					is >> symbol_info.data_value.unsigned_long_long_val;
+				} else {
+					is >> symbol_info.data_value.long_long_val;
+				}
 				break;
 
 			case SymbolTypes::FLOAT:
-				is >> symbol_info.data_value.float_val;
-				break;
-
 			case SymbolTypes::DOUBLE:
 				is >> symbol_info.data_value.double_val;
 				break;

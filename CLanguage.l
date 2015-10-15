@@ -1,10 +1,13 @@
 /******************************************************************************/
 /* Definitions */
 /******************************************************************************/
-%{
+%{ 
 /* Included C/C++ Libraries */
-#include  <stdio.h>
-#include  <stdlib.h>
+#include  <cstdio>
+#include  <cstdlib>
+#include 	<cerrno>
+#include 	<iostream>
+#include 	<string>
 
 /* Included Headers */
 #include  "CLanguage.tab.hh"
@@ -12,9 +15,6 @@
 #include  "SymbolTable.h"
 #include 	"SymbolType.h"
 #include  "TokenReductionsLogger.h"
-
-/* Define YYSTYPE */
-#define YYSTYPE SymbolInfo
 
 /* Globals between flex and bison. These are declared in Globals.cpp. */
 extern CommandLineFlags CL_FLAGS;
@@ -270,22 +270,25 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 %}
 
 [A-Za-z][A-Za-z0-9_]* {
+	// Log source word
 	TR_LOGGER.PushSourceWord(yytext);
+
+	// Set lval
+	yylval.identifier_name = *(new string(yytext));
+
+	// Increment column counter
 	column += yyleng;
 
-	// TODO: Set lval
-	// TODO: Check if the identifier is a typedef
-	/*
-	SymbolInfo info = *(S_TABLE.SearchSymbol(yytext));
-	switch (info.data_type) {
-		case TYPEDEF:
-			TR_LOGGER.PushToken("IDENTIFIER");
-			return TYPDEF_NAME;
-		default:
-			TR_LOGGER.PushToken("IDENTIFIER");
-			return IDENTIFIER;
+	// Check if the identifier is a typedef
+	if(S_TABLE.Has(yytext)) { 
+		if((S_TABLE.SearchSymbol(yytext)->second).data_type 
+					== SymbolTypes::TYPEDEF){
+			TR_LOGGER.PushToken("TYPEDEF_NAME");
+			return TYPEDEF_NAME;
+		}
 	} 
-	*/
+
+	// It isn't a typedef return that it is just an identifier.
 	TR_LOGGER.PushToken("IDENTIFIER");
 	return IDENTIFIER;
 }
@@ -294,28 +297,69 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 /* Constant Values */
 %}
 [1-9][0-9]*{int_suffix}? { // Regular Integer
-	// TODO: Set lval
-	// TODO: Overflow checking
+	// Log token and source word.
 	TR_LOGGER.PushToken("INTEGER_CONSTANT");
 	TR_LOGGER.PushSourceWord(yytext);
+	
+	// Check Overflow
+	char** end_ptr;
+	int base = 10;
+	unsigned long long input = std::strtoull(yytext, end_ptr, base);
+	if(errno == ERANGE) {
+		TR_LOGGER.Error("Integer Constant Overflow", line, column);
+		yylval.data_value.unsigned_long_long_val = 0;
+		yylval.data_is_valid = false;
+	} else {
+		yylval.data_value.unsigned_long_long_val = input;
+	}
+
+	// Increment column counter and return
 	column += yyleng;
 	return INTEGER_CONSTANT;
 }
 
 [0][0-7]*{int_suffix}? { // Octal Integer
-	// TODO: Set lval
-	// TODO: Overflow checking
+	// Log token and source word.
 	TR_LOGGER.PushToken("INTEGER_CONSTANT");
 	TR_LOGGER.PushSourceWord(yytext);
+
+	// Check Overflow
+	char** end_ptr;
+	int base = 8;
+	unsigned long long input = std::strtoull(yytext, end_ptr, base);
+	if(errno == ERANGE) {
+		TR_LOGGER.Error("Integer Constant Overflow", line, column);
+		yylval.data_value.unsigned_long_long_val = 0;
+		yylval.data_is_valid = false;
+	} else {
+		yylval.data_value.unsigned_long_long_val = input;
+		yylval.data_is_valid = true;
+	}
+
+	// Increment column counter and return
 	column += yyleng;
 	return INTEGER_CONSTANT;
 }
 
-[0][xX][0-9A-Fa-f]+{int_suffix}? { // Octal Integer
-	// TODO: Set lval
-	// TODO: Overflow checking
+[0][xX][0-9A-Fa-f]+{int_suffix}? { // Hexidecimal Integer
+	// Log token and source word.
 	TR_LOGGER.PushToken("INTEGER_CONSTANT");
 	TR_LOGGER.PushSourceWord(yytext);
+
+	// Check Overflow
+	char** end_ptr;
+	int base = 16;
+	unsigned long long input = std::strtoull(yytext, end_ptr, base);
+	if(errno == ERANGE) {
+		TR_LOGGER.Error("Integer Constant Overflow", line, column);
+		yylval.data_value.unsigned_long_long_val = 0;
+		yylval.data_is_valid = false;
+	} else {
+		yylval.data_value.unsigned_long_long_val = input;
+		yylval.data_is_valid = true;
+	}
+
+	// Increment column counter and return
 	column += yyleng;
 	return INTEGER_CONSTANT;
 }
@@ -323,26 +367,49 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 [0-9]+"."[0-9]*([eE]["+"|"-"]?[0-9]+)?[flFL]? |
 [0-9]+"."?([eE]["+"|"-"]?[0-9]+)?[flFL]?  |
 "."[0-9]+([eE]["+"|"-"]?[0-9]+)?[flFL]? {
-	// TODO: Set lval
-	// TODO: Overflow checking
+	// Log token and source word
 	TR_LOGGER.PushToken("FLOATING_CONSTANT");
 	TR_LOGGER.PushSourceWord(yytext);
+
+	// Check Overflow
+	char** end_ptr;
+	double input = std::strtod(yytext, end_ptr);
+	if(errno == ERANGE) {
+		TR_LOGGER.Error("Floating Point Constant Overflow", line, column);
+		yylval.data_value.double_val = 0;
+		yylval.data_is_valid = false;
+	} else {
+		yylval.data_value.double_val = input;
+		yylval.data_is_valid = true;
+	}
+
+	// Increment column counter and return
 	column += yyleng;
 	return FLOATING_CONSTANT;
 }
 
 \'\\?[^\']\' {
-	// TODO: Set lval
+	// Log token and source word
 	TR_LOGGER.PushToken("CHARACTER_CONSTANT");
 	TR_LOGGER.PushSourceWord(yytext);
+
+	// Assign lval
+	yylval.data_value.char_val = *yytext;
+
+	// Increment column counter and return
 	column += yyleng;
 	return CHARACTER_CONSTANT;
 }
 
 \"[^\"]*\" {
-	// TODO: Set lval
+	// Log token and source word
 	TR_LOGGER.PushToken("STRING_LITERAL");
 	TR_LOGGER.PushSourceWord(yytext);
+
+	// Assign lval
+	yylval.data_value.string_val = new std::string(yytext);
+
+	// Increment column counter and return
 	column += yyleng;
 	return STRING_LITERAL;
 }

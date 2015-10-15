@@ -30,6 +30,10 @@ public:
 	// an iterator to the symbol that is the closest to the top of the stack.
 	map<string, SymbolInfo>::iterator SearchSymbol(const string& search_name);
 
+	// This will search for the symbol throughout the entire symbol table and 
+	// return true if the name is in the symbol table somewhere.
+	bool Has(const string& search_name);
+
 	// This will take the symbol table and turn it into a form that will be able to
 	// be read by the contruct from file constructor
 	void OutputToFile(const string& file_name) const;
