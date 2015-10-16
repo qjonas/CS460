@@ -28,7 +28,7 @@ public:
 
 	// This will search for the symbol throughout the entire symbol table and return
 	// an iterator to the symbol that is the closest to the top of the stack.
-	map<string, SymbolInfo>::iterator SearchSymbol(const string& search_name);
+	SymbolInfo* GetMostRecentSymbolInfo(const string& search_name);
 
 	bool HasShadowing(const string& search_name) const;
 
