@@ -44,7 +44,7 @@ public:
 
 	// Creates a new stack frame.
 	void PushFrame();
-
+	
 	// Removes a stack frame. Will return false if already at the global scope.
 	bool PopFrame();
 

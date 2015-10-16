@@ -20,6 +20,7 @@
 extern CommandLineFlags CL_FLAGS;
 extern SymbolTable S_TABLE;
 extern TokenReductionsLogger TR_LOGGER;
+extern bool INSERT_MODE;
 
 /* Global variables for flex. */
 int column = 1;
@@ -272,6 +273,16 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 [A-Za-z][A-Za-z0-9_]* {
 	// Log source word
 	TR_LOGGER.PushSourceWord(yytext);
+
+	// Check insert mode.
+	if (INSERT_MODE) {
+		if(S_TABLE.HasInScope(yytext)) {
+			SymbolInfo* info = S_TABLE.GetMostRecentSymbolInfo(yytext);
+		}
+
+	} else { // Lookup mode.
+
+	}
 
 	// Set lval
 	yylval->identifier_name = *(new string(yytext));

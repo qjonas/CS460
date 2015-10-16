@@ -18,6 +18,7 @@
 extern CommandLineFlags CL_FLAGS;
 extern SymbolTable S_TABLE;
 extern TokenReductionsLogger TR_LOGGER;
+extern bool INSERT_MODE;
 
 /* Functions from Flex */
 extern int yylex();
@@ -181,7 +182,8 @@ declaration
 	;
 
 declaration_list
-	: {insertMode = true;} declaration { insertMode = false;
+	: {INSERT_MODE = true;} declaration {
+		INSERT_MODE = false;
 		TR_LOGGER.PushReduction("declaration -> declaration_list");
 	}
 	| declaration_list declaration {
@@ -675,15 +677,15 @@ compound_statement
 	: OPEN_CURLY CLOSE_CURLY {
 		TR_LOGGER.PushReduction("OPEN_CURLY CLOSE_CURLY -> expression_statement");
 	}
-	| OPEN_CURLY {S_TABLE.pushFrame();} statement_list CLOSE_CURLY {
+	| OPEN_CURLY {S_TABLE.PushFrame();} statement_list CLOSE_CURLY {
 		TR_LOGGER.PushReduction(
 			"OPEN_CURLY statement_list CLOSE_CURLY -> expression_statement");
 	}
-	| OPEN_CURLY {S_TABLE.pushFrame();} declaration_list CLOSE_CURLY {
+	| OPEN_CURLY {S_TABLE.PushFrame();} declaration_list CLOSE_CURLY {
 		TR_LOGGER.PushReduction(
 			"OPEN_CURLY declaration_list CLOSE_CURLY -> expression_statement");
 	}
-	| OPEN_CURLY {S_TABLE.pushFrame();} declaration_list statement_list CLOSE_CURLY {
+	| OPEN_CURLY {S_TABLE.PushFrame();} declaration_list statement_list CLOSE_CURLY {
 		TR_LOGGER.PushReduction(
 			"OPEN_CURLY declaration_list statement_list CLOSE_CURLY "
 			"-> expression_statement");
