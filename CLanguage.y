@@ -181,7 +181,7 @@ declaration
 	;
 
 declaration_list
-	: declaration {
+	: {insertMode = true;} declaration { insertMode = false;
 		TR_LOGGER.PushReduction("declaration -> declaration_list");
 	}
 	| declaration_list declaration {
