@@ -50,7 +50,21 @@ map<string, SymbolInfo>::iterator SymbolTable::SearchSymbol(
 	return table_.front().end();
 }
 
-bool SymbolTable::Has(const string& search_name) {
+bool SymbolTable::HasShadowing(const string& search_name) const {
+	list<map<string,SymbolInfo>>::const_iterator iter = table_.begin();
+	iter++;
+	while(iter != table_.end()) {
+		map<string, SymbolInfo>::const_iterator search_iter =
+				iter->find(search_name);
+		if(search_iter != iter->end()){
+			return true;
+		}
+		iter++;
+	}
+	return false;
+}
+
+bool SymbolTable::Has(const string& search_name) const {
 	for(auto map_iter : table_) {
 		map<string, SymbolInfo>::iterator search_iter =
 				map_iter.find(search_name);
