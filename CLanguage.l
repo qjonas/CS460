@@ -274,19 +274,19 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 	TR_LOGGER.PushSourceWord(yytext);
 
 	// Set lval
-	yylval.identifier_name = *(new string(yytext));
+	yylval->identifier_name = *(new string(yytext));
 
 	// Increment column counter
 	column += yyleng;
 
 	// Check if the identifier is a typedef
-	if(S_TABLE.Has(yytext)) { 
+	if(S_TABLE.Has(yytext)) {
 		if((S_TABLE.SearchSymbol(yytext)->second).data_type 
 					== SymbolTypes::TYPEDEF){
 			TR_LOGGER.PushToken("TYPEDEF_NAME");
 			return TYPEDEF_NAME;
 		}
-	} 
+	}
 
 	// It isn't a typedef return that it is just an identifier.
 	TR_LOGGER.PushToken("IDENTIFIER");
@@ -307,10 +307,10 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 	unsigned long long input = std::strtoull(yytext, end_ptr, base);
 	if(errno == ERANGE) {
 		TR_LOGGER.Error("Integer Constant Overflow", line, column);
-		yylval.data_value.unsigned_long_long_val = 0;
-		yylval.data_is_valid = false;
+		yylval->data_value.unsigned_long_long_val = 0;
+		yylval->data_is_valid = false;
 	} else {
-		yylval.data_value.unsigned_long_long_val = input;
+		yylval->data_value.unsigned_long_long_val = input;
 	}
 
 	// Increment column counter and return
@@ -329,11 +329,11 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 	unsigned long long input = std::strtoull(yytext, end_ptr, base);
 	if(errno == ERANGE) {
 		TR_LOGGER.Error("Integer Constant Overflow", line, column);
-		yylval.data_value.unsigned_long_long_val = 0;
-		yylval.data_is_valid = false;
+		yylval->data_value.unsigned_long_long_val = 0;
+		yylval->data_is_valid = false;
 	} else {
-		yylval.data_value.unsigned_long_long_val = input;
-		yylval.data_is_valid = true;
+		yylval->data_value.unsigned_long_long_val = input;
+		yylval->data_is_valid = true;
 	}
 
 	// Increment column counter and return
@@ -352,11 +352,11 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 	unsigned long long input = std::strtoull(yytext, end_ptr, base);
 	if(errno == ERANGE) {
 		TR_LOGGER.Error("Integer Constant Overflow", line, column);
-		yylval.data_value.unsigned_long_long_val = 0;
-		yylval.data_is_valid = false;
+		yylval->data_value.unsigned_long_long_val = 0;
+		yylval->data_is_valid = false;
 	} else {
-		yylval.data_value.unsigned_long_long_val = input;
-		yylval.data_is_valid = true;
+		yylval->data_value.unsigned_long_long_val = input;
+		yylval->data_is_valid = true;
 	}
 
 	// Increment column counter and return
@@ -376,11 +376,11 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 	double input = std::strtod(yytext, end_ptr);
 	if(errno == ERANGE) {
 		TR_LOGGER.Error("Floating Point Constant Overflow", line, column);
-		yylval.data_value.double_val = 0;
-		yylval.data_is_valid = false;
+		yylval->data_value.double_val = 0;
+		yylval->data_is_valid = false;
 	} else {
-		yylval.data_value.double_val = input;
-		yylval.data_is_valid = true;
+		yylval->data_value.double_val = input;
+		yylval->data_is_valid = true;
 	}
 
 	// Increment column counter and return
@@ -394,7 +394,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 	TR_LOGGER.PushSourceWord(yytext);
 
 	// Assign lval
-	yylval.data_value.char_val = *yytext;
+	yylval->data_value.char_val = *yytext;
 
 	// Increment column counter and return
 	column += yyleng;
@@ -407,7 +407,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 	TR_LOGGER.PushSourceWord(yytext);
 
 	// Assign lval
-	yylval.data_value.string_val = new std::string(yytext);
+	yylval->data_value.string_val = new std::string(yytext);
 
 	// Increment column counter and return
 	column += yyleng;

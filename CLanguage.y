@@ -10,7 +10,7 @@
 
 %code requires {
 	#include 	"SymbolType.h"
-	#define YYSTYPE SymbolInfo
+	#define YYSTYPE SymbolInfo*
 }
 
 %{
