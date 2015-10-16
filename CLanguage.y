@@ -675,17 +675,15 @@ compound_statement
 	: OPEN_CURLY CLOSE_CURLY {
 		TR_LOGGER.PushReduction("OPEN_CURLY CLOSE_CURLY -> expression_statement");
 	}
-	| OPEN_CURLY statement_list CLOSE_CURLY {
+	| OPEN_CURLY {S_TABLE.pushFrame();} statement_list CLOSE_CURLY {
 		TR_LOGGER.PushReduction(
 			"OPEN_CURLY statement_list CLOSE_CURLY -> expression_statement");
 	}
-	| OPEN_CURLY declaration_list CLOSE_CURLY {
-		// TODO: Deal with new scope on SymbolTable.
+	| OPEN_CURLY {S_TABLE.pushFrame();} declaration_list CLOSE_CURLY {
 		TR_LOGGER.PushReduction(
 			"OPEN_CURLY declaration_list CLOSE_CURLY -> expression_statement");
 	}
-	| OPEN_CURLY declaration_list statement_list CLOSE_CURLY {
-		// TODO: Deal with new scope on SymbolTable.
+	| OPEN_CURLY {S_TABLE.pushFrame();} declaration_list statement_list CLOSE_CURLY {
 		TR_LOGGER.PushReduction(
 			"OPEN_CURLY declaration_list statement_list CLOSE_CURLY "
 			"-> expression_statement");
