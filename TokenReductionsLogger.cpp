@@ -104,4 +104,31 @@ void TokenReductionsLogger::Error(
 	}
 }
 
+void TokenReductionsLogger::Warning(
+	const std::string& error, int line, int column) {
+	if (console_output_) {
+		cerr << "WARNING: " << error << endl;
+		cerr << "Line: " << line << " Column: " << column << endl;
+		cerr  << "Source: ";
+		for(string word : source_line_) {
+			cerr << word;
+		}
+		cerr << endl;
+		for(int i = 0; i < column + 9; i++) cerr << " ";
+		cerr << "^" << endl;
+	}
+
+	if (file_out_ != NULL) {
+		*(file_out_) << "WARNING: " << error <<  endl;
+		*(file_out_) << " Line: " << line << " Column: " << column << endl;
+		*(file_out_) << "Source: ";
+		for(string word : source_line_) {
+			*(file_out_) << word;
+		}
+		*(file_out_) << endl;
+		for(int i = 0; i < column + 9 ; i++) *(file_out_) << " ";
+		*(file_out_) << "^" << endl;
+	}
+}
+
 TokenReductionsLogger::TokenReductionsLogger() : file_out_(NULL), console_output_(true) {}

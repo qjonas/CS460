@@ -273,26 +273,50 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 [A-Za-z][A-Za-z0-9_]* {
 	// Log source word
 	TR_LOGGER.PushSourceWord(yytext);
-
-	// Check insert mode.
-	if (INSERT_MODE) {
-		if(S_TABLE.HasInScope(yytext)) {
-			SymbolInfo* info = S_TABLE.GetMostRecentSymbolInfo(yytext);
-		}
-
-	} else { // Lookup mode.
-
-	}
-
-	// Set lval
-	yylval->identifier_name = *(new string(yytext));
-
 	// Increment column counter
 	column += yyleng;
 
-	// It isn't a typedef return that it is just an identifier.
-	TR_LOGGER.PushToken("IDENTIFIER");
-	return IDENTIFIER;
+	// Get most recent symbol info.
+	SymbolInfo* info = S_TABLE.GetMostRecentSymbolInfo(yytext);
+	if(info != NULL && info->data_type == SymbolTypes::TYPEDEF) {
+		// If it is a typedef log and return typedef.
+		yylval->data_type = SymbolTypes::TYPEDEF;
+		TR_LOGGER.PushToken("TYPEDEF");
+		return TYPEDEF;
+	}
+	// Check insert mode.
+	if (INSERT_MODE) {
+		cout << "In insert mode." << endl;
+		if (S_TABLE.HasInScope(yytext)) {
+			// If the identifier is in the scope. There is an error. Log and return.
+			TR_LOGGER.Error("Identifier already declared in scope.", 
+				line - yyleng, column);
+			TR_LOGGER.PushToken("IDENTIFIER");
+			return IDENTIFIER;
+		} else if (S_TABLE.HasShadowing(yytext)) {	
+			// If identifier is shadowed output warning.
+			TR_LOGGER.Warning("Identifier already declared in scope.", 
+				line - yyleng, column);
+		}
+		SymbolInfo insert_info;
+		insert_info.identifier_name = string(yytext);
+		S_TABLE.InsertSymbol(yytext, insert_info);
+		yylval = S_TABLE.GetMostRecentSymbolInfo(yytext);
+		TR_LOGGER.PushToken("IDENTIFIER");
+		return IDENTIFIER;
+	} else { // Lookup mode.
+		cout << "In lookup mode." << endl;
+		if(info != NULL) { // The info can be accessed
+			yylval = info;
+			TR_LOGGER.PushToken("IDENTIFIER");
+			return IDENTIFIER;
+		} else {
+			TR_LOGGER.Error("Identifier not declared in scope.", 
+				line - yyleng, column);
+			TR_LOGGER.PushToken("IDENTIFIER");
+			return IDENTIFIER;
+		}
+	}
 }
 
 %{

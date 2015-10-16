@@ -31,10 +31,10 @@ SymbolTable::SymbolTable() {
 bool SymbolTable::InsertSymbol(const string& name, SymbolInfo value) {
 	if(table_.front().find(name) == table_.front().end()){
 		table_.front()[name] = value;
+		cout << table_.front()[name].identifier_name 
+				 << " is now in the SymbolTable" << endl;
 		return true;
 	}
-	cerr << "Identifier " << name << " has already been declared in this scope"
-		 << endl;
 	return false;
 }
 
@@ -43,7 +43,7 @@ SymbolInfo* SymbolTable::GetMostRecentSymbolInfo(
 	for(auto map_iter : table_) {
 		map<string, SymbolInfo>::iterator search_iter =
 				map_iter.find(search_name);
-		if(search_iter != map_iter.end()){
+		if(search_iter != map_iter.end()){ 
 			return &(search_iter->second);
 		}
 	}
@@ -51,7 +51,7 @@ SymbolInfo* SymbolTable::GetMostRecentSymbolInfo(
 }
 
 bool SymbolTable::HasInScope(const string& search_name) const {
-	return table_.front().find(search_name) == table_.front().end();
+	return !(table_.front().find(search_name) == table_.front().end());
 }
 
 bool SymbolTable::HasShadowing(const string& search_name) const {

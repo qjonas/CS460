@@ -182,8 +182,7 @@ declaration
 	;
 
 declaration_list
-	: {INSERT_MODE = true;} declaration {
-		INSERT_MODE = false;
+	: declaration  {
 		TR_LOGGER.PushReduction("declaration -> declaration_list");
 	}
 	| declaration_list declaration {
@@ -674,23 +673,37 @@ expression_statement
 	;
 
 compound_statement
-	: OPEN_CURLY CLOSE_CURLY {
-		TR_LOGGER.PushReduction("OPEN_CURLY CLOSE_CURLY -> expression_statement");
+	: open_curly close_curly {
+		TR_LOGGER.PushReduction("open_curly close_curly -> expression_statement");
 	}
-	| OPEN_CURLY {S_TABLE.PushFrame();} statement_list CLOSE_CURLY {
+	| open_curly statement_list close_curly {
 		TR_LOGGER.PushReduction(
-			"OPEN_CURLY statement_list CLOSE_CURLY -> expression_statement");
+			"open_curly statement_list close_curly -> expression_statement");
 	}
-	| OPEN_CURLY {S_TABLE.PushFrame();} declaration_list CLOSE_CURLY {
+	| open_curly declaration_list close_curly {
 		TR_LOGGER.PushReduction(
-			"OPEN_CURLY declaration_list CLOSE_CURLY -> expression_statement");
+			"open_curly declaration_list close_curly -> expression_statement");
 	}
-	| OPEN_CURLY {S_TABLE.PushFrame();} declaration_list statement_list CLOSE_CURLY {
+	| open_curly declaration_list statement_list 
+		close_curly {
 		TR_LOGGER.PushReduction(
-			"OPEN_CURLY declaration_list statement_list CLOSE_CURLY "
+			"open_curly declaration_list statement_list close_curly "
 			"-> expression_statement");
 	}
 	;
+
+open_curly
+	: OPEN_CURLY {
+		INSERT_MODE = true;
+		S_TABLE.PushFrame();
+		TR_LOGGER.PushReduction("OPEN_CURLY -> open_curly");
+	}
+
+close_curly
+	: CLOSE_CURLY {
+		S_TABLE.PopFrame();
+		TR_LOGGER.PushReduction("CLOSE_CURLY -> close_curly");
+	}
 
 statement_list
 	: statement {
