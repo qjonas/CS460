@@ -38,16 +38,20 @@ bool SymbolTable::InsertSymbol(const string& name, SymbolInfo value) {
 	return false;
 }
 
-map<string, SymbolInfo>::iterator SymbolTable::SearchSymbol(
+SymbolInfo* SymbolTable::GetMostRecentSymbolInfo(
 		const string& search_name) {
 	for(auto map_iter : table_) {
 		map<string, SymbolInfo>::iterator search_iter =
 				map_iter.find(search_name);
 		if(search_iter != map_iter.end()){
-			return search_iter;
+			return &(search_iter->second);
 		}
 	}
-	return table_.front().end();
+	return NULL;
+}
+
+bool SymbolTable::HasInScope(const string& search_name) const {
+	return table_.front().find(search_name) == table_.front().end();
 }
 
 bool SymbolTable::HasShadowing(const string& search_name) const {

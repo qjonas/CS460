@@ -279,15 +279,6 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 	// Increment column counter
 	column += yyleng;
 
-	// Check if the identifier is a typedef
-	if(S_TABLE.Has(yytext)) {
-		if((S_TABLE.SearchSymbol(yytext)->second).data_type 
-					== SymbolTypes::TYPEDEF){
-			TR_LOGGER.PushToken("TYPEDEF_NAME");
-			return TYPEDEF_NAME;
-		}
-	}
-
 	// It isn't a typedef return that it is just an identifier.
 	TR_LOGGER.PushToken("IDENTIFIER");
 	return IDENTIFIER;
