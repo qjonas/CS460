@@ -78,55 +78,57 @@ void TokenReductionsLogger::LogSourceLine() {
 }
 
 void TokenReductionsLogger::Error(
-	const std::string& error, int line, int column) {
+	const std::string& error, int line, int COLUMN) {
+	LogTokenReductions();
 	if (console_output_) {
 		cerr << "ERROR: " << error << endl;
-		cerr << "Line: " << line << " Column: " << column << endl;
+		cerr << "Line: " << line << " Column: " << COLUMN << endl;
 		cerr  << "Source: ";
 		for(string word : source_line_) {
 			cerr << word;
 		}
 		cerr << endl;
-		for(int i = 0; i < column + 7; i++) cerr << " ";
+		for(int i = 0; i < COLUMN + 7; i++) cerr << " ";
 		cerr << "^" << endl;
 	}
 
 	if (file_out_ != NULL) {
 		*(file_out_) << "ERROR: " << error <<  endl;
-		*(file_out_) << " Line: " << line << " Column: " << column << endl;
+		*(file_out_) << " Line: " << line << " Column: " << COLUMN << endl;
 		*(file_out_) << "Source: ";
 		for(string word : source_line_) {
 			*(file_out_) << word;
 		}
 		*(file_out_) << endl;
-		for(int i = 0; i < column + 7; i++) *(file_out_) << " ";
+		for(int i = 0; i < COLUMN + 7; i++) *(file_out_) << " ";
 		*(file_out_) << "^" << endl;
 	}
+	exit(0);
 }
 
 void TokenReductionsLogger::Warning(
-	const std::string& error, int line, int column) {
+	const std::string& error, int line, int COLUMN) {
 	if (console_output_) {
 		cerr << "WARNING: " << error << endl;
-		cerr << "Line: " << line << " Column: " << column << endl;
+		cerr << "Line: " << line << " Column: " << COLUMN << endl;
 		cerr  << "Source: ";
 		for(string word : source_line_) {
 			cerr << word;
 		}
 		cerr << endl;
-		for(int i = 0; i < column + 9; i++) cerr << " ";
+		for(int i = 0; i < COLUMN + 9; i++) cerr << " ";
 		cerr << "^" << endl;
 	}
 
 	if (file_out_ != NULL) {
 		*(file_out_) << "WARNING: " << error <<  endl;
-		*(file_out_) << " Line: " << line << " Column: " << column << endl;
+		*(file_out_) << " Line: " << line << " Column: " << COLUMN << endl;
 		*(file_out_) << "Source: ";
 		for(string word : source_line_) {
 			*(file_out_) << word;
 		}
 		*(file_out_) << endl;
-		for(int i = 0; i < column + 9 ; i++) *(file_out_) << " ";
+		for(int i = 0; i < COLUMN + 9 ; i++) *(file_out_) << " ";
 		*(file_out_) << "^" << endl;
 	}
 }

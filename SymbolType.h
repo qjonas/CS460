@@ -8,24 +8,34 @@
 #ifndef SYMBOLTYPE_H_
 #define SYMBOLTYPE_H_
 
-#include <vector>
-#include <string>
 #include <istream>
+#include <list>
 #include <ostream>
+#include <string>
+#include <vector>
 
 // SymbolType will enumerate the primitive data types in C.
 namespace SymbolTypes{
 enum SymbolType {
-	CHAR, SHORT, INT, LONG, FLOAT, DOUBLE, TYPEDEF, STRING
+	STRUCT, UNION, ENUM, TYPEDEF_NAME, SIGNED, UNSIGNED, SHORT, LONG, 
+	CHAR, INT, FLOAT, DOUBLE, STRING
+};
+enum StorageClassSpecifier {
+	NONE, AUTO, REGISTER, STATIC, EXTERN, TYPEDEF
+};
+enum TypeQualifier {
+	CONST, VOLATILE
 };
 }
+
+std::ostream& operator<<(std::ostream &os, SymbolTypes::SymbolType symbol_type);
 
 // FunctionInfo will store information of function identifiers in C.
 struct FunctionInfo {
 	// Parameter types will list the parameter types of a function.
 	// ex: int foo(int i, char c, double d);
 	// parameter_types = {INT, CHAR, DOUBLE};
-	std::vector<SymbolTypes::SymbolType> parameters_types;
+	std::list<SymbolTypes::SymbolType> parameters_types;
 
 	// Range start will denote which parameter holds the elipses.
 	// ex_1: int foo(int i, char c, ...);
@@ -52,11 +62,21 @@ union SymbolValue {
 
 // SymbolInfo will store all of the information of the identifier.
 typedef struct SymbolInfo {
+	SymbolInfo();
 	// Identifier name will store the name of the identifier.
 	std::string identifier_name;
 
 	// Data type will store the enumerated SymbolType value of the identifier.
-	SymbolTypes::SymbolType data_type;
+	std::list<SymbolTypes::SymbolType> type_specifier_list;
+
+	// This will store the storage classifier type
+	SymbolTypes::StorageClassSpecifier storage_class_specifier;
+
+	// This will store a list of type qualifiers
+	std::list<SymbolTypes::TypeQualifier> type_qualifier_list;
+
+	// Name of type if type_specifier is a typedef_name;
+	std::string typedef_name;
 
 	// Is const denotes whether an identifier is function.
 	bool is_function;
@@ -70,15 +90,6 @@ typedef struct SymbolInfo {
 	// Is const denotes whether an identifier is constant.
 	bool is_const;
 
-	// Is unsigned denotes whether an identifier is an unsigned.
-	bool is_unsigned;
-
-	enum Longs{
-		NO_LONG, ONE_LONG, TWO_LONG
-	};
-
-	Longs num_longs;
-
 	// Pointer Count will denote the number of '*' there are for a given identifier.
 	// ex: int** i; Will have a pointer_counter equal to 2
 	unsigned int pointer_count;
@@ -86,5 +97,6 @@ typedef struct SymbolInfo {
 
 std::ostream& operator <<(std::ostream &os, SymbolInfo &symbol_info);
 std::istream& operator >>(std::istream &is, SymbolInfo &symbol_info);
+
 
 #endif /* SYMBOLTYPE_H_ */

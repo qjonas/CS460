@@ -1,11 +1,23 @@
 /******************************************************************************/
 /* Definitions */
 /******************************************************************************/
+
+/******************************************************************************/
+/* TODOs 
+/* Get function definitions correctly modifying things already in  table 	
+/* 
+/******************************************************************************/
+
+
 %{
 /* Included C/C++ Libraries */
+#include <iostream>
+
+/* Included Header Files */
 #include  "CommandLineFlags.h"
 #include  "SymbolTable.h"
 #include  "TokenReductionsLogger.h"
+#include 	"SymbolInfoUtil.h"
 %}
 
 %code requires {
@@ -19,12 +31,16 @@ extern CommandLineFlags CL_FLAGS;
 extern SymbolTable S_TABLE;
 extern TokenReductionsLogger TR_LOGGER;
 extern bool INSERT_MODE;
+extern int LINE;
+extern int COLUMN;
 
 /* Functions from Flex */
 extern int yylex();
 void yyerror(const char * err);
 %}
 
+/* Expect 1 S/R conflict from dangling else */
+%expect 1
 
 /* Token Declarations */
 /* Reserved Words */
@@ -182,116 +198,185 @@ declaration
 	;
 
 declaration_list
-	: declaration  {
+	: {INSERT_MODE = true;} declaration {INSERT_MODE = false;} {
 		TR_LOGGER.PushReduction("declaration -> declaration_list");
 	}
-	| declaration_list declaration {
+	| declaration_list {INSERT_MODE = true;} declaration {INSERT_MODE = false;} {
 		TR_LOGGER.PushReduction("delcaration_list declaration -> declaration_list");
 	}
 	;
 
 declaration_specifiers
 	: storage_class_specifier {
+		// Log Reduction
 		TR_LOGGER.PushReduction(
 			"storage_class_specifier -> declaration_specifiers");
+		// Pass through symbol info
+		$$ = $1;
 	}
 	| storage_class_specifier declaration_specifiers {
+		// Log Reduction
 		TR_LOGGER.PushReduction(
 			"storage_class_specifier declaration_specifiers "
 			"-> declaration_specifiers");
+
+		// Check if there has not been a prior storage class specifier.
+		if($2->storage_class_specifier != SymbolTypes::NONE) {
+			// Error if there has been another storage class specifier.
+			TR_LOGGER.Error("Cannot have more than one storage class specifier.",
+											LINE, COLUMN);
+		} else {
+			// Assign the storage_class_specifier none has been declare before
+			$2->storage_class_specifier = $1->storage_class_specifier;
+		}
+		// Pass through $2
+		$$ = $2;
+
+		// $1 is now unneeded
+		delete $1;
 	}
 	| type_specifier {
+		// Log Reduction
 		TR_LOGGER.PushReduction("type_specifier -> declaration_specifiers");
+
+		// Pass through symbol info
+		$$ = $1;
 	}
 	| type_specifier declaration_specifiers {
 		TR_LOGGER.PushReduction(
 			"type_specifier declaration_specifiers -> declaration_specifiers");
+		// Add type specifier to declaration specifier
+		$2->type_specifier_list.push_front($1->type_specifier_list.front());
+		$$ = $2;
+
+		// Delete type_specifier because it is unneeded
+		delete $1;
+
+		// Check if the data type is valid
+		if(!(IsDataTypeValid(*($2)))) {
+			TR_LOGGER.Error("Data Type not valid.", LINE, COLUMN);
+		}
 	}
 	| type_qualifier {
+		// Log reduction
 		TR_LOGGER.PushReduction(
 			"type_qualifier -> declaration_specifiers");
+		// Pass through SymbolInfo
+		$$ = $1;
 	}
 	| type_qualifier declaration_specifiers {
 		TR_LOGGER.PushReduction(
 			"type_qualifier declaration_specifiers -> declaration_specifiers");
+		// Push type qualifier to the front
+		$2->type_qualifier_list.push_front($1->type_qualifier_list.front());
+
+		// Assign $$ to $2
+		$$ = $2;
+
+		// $1 is now unneeded delete it
+		delete $1;
+
+		// Check if the Type qualifier is valid if not Error.
+		if(!(IsTypeQualifierValid(*($2)))) {
+			TR_LOGGER.Error("Repeated type qualifier.", LINE, COLUMN);
+		}
 	}
 	;
 
 storage_class_specifier
 	: AUTO {
+		$$ = $1;
 		TR_LOGGER.PushReduction("AUTO -> storage_class_specifier");
 	}
 	| REGISTER {
+		$$ = $1;
 		TR_LOGGER.PushReduction("REGISTER -> storage_class_specifier");
 	}
 	| STATIC {
+		$$ = $1;
 		TR_LOGGER.PushReduction("STATIC -> storage_class_specifier");
 	}
 	| EXTERN {
+		$$ = $1;
 		TR_LOGGER.PushReduction("EXTERN -> storage_class_specifier");
 	}
 	| TYPEDEF {
+		$$ = $1;
 		TR_LOGGER.PushReduction("TYPEDEF -> storage_class_specifier");
 	}
 	;
 
 type_specifier
 	: VOID {
+		$$ = $1;
 		TR_LOGGER.PushReduction("VOID -> type_specifier");
 	}
 	| CHAR {
+		$$ = $1;
 		TR_LOGGER.PushReduction("CHAR -> type_specifier");
 	}
 	| SHORT {
+		$$ = $1;
 		TR_LOGGER.PushReduction("SHORT -> type_specifier");
 	}
 	| INT  {
+		$$ = $1;
 		TR_LOGGER.PushReduction("INT -> type_specifier");
 	}
 	| LONG {
+		$$ = $1;
 		TR_LOGGER.PushReduction("LONG -> type_specifier");
 	}
 	| FLOAT {
+		$$ = $1;
 		TR_LOGGER.PushReduction("FLOAT -> type_specifier");
 	}
 	| DOUBLE  {
+		$$ = $1;
 		TR_LOGGER.PushReduction("DOUBLE -> type_specifier");
 	}
 	| SIGNED  {
+		$$ = $1;
 		TR_LOGGER.PushReduction("SIGNED -> type_specifier");
 	}
 	| UNSIGNED {
+		$$ = $1;
 		TR_LOGGER.PushReduction("UNSIGNED -> type_specifier");
 	}
 	| struct_or_union_specifier {
+		$$ = $1;
 		TR_LOGGER.PushReduction("struct_or_union_specifier -> type_specifier");
 	}
 	| enum_specifier {
+		$$ = $1;
 		TR_LOGGER.PushReduction("enum_specifier -> type_specifier");
 	}
 	| TYPEDEF_NAME {
+		$$ = $1;
 		TR_LOGGER.PushReduction("TYPEDEF_NAME -> type_specifier");
 	}
 	;
 
 type_qualifier
 	: CONST  {
+		$$ = $1;
 		TR_LOGGER.PushReduction("CONST -> type_qualifier");
 	}
 	| VOLATILE {
+		$$ = $1;
 		TR_LOGGER.PushReduction("VOLATILE -> type_qualifier");
 	}
 	;
 
 struct_or_union_specifier
-	: struct_or_union identifier OPEN_CURLY struct_declaration_list CLOSE_CURLY {
-		TR_LOGGER.PushReduction("struct_or_union identifier OPEN_CURLY "
-														"struct_declaration_list CLOSE_CURLY "
+	: struct_or_union identifier open_curly struct_declaration_list close_curly {
+		TR_LOGGER.PushReduction("struct_or_union identifier open_curly "
+														"struct_declaration_list close_curly "
 														"-> struct_or_union_specifier");
 	}
-	| struct_or_union OPEN_CURLY struct_declaration_list CLOSE_CURLY {
-		TR_LOGGER.PushReduction("struct_or_union OPEN_CURLY "
-														"struct_declaration_list CLOSE_CURLY "
+	| struct_or_union open_curly struct_declaration_list close_curly {
+		TR_LOGGER.PushReduction("struct_or_union open_curly "
+														"struct_declaration_list close_curly "
 														"-> struct_or_union_specifier");
 	}
 	| struct_or_union identifier {
@@ -389,13 +474,13 @@ struct_declarator
 	;
 
 enum_specifier
-	: ENUM OPEN_CURLY enumerator_list CLOSE_CURLY {
+	: ENUM open_curly enumerator_list close_curly {
 		TR_LOGGER.PushReduction(
-			"ENUM OPEN_CURLY enumerator_list CLOSE_CURLY -> enum_specifier");
+			"ENUM open_curly enumerator_list close_curly -> enum_specifier");
 	}
-	| ENUM identifier OPEN_CURLY enumerator_list CLOSE_CURLY {
+	| ENUM identifier open_curly enumerator_list close_curly {
 		TR_LOGGER.PushReduction(
-			"ENUM identifier OPEN_CURLY enumerator_list CLOSE_CURLY "
+			"ENUM identifier open_curly enumerator_list close_curly "
 			"-> enum_specifier");
 	}
 	| ENUM identifier  {
@@ -539,13 +624,13 @@ initializer
 	: assignment_expression {
 		TR_LOGGER.PushReduction("assignment_expression -> initializer");
 	}
-	| OPEN_CURLY initializer_list CLOSE_CURLY  {
+	| open_curly initializer_list close_curly  {
 		TR_LOGGER.PushReduction(
-			"OPEN_CURLY initializer_list CLOSE_CURLY -> initializer");
+			"open_curly initializer_list close_curly -> initializer");
 	}
-	| OPEN_CURLY initializer_list COMMA CLOSE_CURLY {
+	| open_curly initializer_list COMMA close_curly {
 		TR_LOGGER.PushReduction(
-			"OPEN_CURLY initializer_list COMMA CLOSE_CURLY -> initializer");
+			"open_curly initializer_list COMMA close_curly -> initializer");
 	}
 	;
 
@@ -691,19 +776,6 @@ compound_statement
 			"-> expression_statement");
 	}
 	;
-
-open_curly
-	: OPEN_CURLY {
-		INSERT_MODE = true;
-		S_TABLE.PushFrame();
-		TR_LOGGER.PushReduction("OPEN_CURLY -> open_curly");
-	}
-
-close_curly
-	: CLOSE_CURLY {
-		S_TABLE.PopFrame();
-		TR_LOGGER.PushReduction("CLOSE_CURLY -> close_curly");
-	}
 
 statement_list
 	: statement {
@@ -1140,30 +1212,48 @@ argument_expression_list
 
 constant
 	: INTEGER_CONSTANT {
+		$$ = $1;
 		TR_LOGGER.PushReduction("INTEGER_CONSTANT -> constant");
 	}
 	| CHARACTER_CONSTANT {
+		$$ = $1;
 		TR_LOGGER.PushReduction("CHARACTER_CONSTANT -> constant");
 	}
 	| FLOATING_CONSTANT {
+		$$ = $1;
 		TR_LOGGER.PushReduction("FLOATING_CONSTANT -> constant");
 	}
 	| ENUMERATION_CONSTANT {
+		$$ = $1;
 		TR_LOGGER.PushReduction("ENUMERATION_CONSTANT -> constant");
 	}
 	;
 
 string
 	: STRING_LITERAL {
+		$$ = $1;
 		TR_LOGGER.PushReduction("STRING_LITERAL -> string");
 	}
 	;
 
 identifier
 	: IDENTIFIER {
+		$$ = $1;
 		TR_LOGGER.PushReduction("IDENTIFIER -> identifier");
 	}
 	;
+
+open_curly
+	: OPEN_CURLY {
+		S_TABLE.PushFrame();
+		TR_LOGGER.PushReduction("OPEN_CURLY-> open_curly");
+	}
+
+close_curly
+	: CLOSE_CURLY {
+		S_TABLE.PopFrame();
+		TR_LOGGER.PushReduction("CLOSE_CURLY -> close_curly");
+	}
 
 %%
 /******************************************************************************/

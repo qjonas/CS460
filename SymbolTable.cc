@@ -93,6 +93,8 @@ void SymbolTable::OutputToFile(const string& file_name) const {
 
 void SymbolTable::PushFrame() {
 	table_.push_front(*(new map<string, SymbolInfo>));
+	cout << "New frame has been pushed. The stack now has " << table_.size()
+			 << " frame(s)." << endl;
 }
 
 bool SymbolTable::PopFrame() {
