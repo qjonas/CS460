@@ -91,6 +91,32 @@ void SymbolTable::OutputToFile(const string& file_name) const {
 	ofs.close();
 }
 
+void SymbolTable::Print() const {
+	cout << "Number of stack frames: " << table_.size() << endl;
+	cout << "{" << endl;
+	for(auto table_map : table_) {
+		cout << "\tNumber of identifiers: " << table_map.size();
+		for(auto ident_tuple : table_map) {
+			cout << "\t{" << endl;
+			cout << "\t\tidentifier_name: " << ident_tuple.second.identifier_name << endl;
+			cout << "\t\ttype_specifier: ";
+			for(auto type_specifier : ident_tuple.second.type_specifier_list) {
+				cout << type_specifier << " ";
+			}
+			cout << endl;
+			cout << "\t\tstorage_class_specifier: " << ident_tuple.second.storage_class_specifier;
+			cout << "\t\ttype_qualifier_list: ";
+			for(auto qualifier: ident_tuple.second.type_qualifier_list) {
+				cout << qualifier << " ";
+			}
+			cout << endl;
+			cout << "\t\ttypedef_name: " << ident_tuple.second.typedef_name;
+			cout << "\t\tis_function: " << ident_tuple.second.is_function;
+		}
+	}
+}
+
+
 void SymbolTable::PushFrame() {
 	table_.push_front(*(new map<string, SymbolInfo>));
 	cout << "New frame has been pushed. The stack now has " << table_.size()

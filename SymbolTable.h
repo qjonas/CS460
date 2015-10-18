@@ -40,6 +40,8 @@ public:
 	// be read by the contruct from file constructor
 	void OutputToFile(const std::string& file_name) const;
 
+	void Print() const;
+
 	// Creates a new stack frame.
 	void PushFrame();
 	

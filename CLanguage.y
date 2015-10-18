@@ -194,19 +194,6 @@ declaration
 		TR_LOGGER.PushReduction("declaration_specifiers SEMI -> declaration");
 	}
 	| declaration_specifiers init_declarator_list SEMI {
-		// Loop through each symbol info in init_declarator_list
-		for(auto info : $2) {
-			// Find its pointer in the symbol table
-			SymbolInfo* table_node 
-					= S_TABLE.GetMostRecentSymbolInfo(info.identifier_name);
-			if(!table_node) TR_LOGGER.Error("Identifier not in table", LINE, COLUMN);
-
-			// Change it's values based on the declaration_specifiers
-			table_node->type_specifier_list = $1.front().type_specifier_list;
-			table_node->type_qualifier_list = $1.front().type_qualifier_list;
-			table_node->storage_class_specifier = $1.front().storage_class_specifier;
-		}
-
 		TR_LOGGER.PushReduction(
 			"declaration_specifiers init declarator_list SEMI -> declaration");
 	}

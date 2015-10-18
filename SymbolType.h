@@ -29,6 +29,9 @@ enum TypeQualifier {
 }
 
 std::ostream& operator<<(std::ostream &os, SymbolTypes::SymbolType symbol_type);
+std::ostream& operator<<(std::ostream &os, SymbolTypes::StorageClassSpecifier storage_class_specifier);
+std::ostream& operator<<(std::ostream &os, SymbolTypes::TypeQualifier type_qualifier);
+
 
 // FunctionInfo will store information of function identifiers in C.
 struct FunctionInfo {
@@ -86,9 +89,6 @@ typedef struct SymbolInfo {
 
 	// Denotes if the data value is still valid for value checking
 	bool data_is_valid;
-
-	// Is const denotes whether an identifier is constant.
-	bool is_const;
 
 	// Pointer Count will denote the number of '*' there are for a given identifier.
 	// ex: int** i; Will have a pointer_counter equal to 2

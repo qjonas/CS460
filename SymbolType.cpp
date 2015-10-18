@@ -40,7 +40,34 @@ ostream& operator <<(ostream &os, SymbolType symbol_type) {
 	return os;
 }
 
-std::ostream& operator <<(std::ostream &os, FunctionInfo &function_info) {
+ostream& operator<<(ostream &os, SymbolTypes::StorageClassSpecifier storage_class_specifier) {
+	switch (storage_class_specifier) {
+		case NONE:
+			os << "NONE"; break;
+		case AUTO:
+			os << "AUTO"; break;
+		case REGISTER:
+			os << "REGISTER"; break;
+		case STATIC:
+			os << "STATIC"; break;
+		case EXTERN:
+			os << "EXTERN"; break;
+		case TYPEDEF:
+			os << "TYPEDEF"; break;
+ 	}
+ 	return os;
+}
+ostream& operator<<(ostream &os, SymbolTypes::TypeQualifier type_qualifier) {
+	switch (type_qualifier) {
+		case CONST:
+			os << "CONST"; break;
+		case VOLATILE:
+			os << "VOLATILE"; break;
+	}
+	return os;
+}
+
+ostream& operator <<(ostream &os, FunctionInfo &function_info) {
 	os << "{ ";
 	os << "parameter_types: {";
 	for(SymbolTypes::SymbolType type : function_info.parameters_types) os << ' ' << type;
@@ -51,7 +78,7 @@ std::ostream& operator <<(std::ostream &os, FunctionInfo &function_info) {
 	return os;
 }
 
-std::istream& operator >>(std::istream &is, FunctionInfo &function_info) {
+istream& operator >>(istream &is, FunctionInfo &function_info) {
 	char dummy_char;
 	string dummy_str;
 	int enum_value = -1;
@@ -69,7 +96,7 @@ std::istream& operator >>(std::istream &is, FunctionInfo &function_info) {
 }
 
 SymbolInfo::SymbolInfo() : storage_class_specifier(NONE), is_function(false),
-	data_is_valid(false), is_const(false), pointer_count(0) {}
+	data_is_valid(false), pointer_count(0) {}
 
 ostream& operator <<(ostream &os, SymbolInfo &symbol_info) {
 	// os << '{' << endl;
