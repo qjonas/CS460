@@ -8,21 +8,23 @@
 /* 
 /******************************************************************************/
 
-
 %{
 /* Included C/C++ Libraries */
 #include <iostream>
+#include <list>
 
 /* Included Header Files */
 #include  "CommandLineFlags.h"
 #include  "SymbolTable.h"
 #include  "TokenReductionsLogger.h"
 #include 	"SymbolInfoUtil.h"
+
+using namespace std;
 %}
 
 %code requires {
 	#include 	"SymbolType.h"
-	#define YYSTYPE SymbolInfo*
+	#define YYSTYPE std::list<SymbolInfo>
 }
 
 %{
@@ -191,7 +193,20 @@ declaration
 	: declaration_specifiers SEMI {
 		TR_LOGGER.PushReduction("declaration_specifiers SEMI -> declaration");
 	}
-	| declaration_specifiers init_declarator_list SEMI {	
+	| declaration_specifiers init_declarator_list SEMI {
+		// Loop through each symbol info in init_declarator_list
+		for(auto info : $2) {
+			// Find its pointer in the symbol table
+			SymbolInfo* table_node 
+					= S_TABLE.GetMostRecentSymbolInfo(info.identifier_name);
+			if(!table_node) TR_LOGGER.Error("Identifier not in table", LINE, COLUMN);
+
+			// Change it's values based on the declaration_specifiers
+			table_node->type_specifier_list = $1.front().type_specifier_list;
+			table_node->type_qualifier_list = $1.front().type_qualifier_list;
+			table_node->storage_class_specifier = $1.front().storage_class_specifier;
+		}
+
 		TR_LOGGER.PushReduction(
 			"declaration_specifiers init declarator_list SEMI -> declaration");
 	}
@@ -221,19 +236,16 @@ declaration_specifiers
 			"-> declaration_specifiers");
 
 		// Check if there has not been a prior storage class specifier.
-		if($2->storage_class_specifier != SymbolTypes::NONE) {
+		if($2.front().storage_class_specifier != SymbolTypes::NONE) {
 			// Error if there has been another storage class specifier.
 			TR_LOGGER.Error("Cannot have more than one storage class specifier.",
 											LINE, COLUMN);
 		} else {
 			// Assign the storage_class_specifier none has been declare before
-			$2->storage_class_specifier = $1->storage_class_specifier;
+			$2.front().storage_class_specifier = $1.front().storage_class_specifier;
 		}
 		// Pass through $2
 		$$ = $2;
-
-		// $1 is now unneeded
-		delete $1;
 	}
 	| type_specifier {
 		// Log Reduction
@@ -246,14 +258,11 @@ declaration_specifiers
 		TR_LOGGER.PushReduction(
 			"type_specifier declaration_specifiers -> declaration_specifiers");
 		// Add type specifier to declaration specifier
-		$2->type_specifier_list.push_front($1->type_specifier_list.front());
+		$2.front().type_specifier_list.push_front($1.front().type_specifier_list.front());
 		$$ = $2;
 
-		// Delete type_specifier because it is unneeded
-		delete $1;
-
 		// Check if the data type is valid
-		if(!(IsDataTypeValid(*($2)))) {
+		if(!(IsDataTypeValid($2.front()))) {
 			TR_LOGGER.Error("Data Type not valid.", LINE, COLUMN);
 		}
 	}
@@ -268,16 +277,13 @@ declaration_specifiers
 		TR_LOGGER.PushReduction(
 			"type_qualifier declaration_specifiers -> declaration_specifiers");
 		// Push type qualifier to the front
-		$2->type_qualifier_list.push_front($1->type_qualifier_list.front());
+		$2.front().type_qualifier_list.push_front($1.front().type_qualifier_list.front());
 
 		// Assign $$ to $2
 		$$ = $2;
 
-		// $1 is now unneeded delete it
-		delete $1;
-
 		// Check if the Type qualifier is valid if not Error.
-		if(!(IsTypeQualifierValid(*($2)))) {
+		if(!(IsTypeQualifierValid($2.front()))) {
 			TR_LOGGER.Error("Repeated type qualifier.", LINE, COLUMN);
 		}
 	}
@@ -511,6 +517,7 @@ enumerator
 
 declarator
 	: direct_declarator {
+		$$ = $1;
 		TR_LOGGER.PushReduction("direct_declarator -> declarator");
 	}
 	| pointer direct_declarator {
@@ -520,7 +527,11 @@ declarator
 
 direct_declarator
 	: identifier {
+		// Log reduction
 		TR_LOGGER.PushReduction("identifier -> direct_declarator");
+
+		// Pass through
+		$$ = $1;
 	}
 	| OPEN_PAREN declarator CLOSE_PAREN {
 		TR_LOGGER.PushReduction(
