@@ -15,7 +15,6 @@
 
 /* Included Header Files */
 #include  "CommandLineFlags.h"
-#include  "SymbolTable.h"
 #include  "TokenReductionsLogger.h"
 #include 	"SymbolInfoUtil.h"
 
@@ -23,7 +22,7 @@ using namespace std;
 %}
 
 %code requires {
-	#include 	"SymbolType.h"
+	#include  "SymbolTable.h"
 	#define YYSTYPE std::list<SymbolInfo>
 }
 
