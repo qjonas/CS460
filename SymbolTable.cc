@@ -15,14 +15,8 @@
 #include <stack>
 #include <string>
 
-#include "SymbolType.h"
-
 using namespace std;
-
-SymbolTable& SymbolTable::GetInstance() {
-	static SymbolTable instance;
-	return instance;
-}
+using namespace SymbolTypes;
 
 SymbolTable::SymbolTable() {
 	PushFrame();
@@ -80,22 +74,15 @@ bool SymbolTable::Has(const string& search_name) const {
 }
 
 void SymbolTable::OutputToFile(const string& file_name) const {
-	ofstream ofs(file_name);
-	for(auto table_map : table_) {
-		ofs << table_map.size() << " ";
-		for(auto map_value : table_map) {
-			ofs << map_value.first << " " << map_value.second << " ";
-		}
-		ofs << "\n";
-	}
-	ofs.close();
+
 }
 
 void SymbolTable::Print() const {
 	cout << "Number of stack frames: " << table_.size() << endl;
-	cout << "{" << endl;
+	int stack_frames = table_.size() - 1;
 	for(auto table_map : table_) {
-		cout << "\tNumber of identifiers: " << table_map.size();
+		cout << "Stack Frame: " << stack_frames-- << endl;
+		cout << "\tNumber of identifiers: " << table_map.size() << endl;
 		for(auto ident_tuple : table_map) {
 			cout << "\t{" << endl;
 			cout << "\t\tidentifier_name: " << ident_tuple.second.identifier_name << endl;
@@ -104,14 +91,15 @@ void SymbolTable::Print() const {
 				cout << type_specifier << " ";
 			}
 			cout << endl;
-			cout << "\t\tstorage_class_specifier: " << ident_tuple.second.storage_class_specifier;
+			cout << "\t\tstorage_class_specifier: " << ident_tuple.second.storage_class_specifier << endl;
 			cout << "\t\ttype_qualifier_list: ";
 			for(auto qualifier: ident_tuple.second.type_qualifier_list) {
 				cout << qualifier << " ";
 			}
 			cout << endl;
-			cout << "\t\ttypedef_name: " << ident_tuple.second.typedef_name;
-			cout << "\t\tis_function: " << ident_tuple.second.is_function;
+			cout << "\t\ttypedef_name: " << ident_tuple.second.typedef_name << endl;
+			cout << "\t\tis_function: " << ident_tuple.second.is_function << endl;
+			cout << "\t}" << endl;
 		}
 	}
 }
@@ -119,8 +107,6 @@ void SymbolTable::Print() const {
 
 void SymbolTable::PushFrame() {
 	table_.push_front(*(new map<string, SymbolInfo>));
-	cout << "New frame has been pushed. The stack now has " << table_.size()
-			 << " frame(s)." << endl;
 }
 
 bool SymbolTable::PopFrame() {
@@ -140,20 +126,8 @@ void SymbolTable::Reset() {
 }
 
 void SymbolTable::CopyFromFile(const string& file_name) {
-	Reset();
-	ifstream fin(file_name);
-	int num_identifiers_in_stack;
-	fin >> num_identifiers_in_stack;
-	while(fin.good()) {
-		table_.push_back(*(new map<string, SymbolInfo>()));
-		for(int i = 0; i < num_identifiers_in_stack; i++) {
-			string identifier_name;
-			SymbolInfo value;
-			fin >> identifier_name;
-			fin >> value;
-			table_.back()[identifier_name] = value;
-		}
-		fin >> num_identifiers_in_stack;
-	}
-	fin.close();
+
 }
+
+SymbolInfo::SymbolInfo() : storage_class_specifier(NONE), is_function(false),
+	data_is_valid(false), pointer_count(0) {}

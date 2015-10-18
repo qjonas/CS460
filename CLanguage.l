@@ -13,7 +13,6 @@
 #include  "CLanguage.tab.hh"
 #include  "CommandLineFlags.h"
 #include  "SymbolTable.h"
-#include 	"SymbolType.h"
 #include  "TokenReductionsLogger.h"
 
 using namespace std;
@@ -42,6 +41,10 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 %{
 /* Reserved Words */
 %}
+"!!" {
+	S_TABLE.Print();
+}
+
 "auto"	{
 	TR_LOGGER.PushToken("AUTO");
 	TR_LOGGER.PushSourceWord(yytext);

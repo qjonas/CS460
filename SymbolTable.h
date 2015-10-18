@@ -14,12 +14,12 @@
 #include <stack>
 #include <string>
 
-#include "SymbolType.h"
+struct SymbolInfo;
 
 class SymbolTable {
 public:
-	// Singleton getter
-	static SymbolTable& GetInstance();
+	// Constructor
+	SymbolTable();
 
 	// Insert a new identifier into the symbol table
 	bool InsertSymbol(const std::string& name, SymbolInfo value);
@@ -54,10 +54,93 @@ public:
 	// Copies the output of a previous symbol table.
 	void CopyFromFile(const std::string& file_name);
 
-private:
-	// Constructors
-	SymbolTable();
 	std::list< std::map<std::string, SymbolInfo> > table_;
 };
+
+// SymbolType will enumerate the primitive data types in C.
+namespace SymbolTypes{
+enum SymbolType {
+	STRUCT, UNION, ENUM, TYPEDEF_NAME, SIGNED, UNSIGNED, SHORT, LONG, 
+	CHAR, INT, FLOAT, DOUBLE, STRING
+};
+enum StorageClassSpecifier {
+	NONE, AUTO, REGISTER, STATIC, EXTERN, TYPEDEF
+};
+enum TypeQualifier {
+	CONST, VOLATILE
+};
+}
+
+// SymbolValue will union the values of the identifiers.
+union SymbolValue {
+	char char_val;
+	long long long_long_val;
+	unsigned long long unsigned_long_long_val;
+	double double_val;
+	std::string * string_val;
+};
+
+// SymbolInfo will store all of the information of the identifier.
+typedef struct SymbolInfo {
+	SymbolInfo();
+	/* Basic SymbolInfo */
+	// Identifier name will store the name of the identifier.
+	// Only SymbolInfos with names are going to be in the Symbol table.
+	std::string identifier_name;
+
+	// Data value will store a pointer to the value of associated with an identifier.
+	SymbolValue data_value;
+
+	// Denotes if the data value is still valid for value checking
+	bool data_is_valid;
+
+
+	/* Members Deaing with Data Type */
+	// Data type will store the enumerated SymbolType value of the identifier.
+	std::list<SymbolTypes::SymbolType> type_specifier_list;
+
+	// This will store the storage classifier type
+	SymbolTypes::StorageClassSpecifier storage_class_specifier;
+
+	// This will store a list of type qualifiers
+	std::list<SymbolTypes::TypeQualifier> type_qualifier_list;
+
+	// Name of type if type_specifier is a typedef_name;
+	std::string typedef_name;
+
+	// Values inside of struct
+	SymbolTable struct_or_union_values;
+
+	// Pointer Count will denote the number of '*' there are for a given identifier.
+	// ex: int** i; Will have a pointer_counter equal to 2
+	unsigned int pointer_count;
+
+	// Contains the sizes of the arrays declared with square brackets. Empty
+	// brackets will have an ambiguous size and the value in the list will be
+	// SymbolTypes::AMBIGUOUS_ARRAY_SIZE
+	// The size of the array_sizes list will be the number of square brackets.
+	std::list<int> array_sizes;
+
+
+	/* Member dealing with identifier being a function */
+	// Is const denotes whether an identifier is function.
+	bool is_function;
+
+	// Parameter types will list the parameter types of a function.
+	// ex: int foo(int i, char c, double d);
+	// parameter_types = {INT, CHAR, DOUBLE};
+	std::list<std::list<SymbolTypes::SymbolType> > parameters_types;
+
+	// Range start will denote which parameter holds the elipses.
+	// ex_1: int foo(int i, char c, ...);
+	// range_start = 2
+	// ex_2: int bar(...);
+	// range_start = 0
+	// ex_3: int baz();
+	// range_start = -1
+	int range_start;
+} SymbolInfo;
+
+
 
 #endif /* SYMBOLTABLE_H_ */

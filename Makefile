@@ -18,7 +18,7 @@ LIBS	= -L/usr/local/lib -ll
 
 # CLanguage build objects
 BUILDOBJS =  CLanguage.tab.o lex.yy.o SymbolTable.o CommandLineFlags.o 
-BUILDOBJS += SymbolType.o Globals.o TokenReductionsLogger.o SymbolInfoUtil.o
+BUILDOBJS += Globals.o TokenReductionsLogger.o SymbolInfoUtil.o
 
 CLanguage: $(BUILDOBJS)
 	$(CC) $(C11) -o CLanguage $(BUILDOBJS) $(LIBS)
@@ -40,9 +40,6 @@ SymbolTable.o: SymbolTable.cc
 
 CommandLineFlags.o: CommandLineFlags.cpp
 	$(CC) $(C11) -c CommandLineFlags.cpp
-
-SymbolType.o: SymbolType.cpp
-	$(CC) $(C11) -c SymbolType.cpp -std=c++11
 
 Globals.o: Globals.cpp
 	$(CC) -c Globals.cpp
