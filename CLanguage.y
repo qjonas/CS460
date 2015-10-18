@@ -1079,11 +1079,17 @@ multiplicative_expression
 			"-> multiplicative_expression");
 	}
 	| multiplicative_expression FORWARD_SLASH cast_expression {
+			if($2.front().data_value.long_long_val == 0) {
+			// Error division by 0
+			TR_LOGGER.Error("Cannot divide by 0, seriously, stop that.",
+											LINE, COLUMN);
+			}
 		TR_LOGGER.PushReduction(
 			"multiplicative_expression FORWARD_SLASH cast_expression "
 			"-> multiplicative_expression");
 	}
 	| multiplicative_expression PERCENT cast_expression {
+
 		TR_LOGGER.PushReduction(
 			"multiplicative_expression PERCENT cast_expression "
 			"-> multiplicative_expression");

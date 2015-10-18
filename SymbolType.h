@@ -57,6 +57,7 @@ std::istream& operator >>(std::istream &is, FunctionInfo &function_info);
 union SymbolValue {
 	char char_val;
 	long long long_long_val;
+	int int_val;
 	unsigned long long unsigned_long_long_val;
 	double double_val;
 	std::string * string_val;
