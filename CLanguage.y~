@@ -1244,7 +1244,7 @@ identifier
 open_curly
 	: OPEN_CURLY {
 		S_TABLE.PushFrame();
-		INSERT_MODE = false;
+		INSERT_MODE = False;
 		TR_LOGGER.PushReduction("OPEN_CURLY-> open_curly");
 	}
 
