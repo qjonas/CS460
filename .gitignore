@@ -41,3 +41,7 @@ Thumbs.db
 *.tab.*
 lex.yy.*
 CLanguage
+
+# Backup Files #
+################
+*~
