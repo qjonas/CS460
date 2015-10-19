@@ -25,8 +25,6 @@ SymbolTable::SymbolTable() {
 bool SymbolTable::InsertSymbol(const string& name, SymbolInfo value) {
 	if(table_.front().find(name) == table_.front().end()){
 		table_.front()[name] = value;
-		cout << table_.front()[name].identifier_name 
-				 << " is now in the SymbolTable" << endl;
 		return true;
 	}
 	return false;
@@ -34,13 +32,14 @@ bool SymbolTable::InsertSymbol(const string& name, SymbolInfo value) {
 
 SymbolInfo* SymbolTable::GetMostRecentSymbolInfo(
 		const string& search_name) {
-	for(auto map_iter : table_) {
-		map<string, SymbolInfo>::iterator search_iter =
-				map_iter.find(search_name);
-		if(search_iter != map_iter.end()){ 
-			return &(search_iter->second);
+	for(list<map<string, SymbolInfo>>::iterator list_iter = table_.begin();
+			list_iter != table_.end(); list_iter++) {
+    cout << "Searching for " << search_name << endl;
+		if(list_iter->find(search_name) != list_iter->end()) {
+			return &((*list_iter)[search_name]);
 		}
 	}
+	cout << "Warning returning null pointer." << endl;
 	return NULL;
 }
 
@@ -87,7 +86,7 @@ void SymbolTable::Print() const {
 			cout << "\t{" << endl;
 			cout << "\t\tidentifier_name: " << ident_tuple.second.identifier_name << endl;
 			cout << "\t\ttype_specifier: ";
-			for(auto type_specifier : ident_tuple.second.type_specifier_list) {
+			for(SymbolTypes::SymbolType type_specifier : ident_tuple.second.type_specifier_list) {
 				cout << type_specifier << " ";
 			}
 			cout << endl;
@@ -99,6 +98,21 @@ void SymbolTable::Print() const {
 			cout << endl;
 			cout << "\t\ttypedef_name: " << ident_tuple.second.typedef_name << endl;
 			cout << "\t\tis_function: " << ident_tuple.second.is_function << endl;
+			cout << "\t\tparameters_types: ";
+			for(auto list_ : ident_tuple.second.parameters_types) {
+				cout << "{ ";
+				for(auto type : list_) {
+					cout << type << " ";
+				}
+				cout << "} ";
+			}
+			cout << endl;
+      cout << "\t\tpointer_count: " << ident_tuple.second.pointer_count << endl;
+			cout << "\t\tarray_sizes: ";
+			for(auto size : ident_tuple.second.array_sizes) {
+				cout << size << " ";
+			}
+			cout << endl;
 			cout << "\t}" << endl;
 		}
 	}
@@ -130,4 +144,64 @@ void SymbolTable::CopyFromFile(const string& file_name) {
 }
 
 SymbolInfo::SymbolInfo() : storage_class_specifier(NONE), is_function(false),
-	data_is_valid(false), pointer_count(0) {}
+	data_is_valid(false), pointer_count(0), range_start(-1) {}
+
+ostream& operator <<(ostream &os, SymbolType symbol_type) {
+  switch (symbol_type) {
+    case STRUCT:
+      os << "STRUCT"; break;
+    case UNION:
+      os << "UNION"; break;
+    case ENUM:
+      os << "ENUM"; break;
+    case TYPEDEF_NAME:
+      os << "TYPEDEF_NAME"; break;
+    case SIGNED:
+      os << "SIGNED"; break;
+    case UNSIGNED:
+      os << "UNSIGNED"; break;
+    case SHORT:
+      os << "SHORT"; break;
+    case LONG:
+      os << "LONG"; break;
+    case CHAR:
+      os << "CHAR"; break;
+    case INT:
+      os << "INT"; break;
+    case FLOAT:
+      os << "FLOAT"; break;
+    case DOUBLE:
+      os << "DOUBLE"; break;
+    case STRING:
+      os << "STRING"; break;
+  }
+  return os;
+}
+
+ostream& operator<<(ostream &os, SymbolTypes::StorageClassSpecifier storage_class_specifier) {
+  switch (storage_class_specifier) {
+    case NONE:
+      os << "NONE"; break;
+    case AUTO:
+      os << "AUTO"; break;
+    case REGISTER:
+      os << "REGISTER"; break;
+    case STATIC:
+      os << "STATIC"; break;
+    case EXTERN:
+      os << "EXTERN"; break;
+    case TYPEDEF:
+      os << "TYPEDEF"; break;
+  }
+  return os;
+}
+ostream& operator<<(ostream &os, SymbolTypes::TypeQualifier type_qualifier) {
+  switch (type_qualifier) {
+    case CONST:
+      os << "CONST"; break;
+    case VOLATILE:
+      os << "VOLATILE"; break;
+  }
+  return os;
+}
+

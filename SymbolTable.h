@@ -16,6 +16,21 @@
 
 struct SymbolInfo;
 
+// SymbolType will enumerate the primitive data types in C.
+namespace SymbolTypes{
+enum SymbolType {
+	STRUCT, UNION, ENUM, TYPEDEF_NAME, SIGNED, UNSIGNED, SHORT, LONG, 
+	CHAR, INT, FLOAT, DOUBLE, STRING
+};
+enum StorageClassSpecifier {
+	NONE, AUTO, REGISTER, STATIC, EXTERN, TYPEDEF
+};
+enum TypeQualifier {
+	CONST, VOLATILE
+};
+const int NO_ARRAY_SIZE = -1;
+}
+
 class SymbolTable {
 public:
 	// Constructor
@@ -57,19 +72,7 @@ public:
 	std::list< std::map<std::string, SymbolInfo> > table_;
 };
 
-// SymbolType will enumerate the primitive data types in C.
-namespace SymbolTypes{
-enum SymbolType {
-	STRUCT, UNION, ENUM, TYPEDEF_NAME, SIGNED, UNSIGNED, SHORT, LONG, 
-	CHAR, INT, FLOAT, DOUBLE, STRING
-};
-enum StorageClassSpecifier {
-	NONE, AUTO, REGISTER, STATIC, EXTERN, TYPEDEF
-};
-enum TypeQualifier {
-	CONST, VOLATILE
-};
-}
+
 
 // SymbolValue will union the values of the identifiers.
 union SymbolValue {
@@ -83,6 +86,7 @@ union SymbolValue {
 // SymbolInfo will store all of the information of the identifier.
 typedef struct SymbolInfo {
 	SymbolInfo();
+
 	/* Basic SymbolInfo */
 	// Identifier name will store the name of the identifier.
 	// Only SymbolInfos with names are going to be in the Symbol table.
@@ -90,10 +94,8 @@ typedef struct SymbolInfo {
 
 	// Data value will store a pointer to the value of associated with an identifier.
 	SymbolValue data_value;
-
 	// Denotes if the data value is still valid for value checking
 	bool data_is_valid;
-
 
 	/* Members Deaing with Data Type */
 	// Data type will store the enumerated SymbolType value of the identifier.
@@ -128,7 +130,7 @@ typedef struct SymbolInfo {
 
 	// Parameter types will list the parameter types of a function.
 	// ex: int foo(int i, char c, double d);
-	// parameter_types = {INT, CHAR, DOUBLE};
+	// parameter_types = {{INT}, {CHAR}, {DOUBLE}};
 	std::list<std::list<SymbolTypes::SymbolType> > parameters_types;
 
 	// Range start will denote which parameter holds the elipses.
@@ -141,6 +143,9 @@ typedef struct SymbolInfo {
 	int range_start;
 } SymbolInfo;
 
+std::ostream& operator<<(std::ostream &os, SymbolTypes::SymbolType symbol_type);
+std::ostream& operator<<(std::ostream &os, SymbolTypes::StorageClassSpecifier storage_class_specifier);
+std::ostream& operator<<(std::ostream &os, SymbolTypes::TypeQualifier type_qualifier);
 
 
 #endif /* SYMBOLTABLE_H_ */

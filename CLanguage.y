@@ -190,11 +190,26 @@ function_definition
 
 declaration
 	: declaration_specifiers SEMI {
+		// Log reduction.
 		TR_LOGGER.PushReduction("declaration_specifiers SEMI -> declaration");
+		// Do nothing
 	}
 	| declaration_specifiers init_declarator_list SEMI {
+		// Log reduction.
 		TR_LOGGER.PushReduction(
-			"declaration_specifiers init declarator_list SEMI -> declaration");
+			"declaration_specifiers init_declarator_list SEMI -> declaration");
+		// Give each identifier in the list the type from the 
+		// declaration specifiers.
+		SymbolInfo* temp = S_TABLE.GetMostRecentSymbolInfo($2.front().identifier_name);
+		temp->type_specifier_list = $1.front().type_specifier_list;
+		for(auto qualifier : $1.front().type_qualifier_list) {
+			temp->type_qualifier_list.push_back(qualifier);
+		}
+		temp->storage_class_specifier = $1.front().storage_class_specifier;
+
+		if(!(IsTypeQualifierValid(*temp))) {
+			TR_LOGGER.Error("Qualifier not valid.", LINE, COLUMN);
+		}
 	}
 	;
 
@@ -260,8 +275,10 @@ declaration_specifiers
 		$$ = $1;
 	}
 	| type_qualifier declaration_specifiers {
+		// Log reduction
 		TR_LOGGER.PushReduction(
 			"type_qualifier declaration_specifiers -> declaration_specifiers");
+
 		// Push type qualifier to the front
 		$2.front().type_qualifier_list.push_front($1.front().type_qualifier_list.front());
 
@@ -398,21 +415,35 @@ struct_declaration_list
 
 init_declarator_list
 	: init_declarator {
+		// Log Reduction
 		TR_LOGGER.PushReduction("init_declarator -> init_declarator_list");
+		// Pass through
+		$$ = $1;
 	}
 	| init_declarator_list COMMA init_declarator {
+		// Log Reduction
 		TR_LOGGER.PushReduction(
 			"init_declarator_list COMMA init_declarator -> init_declarator_list");
+
+		// Add new declarator to the back and pass through
+		$$ = $1;
 	}
 	;
 
 init_declarator
 	: declarator {
+		// Log reduction
 		TR_LOGGER.PushReduction("declarator -> init_declarator");
+		// Pass through
+		$$ = $1;
 	}
 	| declarator EQUALS_SIGN initializer {
+		// Log reduction
 		TR_LOGGER.PushReduction(
 			"declarator EQUALS_SIGN initializer -> init_declarator");
+		// Assign value of declarator to the initializer
+		
+
 	}
 	;
 
@@ -503,11 +534,47 @@ enumerator
 
 declarator
 	: direct_declarator {
-		$$ = $1;
+		// Log reduction
 		TR_LOGGER.PushReduction("direct_declarator -> declarator");
+
+		// Pass through
+		$$ = $1;
 	}
 	| pointer direct_declarator {
+		// Log reduction
 		TR_LOGGER.PushReduction("pointer_direct_declarator -> declarator");
+
+		// Combine type qualifier lists
+		cout << "HERE: " << $1.front().type_qualifier_list.size() << endl;
+
+		for(list<SymbolTypes::TypeQualifier>::iterator iter = $1.front().type_qualifier_list.begin();
+		iter != $1.front().type_qualifier_list.end(); iter++) {
+			cout << "PUSHING: " << *iter << endl;
+			$2.front().type_qualifier_list.push_back(*iter);
+		}
+
+		for(list<SymbolTypes::TypeQualifier>::iterator iter = $2.front().type_qualifier_list.begin();
+		iter != $2.front().type_qualifier_list.end(); iter++) {
+			cout << "PUSHED: " << *iter << endl;
+		}
+
+		if(!(IsTypeQualifierValid($2.front()))){
+			TR_LOGGER.Error("Qualifier is invalid.", LINE, COLUMN);
+		}
+
+		// Copy pointer_count
+		$2.front().pointer_count = $1.front().pointer_count;
+
+		// Get the symbol in the symbol table and assign it to what is here.
+		SymbolInfo* temp = S_TABLE.GetMostRecentSymbolInfo($2.front().identifier_name);
+		*temp = $2.front();
+
+		for(list<SymbolTypes::TypeQualifier>::iterator iter = temp->type_qualifier_list.begin();
+		iter != temp->type_qualifier_list.end(); iter++) {
+			cout << "ST_HAS: " << *iter << endl;
+		}
+
+		$$ = $2;
 	}
 	;
 
@@ -524,39 +591,134 @@ direct_declarator
 			"OPEN_PAREN declarator CLOSE_PAREN -> direct_declarator");
 	}
 	| direct_declarator OPEN_SQUARE CLOSE_SQUARE {
+		// Log Reduction
 		TR_LOGGER.PushReduction(
 			"direct_declarator OPEN_SQUARE CLOSE_SQUARE -> direct_declarator");
+
+		if($1.front().is_function) {
+			TR_LOGGER.Error("Cannot make an array from a function.", LINE, COLUMN);
+		}
+
+		// Push back the new array size
+		$1.front().array_sizes.push_back(SymbolTypes::NO_ARRAY_SIZE);
+
+		// Get the symbol in the symbol table and assign it to what is here.
+		SymbolInfo* temp = S_TABLE.GetMostRecentSymbolInfo($1.front().identifier_name);
+		*temp = $1.front();
+
+		// Pass through
+		$$ = $1;
 	}
 	| direct_declarator OPEN_SQUARE constant_expression CLOSE_SQUARE {
 		TR_LOGGER.PushReduction(
 			"direct_declarator OPEN_SQUARE constant_expression CLOSE_SQUARE "
 			"-> direct_declarator");
 	}
-	| direct_declarator OPEN_PAREN CLOSE_PAREN {
+	| direct_declarator open_paren_scope close_paren_scope {
+		// Log Reduction
 		TR_LOGGER.PushReduction(
 			"direct_declarator OPEN_PAREN CLOSE_PAREN -> direct_declarator");
+
+		// Error if identifier is already a function
+		if($1.front().is_function) {
+			TR_LOGGER.Error("Identifier already declared as a function",
+										  LINE, COLUMN);
+		}
+
+		// Error if declared as an array
+		if($1.front().array_sizes.size() > 0) {
+			TR_LOGGER.Error("Identifier already declared as an array", LINE, COLUMN);
+		}
+
+		// Push set to be a function
+		$1.front().is_function = true;
+
+		// Get the symbol in the symbol table and assign it to what is here.
+		SymbolInfo* temp = S_TABLE.GetMostRecentSymbolInfo($1.front().identifier_name);
+		*temp = $1.front();
+
+		// Pass through
+		$$ = $1;
 	}
-	| direct_declarator OPEN_PAREN parameter_type_list CLOSE_PAREN  {
+	| direct_declarator open_paren_scope parameter_type_list close_paren_scope  {
 		TR_LOGGER.PushReduction(
 			"direct_declarator OPEN_PAREN parameter_type_list CLOSE_PAREN "
 			"-> direct_declarator");
 	}
-	| direct_declarator OPEN_PAREN identifier_list CLOSE_PAREN {
+	| direct_declarator open_paren_scope identifier_list close_paren_scope {
+		// Log Reduction
 		TR_LOGGER.PushReduction(
 			"direct_declarator OPEN_PAREN identifier_list CLOSE_PAREN "
 			"-> direct_declarator");
+
+		// Error if identifier is already a function
+		if($1.front().is_function) {
+			TR_LOGGER.Error("Identifier already declared as a function",
+										  LINE, COLUMN);
+		}
+
+		// Error if declared as an array
+		if($1.front().array_sizes.size() > 0) {
+			TR_LOGGER.Error("Identifier already declared as an array", LINE, COLUMN);
+		}
+
+		// Define it to be a function
+		$1.front().is_function = true;
+
+		// Define the function to take in integers based on the num of identifiers
+		for(int i = 0; i < $3.size(); i++) {
+			$1.front().parameters_types
+					.push_back(*(new list<SymbolTypes::SymbolType>({SymbolTypes::INT})));
+		}
+
+		// Get the symbol in the symbol table and assign it to what is here.
+		SymbolInfo* temp = S_TABLE.GetMostRecentSymbolInfo($1.front().identifier_name);
+		*temp = $1.front();
+
+		// Pass through
+		$$ = $1;
+	}
+	;
+
+open_paren_scope 
+	: OPEN_PAREN {
+		S_TABLE.PushFrame();
+	}
+	;
+
+close_paren_scope
+	: CLOSE_PAREN {
+		S_TABLE.PopFrame();
 	}
 	;
 
 pointer
 	: ASTERISK {
+		// Log reduction.
 		TR_LOGGER.PushReduction("ASTERISK -> pointer");
+
+		$$ = *(new list<SymbolInfo>());
+		$$.push_back(*(new SymbolInfo()));
+		$$.front().pointer_count = 1;
 	}
 	| ASTERISK type_qualifier_list {
+		// Log reduction
 		TR_LOGGER.PushReduction("ASTERISK type_qualifier_list -> pointer");
+
+		// Make point count 1
+		$2.front().pointer_count = 1;
+
+		// Pass through
+		$$ = $2;
 	}
 	| ASTERISK pointer {
+		// Log reduction
 		TR_LOGGER.PushReduction("ASTERISK pointer -> pointer");
+
+		// increase pointer count
+		$2.front().pointer_count++;
+
+		$$ = $2;
 	}
 	| ASTERISK type_qualifier_list pointer {
 		TR_LOGGER.PushReduction("ASTERISK type_qualifier_list pointer -> pointer");
@@ -565,11 +727,24 @@ pointer
 
 type_qualifier_list
 	: type_qualifier {
+		// Log reduction.
 		TR_LOGGER.PushReduction("type_qualifier -> type_qualifier_list");
+
+		$$ = $1;
 	}
 	| type_qualifier_list type_qualifier {
+		// Log reduction
 		TR_LOGGER.PushReduction(
 			"type_qualifier_list type_qualifier -> type_qualifier_list");
+
+		// Add type qualifier
+		$1.front().type_qualifier_list.push_back($2.front().type_qualifier_list.front());
+
+		// Check type qualifier
+		if(!(IsTypeQualifierValid($1.front()))) {
+			TR_LOGGER.Error("Invalid Qualifier.", LINE, COLUMN);
+		}
+		$$ = $1;
 	}
 	;
 
@@ -609,11 +784,24 @@ parameter_declaration
 
 identifier_list
 	: identifier {
+		// Log Reduction
 		TR_LOGGER.PushReduction("identifier -> identifier_list");
+
+		cout << $1.size() << " " ;
+
+		// Pass through
+		$$ = $1; 
 	}
 	| identifier_list COMMA identifier {
+		// Log reduction
 		TR_LOGGER.PushReduction(
 			"identifier_list COMMA identifier -> identifier_list");
+
+		// Add identifier to the list
+		$1.push_back($3.front());
+
+		// Pass through
+		$$ = $1;
 	}
 	;
 

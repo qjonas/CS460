@@ -48,6 +48,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "auto"	{
 	TR_LOGGER.PushToken("AUTO");
 	TR_LOGGER.PushSourceWord(yytext);
+	yylval = *(new list<SymbolInfo>());
 	yylval.push_back(*(new SymbolInfo));
 	yylval.front().storage_class_specifier = SymbolTypes::AUTO;
 	COLUMN += yyleng;
@@ -71,6 +72,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "char"	{
 	TR_LOGGER.PushToken("CHAR");
 	TR_LOGGER.PushSourceWord(yytext);
+	yylval = *(new list<SymbolInfo>());
 	yylval.push_back(*(new SymbolInfo));
 	yylval.front().type_specifier_list.push_back(SymbolTypes::CHAR);
 	COLUMN += yyleng;
@@ -80,6 +82,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "const"	{
 	TR_LOGGER.PushToken("CONST");
 	TR_LOGGER.PushSourceWord(yytext);
+	yylval = *(new list<SymbolInfo>());
 	yylval.push_back(*(new SymbolInfo));
 	yylval.front().type_qualifier_list.push_back(SymbolTypes::CONST);
 	COLUMN += yyleng;
@@ -110,6 +113,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "double"	{
 	TR_LOGGER.PushToken("DOUBLE");
 	TR_LOGGER.PushSourceWord(yytext);
+	yylval = *(new list<SymbolInfo>());
 	yylval.push_back(*(new SymbolInfo));
 	yylval.front().type_specifier_list.push_back(SymbolTypes::DOUBLE);
 	COLUMN += yyleng;
@@ -126,6 +130,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "enum"	{
 	TR_LOGGER.PushToken("ENUM");
 	TR_LOGGER.PushSourceWord(yytext);
+	yylval = *(new list<SymbolInfo>());
 	yylval.push_back(*(new SymbolInfo));
 	yylval.front().type_specifier_list.push_back(SymbolTypes::ENUM);
 	COLUMN += yyleng;
@@ -135,6 +140,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "extern"	{
 	TR_LOGGER.PushToken("EXTERN");
 	TR_LOGGER.PushSourceWord(yytext);
+	yylval = *(new list<SymbolInfo>());
 	yylval.push_back(*(new SymbolInfo));
 	yylval.front().storage_class_specifier = SymbolTypes::EXTERN;
 	COLUMN += yyleng;
@@ -144,6 +150,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "float"	{
 	TR_LOGGER.PushToken("FLOAT");
 	TR_LOGGER.PushSourceWord(yytext);
+	yylval = *(new list<SymbolInfo>());
 	yylval.push_back(*(new SymbolInfo));
 	yylval.front().type_specifier_list.push_back(SymbolTypes::FLOAT);
 	COLUMN += yyleng;
@@ -174,6 +181,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "int"	{
 	TR_LOGGER.PushToken("INT");
 	TR_LOGGER.PushSourceWord(yytext);
+	yylval = *(new list<SymbolInfo>());
 	yylval.push_back(*(new SymbolInfo));
 	yylval.front().type_specifier_list.push_back(SymbolTypes::INT);
 	COLUMN += yyleng;
@@ -183,6 +191,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "long"	{
 	TR_LOGGER.PushToken("LONG");
 	TR_LOGGER.PushSourceWord(yytext);
+	yylval = *(new list<SymbolInfo>());
 	yylval.push_back(*(new SymbolInfo));
 	yylval.front().type_specifier_list.push_back(SymbolTypes::LONG);
 	COLUMN += yyleng;
@@ -192,6 +201,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "register"	{
 	TR_LOGGER.PushToken("REGISTER");
 	TR_LOGGER.PushSourceWord(yytext);
+	yylval = *(new list<SymbolInfo>());
 	yylval.push_back(*(new SymbolInfo));
 	yylval.front().storage_class_specifier = SymbolTypes::REGISTER;
 	COLUMN += yyleng;
@@ -208,6 +218,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "short"	{
 	TR_LOGGER.PushToken("SHORT");
 	TR_LOGGER.PushSourceWord(yytext);
+	yylval = *(new list<SymbolInfo>());
 	yylval.push_back(*(new SymbolInfo));
 	yylval.front().type_specifier_list.push_back(SymbolTypes::SHORT);
 	COLUMN += yyleng;
@@ -217,6 +228,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "signed"	{
 	TR_LOGGER.PushToken("SIGNED");
 	TR_LOGGER.PushSourceWord(yytext);
+	yylval = *(new list<SymbolInfo>());
 	yylval.push_back(*(new SymbolInfo));
 	yylval.front().type_specifier_list.push_back(SymbolTypes::SIGNED);
 	COLUMN += yyleng;
@@ -233,6 +245,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "static"	{
 	TR_LOGGER.PushToken("STATIC");
 	TR_LOGGER.PushSourceWord(yytext);
+	yylval = *(new list<SymbolInfo>());
 	yylval.push_back(*(new SymbolInfo));
 	yylval.front().storage_class_specifier = SymbolTypes::STATIC;
 	COLUMN += yyleng;
@@ -242,6 +255,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "struct"	{
 	TR_LOGGER.PushToken("STRUCT");
 	TR_LOGGER.PushSourceWord(yytext);
+	yylval = *(new list<SymbolInfo>());
 	yylval.push_back(*(new SymbolInfo));
 	yylval.front().type_specifier_list.push_back(SymbolTypes::STRUCT);
 	COLUMN += yyleng;
@@ -258,6 +272,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "typedef"	{
 	TR_LOGGER.PushToken("TYPEDEF");
 	TR_LOGGER.PushSourceWord(yytext);
+	yylval = *(new list<SymbolInfo>());
 	yylval.push_back(*(new SymbolInfo));
 	yylval.front().storage_class_specifier = SymbolTypes::TYPEDEF;
 	COLUMN += yyleng;
@@ -267,6 +282,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "union"	{
 	TR_LOGGER.PushToken("UNION");
 	TR_LOGGER.PushSourceWord(yytext);
+	yylval = *(new list<SymbolInfo>());
 	yylval.push_back(*(new SymbolInfo));
 	yylval.front().type_specifier_list.push_back(SymbolTypes::UNION);
 	COLUMN += yyleng;
@@ -276,6 +292,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "unsigned"	{
 	TR_LOGGER.PushToken("UNSIGNED");
 	TR_LOGGER.PushSourceWord(yytext);
+	yylval = *(new list<SymbolInfo>());
 	yylval.push_back(*(new SymbolInfo));
 	yylval.front().type_specifier_list.push_back(SymbolTypes::UNSIGNED);
 	COLUMN += yyleng;
@@ -292,6 +309,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "volatile"	{
 	TR_LOGGER.PushToken("VOLATILE");
 	TR_LOGGER.PushSourceWord(yytext);
+	yylval = *(new list<SymbolInfo>());
 	yylval.push_back(*(new SymbolInfo));
 	yylval.front().type_qualifier_list.push_back(SymbolTypes::VOLATILE);
 	COLUMN += yyleng;
@@ -316,9 +334,8 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 	COLUMN += yyleng;
 
 	// Get most recent symbol info.
-	SymbolInfo* info = S_TABLE.GetMostRecentSymbolInfo(yytext);
-	if(info != NULL && 
-		 info->storage_class_specifier == SymbolTypes::TYPEDEF) {
+	if(S_TABLE.Has(yytext) && 
+		 S_TABLE.GetMostRecentSymbolInfo(yytext)->storage_class_specifier == SymbolTypes::TYPEDEF) {
 		// If it is a typedef log and return typedef.
 		yylval.push_back(*(new SymbolInfo));
 		yylval.front().type_specifier_list.front() = SymbolTypes::TYPEDEF_NAME;
@@ -347,6 +364,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 
 		// Insert into table
 		S_TABLE.InsertSymbol(yytext, insert_info);
+		yylval = *(new list<SymbolInfo>);
 		yylval.push_front(insert_info);
 
 		// Log and return
@@ -355,8 +373,9 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 
 	} else { // Lookup mode.
 		cout << "In lookup mode." << endl;
-		if(info != NULL) { // The info can be accessed
-			yylval.push_front(*info);
+		if(S_TABLE.Has(yytext)) { // The info can be accessed
+			yylval = *(new list<SymbolInfo>);
+			yylval.push_front(*(S_TABLE.GetMostRecentSymbolInfo(yytext)));
 			TR_LOGGER.PushToken("IDENTIFIER");
 			return IDENTIFIER;
 		} else {
