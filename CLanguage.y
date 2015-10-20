@@ -1403,7 +1403,15 @@ unary_expression
 
 		// Make the data_value positive. Probably something like pushing a 0 to the 
 		// highest bit.
-		$$ = $2;
+		if(isNumber($2)){
+
+			if( (($2.front().data_value.long_long_val) < 0) ){
+			$$.front().data_value.long_long_val = (-1)*($2.front().data_value.long_long_val);
+			}
+		}
+		else{
+			TR_LOGGER.Error("Unkown type conversion, check that data is of type, char, int, or double.", LINE, COLUMN);
+		}
 	}
 	| MINUS cast_expression {
 		// Log reduction
