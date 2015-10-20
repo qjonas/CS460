@@ -1412,31 +1412,46 @@ unary_expression
 
 		// Make the data_value positive. Probably something like pushing a 0 to the 
 		// highest bit.
-		if(isNumber($2)){
+		if($2.front().data_is_valid){
+			if(IsNumber($2.front()) ){
 
-			if( (($2.front().data_value.long_long_val) < 0) ){
-			$$.front().data_value.long_long_val = (-1)*($2.front().data_value.long_long_val);
+				if( (($2.front().data_value.long_long_val) < 0) ){
+				$$.front().data_value.long_long_val = (-1)*($2.front().data_value.long_long_val);
+				}
 			}
-		}
-		else{
-			TR_LOGGER.Error("Unkown type conversion, check that data is of type, char, int, or double.", LINE, COLUMN);
+			else{
+				TR_LOGGER.Error("Unkown type conversion, check that data is of type, char, int, or double.", LINE, COLUMN);
+			}
 		}
 	}
 	| MINUS cast_expression {
 		// Log reduction
 		TR_LOGGER.PushReduction("MINUS cast_expression -> unary_expression");
 
-		// Check if unsigned.
-
-		// Make the data_value negative. Probably something like pushing a 0 to the 
-		// highest bit.
+		// Check if unsigned. TODO
+		if($2.front().data_is_valid){
+			if(IsNumber($2.front()) ){
+				$$.front().data_value.long_long_val = (-1)*($2.front().data_value.long_long_val);
+			}
+			else{
+				TR_LOGGER.Error("Unkown type conversion, check that data is of type, char, int, or double.", LINE, COLUMN);
+			}
+		}
 	}
 	| TILDE cast_expression {
 		// Log reduction
 		TR_LOGGER.PushReduction("TILDE cast_expression -> unary_expression");
+		// Bitwise not operator 
+		// Must be a number 
+		if($2.front().data_is_valid){
+			if(IsNumber($2.front()) ){
+				$$.front().data_value.long_long_val = ~($2.front().data_value.long_long_val);
+			}
+			else{
+				TR_LOGGER.Error("Unkown type conversion, check that data is of type, char, int, or double.", LINE, COLUMN);
+			}
+		}
 
-		// Logical not operator 
-		// Must be integer based
 		// ~n = -(n+1)
 		// Do this and pass through 
 	}
