@@ -14,6 +14,7 @@
 #include  "CommandLineFlags.h"
 #include  "SymbolTable.h"
 #include  "TokenReductionsLogger.h"
+#include 	"SymbolInfoUtil.h"
 
 using namespace std;
 
@@ -43,6 +44,10 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 %}
 "!!" {
 	S_TABLE.Print();
+}
+
+"!!!" {
+	Harris();
 }
 
 "auto"	{

@@ -17,6 +17,7 @@
 #include  "CommandLineFlags.h"
 #include  "TokenReductionsLogger.h"
 #include 	"SymbolInfoUtil.h"
+#include 	"Escape_Sequences_Colors.h"
 
 using namespace std;
 %}
@@ -495,6 +496,7 @@ init_declarator
 						= (long long) $3.front().data_value.double_val;
 				}
 			}
+			$1.front().data_is_valid = true;
 		} else {
 			$1.front().data_is_valid = false;
 		}
@@ -503,7 +505,7 @@ init_declarator
 		*temp = $1.front();
 
 		$$ = *(new list<SymbolInfo>({*temp}));
-
+		INSERT_MODE = true;
 	}
 	;
 
@@ -629,6 +631,7 @@ declarator
 
 		// Pass through
 		$$ = $1;
+
 	}
 	| pointer direct_declarator {
 		// Log reduction
@@ -677,6 +680,8 @@ direct_declarator
 
 		// Pass through
 		$$ = $1;
+
+		INSERT_MODE = false;
 	}
 	| OPEN_PAREN declarator CLOSE_PAREN {
 		TR_LOGGER.PushReduction(
@@ -1195,9 +1200,21 @@ assignment_expression
 		$$ = $1;
 	}
 	| unary_expression assignment_operator assignment_expression {
+		// Log reduction
 		TR_LOGGER.PushReduction(
 			"unary_expression assignment_operator assignment_expression "
 			"-> assignment_expression");
+
+		// TODO: TypeCheck
+		// Copy value
+		$1.front().data_value.unsigned_long_long_val = $3.front().data_value.unsigned_long_long_val;
+		$1.front().data_is_valid = true;
+
+		SymbolInfo* temp = S_TABLE.GetMostRecentSymbolInfo($1.front().identifier_name);
+		*temp = $1.front();
+
+		// Pass through
+		$$ = $1;
 	}
 	;
 
@@ -2535,13 +2552,14 @@ primary_expression
 		TR_LOGGER.PushReduction("identifier -> primary_expression");
 		// Pass through
 		$$ = $1;
+		cout << "VALUE: " << $$.front().data_value.unsigned_long_long_val << endl;
+
 	}
 	| constant {
 		// Log reduction
 		TR_LOGGER.PushReduction("constant -> primary_expression");
 		// Pass through
 		$$ = $1;
-		cout << "VALUE: " << $$.front().data_value.unsigned_long_long_val << endl;
 	}
 	| string {
 		// Log reduction
