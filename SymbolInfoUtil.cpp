@@ -5,6 +5,8 @@
 #include <list>
 #include <ostream>
 #include <set>
+#include <climits>
+#include <cfloat>
 
 #include "SymbolTable.h"
 
@@ -489,31 +491,111 @@ bool IsUnsigned(const SymbolInfo& symbol_info) {
           != valid_data_types.end());
 }
 
-bool checkOverflow(const SymbolInfo& symbol_info, bool inc_or_dec){
-	//Declare to check overflow addition and substraction
+long double maxValue(const SymbolInfo& symbol_info){
+	// Declare set to check if type exists for types.
+  static map<list<SymbolType>, long double> max_value;
+  static bool max_value_initialized = false;
 
+  // Initialize the set with valid data types.
+  if(!max_value_initialized) {
+    // Char data types
+    max_value[list<SymbolType>({CHAR})] = SCHAR_MAX;
+    max_value[list<SymbolType>({SIGNED, CHAR})] = SCHAR_MAX;
+    max_value[list<SymbolType>({UNSIGNED, CHAR})] = UCHAR_MAX;
+    
+    // Short data types
+    max_value[list<SymbolType>({SHORT})] = SHRT_MAX;
+    max_value[list<SymbolType>({SHORT, INT})] = SHRT_MAX;
+    max_value[list<SymbolType>({SIGNED, SHORT})] = SHRT_MAX;
+    max_value[list<SymbolType>({SIGNED, SHORT, INT})] = SHRT_MAX;
+    max_value[list<SymbolType>({UNSIGNED, SHORT})] = USHRT_MAX;
+    max_value[list<SymbolType>({UNSIGNED, SHORT, INT})] = USHRT_MAX;
 
+    // Regular int data types
+    max_value[list<SymbolType>({INT})] = INT_MAX;
+    max_value[list<SymbolType>({SIGNED})] = INT_MAX;
+    max_value[list<SymbolType>({SIGNED, INT})] = INT_MAX;
+    max_value[list<SymbolType>({UNSIGNED})] = UINT_MAX;
+    max_value[list<SymbolType>({UNSIGNED, INT})] = UINT_MAX;
 
+    // Long data Types
+    max_value[list<SymbolType>({LONG})] = LONG_MAX;
+    max_value[list<SymbolType>({LONG, INT})] = LONG_MAX;
+    max_value[list<SymbolType>({SIGNED, LONG})] = LONG_MAX;
+    max_value[list<SymbolType>({SIGNED, LONG, INT})] = LONG_MAX;
+    max_value[list<SymbolType>({UNSIGNED, LONG})] = ULONG_MAX;
+    max_value[list<SymbolType>({UNSIGNED, LONG, INT})] = ULONG_MAX;
 
+    // Long Long data Types
+    max_value[list<SymbolType>({LONG, LONG})] = LLONG_MAX;
+    max_value[list<SymbolType>({LONG, LONG, INT})] = LLONG_MAX;
+    max_value[list<SymbolType>({SIGNED, LONG, LONG})] = LLONG_MAX;
+    max_value[list<SymbolType>({SIGNED, LONG, LONG, INT})] = LLONG_MAX;
+    max_value[list<SymbolType>({UNSIGNED, LONG, LONG})] = ULLONG_MAX;
+    max_value[list<SymbolType>({UNSIGNED, LONG, LONG, INT})] = ULLONG_MAX;
 
+    // Floating point data types
+    max_value[list<SymbolType>({FLOAT})] = FLT_MAX;
+    max_value[list<SymbolType>({DOUBLE})] = DBL_MAX;
+    max_value[list<SymbolType>({LONG, DOUBLE})] = LDBL_MAX;
 
+    max_value_initialized = true;
+  }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  return max_value[symbol_info.type_specifier_list];
 }
+
+long double minValue(const SymbolInfo& symbol_info){
+	// Declare set to check if type exists for types.
+  static map<list<SymbolType>, long double> min_value;
+  static bool min_value_initialized = false;
+
+  // Initialize the set with valid data types.
+  if(!min_value_initialized) {
+    // Char data types
+    min_value[list<SymbolType>({CHAR})] = SCHAR_MIN;
+    min_value[list<SymbolType>({SIGNED, CHAR})] = SCHAR_MIN;
+    min_value[list<SymbolType>({UNSIGNED, CHAR})] = 0;
+    
+    // Short data types
+    min_value[list<SymbolType>({SHORT})] = SHRT_MIN;
+    min_value[list<SymbolType>({SHORT, INT})] = SHRT_MIN;
+    min_value[list<SymbolType>({SIGNED, SHORT})] = SHRT_MIN;
+    min_value[list<SymbolType>({SIGNED, SHORT, INT})] = SHRT_MIN;
+    min_value[list<SymbolType>({UNSIGNED, SHORT})] = 0;
+    min_value[list<SymbolType>({UNSIGNED, SHORT, INT})] = 0;
+
+    // Regular int data types
+    min_value[list<SymbolType>({INT})] = INT_MIN;
+    min_value[list<SymbolType>({SIGNED})] = INT_MIN;
+    min_value[list<SymbolType>({SIGNED, INT})] = INT_MIN;
+    min_value[list<SymbolType>({UNSIGNED})] = 0;
+    min_value[list<SymbolType>({UNSIGNED, INT})] = 0;
+
+    // Long data Types
+    min_value[list<SymbolType>({LONG})] = LONG_MIN;
+    min_value[list<SymbolType>({LONG, INT})] = LONG_MIN;
+    min_value[list<SymbolType>({SIGNED, LONG})] = LONG_MIN;
+    min_value[list<SymbolType>({SIGNED, LONG, INT})] = LONG_MIN;
+    min_value[list<SymbolType>({UNSIGNED, LONG})] = 0;
+    min_value[list<SymbolType>({UNSIGNED, LONG, INT})] = 0;
+
+    // Long Long data Types
+    min_value[list<SymbolType>({LONG, LONG})] = LLONG_MIN;
+    min_value[list<SymbolType>({LONG, LONG, INT})] = LLONG_MIN;
+    min_value[list<SymbolType>({SIGNED, LONG, LONG})] = LLONG_MIN;
+    min_value[list<SymbolType>({SIGNED, LONG, LONG, INT})] = LLONG_MIN;
+    min_value[list<SymbolType>({UNSIGNED, LONG, LONG})] = 0;
+    min_value[list<SymbolType>({UNSIGNED, LONG, LONG, INT})] = 0;
+
+    // Floating point data types
+    min_value[list<SymbolType>({FLOAT})] = FLT_MIN;
+    min_value[list<SymbolType>({DOUBLE})] = DBL_MIN;
+    min_value[list<SymbolType>({LONG, DOUBLE})] = LDBL_MIN;
+
+    min_value_initialized = true;
+  }
+
+  return min_value[symbol_info.type_specifier_list];
+}
+
