@@ -1774,6 +1774,51 @@ multiplicative_expression
 			"-> multiplicative_expression");
 		//$$ = $1 * $2;
 		//long Double maxValue(SymbolInfo)
+		if(!IsNumber($1.front()) || !IsNumber($3.front())){
+			TR_LOGGER.Error("Cannot divide multipy something not of NUMBER type.",
+											LINE, COLUMN);	
+		}
+		// data is valid
+		// Integer MULT
+			if(IsInteger($1.front()) && IsInteger($3.front())) {
+				if(IsUnsigned($1.front()) && IsUnsigned($3.front())) {
+					$$.front().data_value.unsigned_long_long_val = 
+							$1.front().data_value.unsigned_long_long_val 
+							* $3.front().data_value.unsigned_long_long_val;
+				} else if (!IsUnsigned($1.front()) && IsUnsigned($3.front())) {
+					$$.front().data_value.long_long_val = $1.front().data_value.long_long_val 
+							* $3.front().data_value.unsigned_long_long_val;
+				} else if (IsUnsigned($1.front()) && !IsUnsigned($3.front())) {
+					$$.front().data_value.long_long_val = $1.front().data_value.long_long_val 
+							* $3.front().data_value.unsigned_long_long_val;
+				} else {
+					$$.front().data_value.long_long_val = $1.front().data_value.long_long_val 
+							* $3.front().data_value.long_long_val;
+				}
+			// Both floating divide
+			} else if (IsFloating($1.front()) && IsFloating($3.front())) {
+				$$.front().data_value.double_val = $1.front().data_value.double_val * $3.front().data_value.double_val;
+			// Single floating divide
+			} else if (IsFloating($1.front())) {
+				if(IsUnsigned($3.front())) {
+					$$.front().data_value.double_val = $1.front().data_value.double_val 
+						* $3.front().data_value.unsigned_long_long_val;
+				} else {
+					$$.front().data_value.double_val = $1.front().data_value.double_val 
+						* $3.front().data_value.long_long_val;
+				}
+			} else {
+				if(IsUnsigned($1.front())) {
+					$$.front().data_value.double_val 
+						= $1.front().data_value.unsigned_long_long_val 
+								* $3.front().data_value.double_val;
+				} else {
+					$$.front().data_value.double_val 
+						= $1.front().data_value.long_long_val 
+						* $3.front().data_value.double_val;
+				}
+				$$.front().type_specifier_list = $3.front().type_specifier_list;
+			}
 	}
 	| multiplicative_expression FORWARD_SLASH cast_expression {
 			if($2.front().data_value.long_long_val == 0) {
