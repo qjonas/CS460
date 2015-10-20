@@ -461,19 +461,49 @@ struct_declaration
 	;
 
 specifier_qualifier_list
-	: type_specifier {
+	: type_specifier { 
+		// Log reduction
 		TR_LOGGER.PushReduction("type_specifier -> specifier_qualifier_list");
+
+		// Pass through
+		$$ = $1;
 	}
 	| type_specifier specifier_qualifier_list {
+		// Log reduction
 		TR_LOGGER.PushReduction(
 			"type_specifier specifier_qualifier_list -> specifier_qualifier_list");
+
+		// Add type specifier to declaration specifier
+		$2.front().type_specifier_list.push_front($1.front().type_specifier_list.front());
+		$$ = $2;
+
+		// Check if the data type is valid
+		if(!(IsDataTypeValid($2.front()))) {
+			TR_LOGGER.Error("Data Type not valid.", LINE, COLUMN);
+		}
 	}
 	| type_qualifier {
+		// Log reduction.
 		TR_LOGGER.PushReduction("type_qualifier -> specifier_qualifier_list");
+
+		// Pass through
+		$$ = $1;
 	}
 	| type_qualifier specifier_qualifier_list {
+		// Log reduction.
 		TR_LOGGER.PushReduction(
 			"type_qualifier specifier_qualifier_list -> specifier_qualifier_list");
+
+		// Push type qualifier to the front
+		$2.front().type_qualifier_list.push_front($1.front().type_qualifier_list.front());
+
+		// Assign $$ to $2
+		$$ = $2;
+
+		// Check if the Type qualifier is valid if not Error.
+		if(!(IsTypeQualifierValid($2.front()))) {
+			TR_LOGGER.Error("Repeated type qualifier.", LINE, COLUMN);
+		}
 	}
 	;
 
@@ -856,9 +886,14 @@ initializer_list
 
 type_name
 	: specifier_qualifier_list {
+		// Log reduction.
 		TR_LOGGER.PushReduction("specifier_qualifier_list -> type_name");
+
+		// Pass through
+		$$ = $1;
 	}
 	| specifier_qualifier_list abstract_declarator {
+		// Ain't gonna do this.
 		TR_LOGGER.PushReduction(
 			"specifier_qualifier_list abstract_declarator -> type_name");
 	}
@@ -1327,14 +1362,19 @@ cast_expression
 			if (IsFloating($2.front()) && IsInteger($4.front())) {
 				TR_LOGGER.Warning("Up casting", LINE, COLUMN);
 			} else if (IsInteger($2.front()) && IsFloating($4.front())) {
-				
+				TR_LOGGER.Warning("Down casting", LINE, COLUMN);
+			} else if (SizeOfNumber($2.front()) > SizeOfNumber($4.front())) {
+				TR_LOGGER.Warning("Up casting", LINE, COLUMN);
+			} else if (SizeOfNumber($2.front()) > SizeOfNumber($4.front())) {
+				TR_LOGGER.Warning("Down casting", LINE, COLUMN);
 			}
-
-
-
 		}
 
-		// Check both pointers
+		// Check if both pointers
+		if($2.front().array_sizes.size() > 0 &&
+			 $4.front().array_sizes.size() > 0) {
+
+		}
 
 		// Not gonna deal with structs 
 	}
