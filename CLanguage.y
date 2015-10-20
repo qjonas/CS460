@@ -1305,7 +1305,7 @@ multiplicative_expression
 		TR_LOGGER.PushReduction(
 			"multiplicative_expression PERCENT cast_expression "
 			"-> multiplicative_expression");
-
+		// Check if the $3 is equal to zero
 	}
 	;
 

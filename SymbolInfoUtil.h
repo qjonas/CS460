@@ -9,4 +9,5 @@ bool IsExpressionValidArraySubscript(const SymbolInfo symbol_info);
 bool IsDataTypeValidForIncDec(const SymbolInfo& symbol_info);
 bool IsConst(const SymbolInfo& symbol_info);
 void IncrementSymbolInfoBy(SymbolInfo* symbol_info, int value);
+bool IsNumber(const SymbolInfo& symbol_info);
 #endif //SYMBOLINFOUTIL_H_
