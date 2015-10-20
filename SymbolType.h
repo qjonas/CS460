@@ -59,7 +59,7 @@ union SymbolValue {
 	long long long_long_val;
 	int int_val;
 	unsigned long long unsigned_long_long_val;
-	double double_val;
+	long double double_val;
 	std::string * string_val;
 	FunctionInfo * function_info;
 };

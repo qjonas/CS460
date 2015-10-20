@@ -16,5 +16,9 @@ int SizeOfNumber(const SymbolInfo& symbol_info);
 bool IsUnsigned(const SymbolInfo& symbol_info);
 long double maxValue(const SymbolInfo& symbol_info);
 long double minValue(const SymbolInfo& symbol_info);
+bool multOverflow(const SymbolInfo& symbol_info_LH, const SymbolInfo& symbol_info_RH);
+bool addOverflow(const SymbolInfo& symbol_info_LH, const SymbolInfo& symbol_info_RH);
+bool subOverflow(const SymbolInfo& symbol_info_LH, const SymbolInfo& symbol_info_RH);
+
 
 #endif //SYMBOLINFOUTIL_H_
