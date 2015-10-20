@@ -98,7 +98,7 @@ union SymbolValue {
 	char char_val;
 	long long long_long_val;
 	unsigned long long unsigned_long_long_val;
-	double double_val;
+	long double double_val;
 	std::string * string_val;
 };
 
