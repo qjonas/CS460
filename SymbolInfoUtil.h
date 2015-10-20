@@ -13,4 +13,6 @@ bool IsNumber(const SymbolInfo& symbol_info);
 bool IsInteger(const SymbolInfo& symbol_info);
 bool IsFloating(const SymbolInfo& symbol_info);
 int SizeOfNumber(const SymbolInfo& symbol_info);
+//if inc_or_dec true then increment, false then decrement.
+bool checkOverflow(const SymbolInfo& symbol_info, bool inc_or_dec);
 #endif //SYMBOLINFOUTIL_H_
