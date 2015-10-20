@@ -640,3 +640,6 @@ bool subOverflow(const SymbolInfo& symbol_info_LH, const SymbolInfo& symbol_info
 
 }
 
+bool IsRelational(const SymbolInfo& symbol_info) {
+  return IsDataTypeValidForIncDec(symbol_info);
+}
