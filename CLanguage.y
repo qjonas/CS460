@@ -1463,10 +1463,11 @@ unary_expression
 	| PLUS cast_expression {
 		// Log reduction
 		TR_LOGGER.PushReduction("PLUS cast_expression -> unary_expression");
-
+		$$ = $2;
 		// Make the data_value positive. Probably something like pushing a 0 to the 
 		// highest bit.
 		if($2.front().data_is_valid){
+			$$.front().data_is_valid = true;
 			if(IsNumber($2.front()) ){
 
 				if( (($2.front().data_value.long_long_val) < 0) ){
@@ -1474,7 +1475,7 @@ unary_expression
 				}
 			}
 			else{
-				TR_LOGGER.Error("Unkown type conversion, check that data is of type, char, int, or double.", LINE, COLUMN);
+				TR_LOGGER.Error("Unkown type conversion, check that data is of type, char, int, float, or double.", LINE, COLUMN);
 			}
 		}
 	}
@@ -1482,13 +1483,15 @@ unary_expression
 		// Log reduction
 		TR_LOGGER.PushReduction("MINUS cast_expression -> unary_expression");
 
-		// Check if unsigned. TODO
+		// Check if unsigned. TODO: Warning message, C allows this but it is nonsensical
+		$$ = $2;
 		if($2.front().data_is_valid){
+			$$.front().data_is_valid = true;
 			if(IsNumber($2.front()) ){
 				$$.front().data_value.long_long_val = (-1)*($2.front().data_value.long_long_val);
 			}
 			else{
-				TR_LOGGER.Error("Unkown type conversion, check that data is of type, char, int, or double.", LINE, COLUMN);
+				TR_LOGGER.Error("Unkown type conversion, check that data is of type, char, int, float, or double.", LINE, COLUMN);
 			}
 		}
 	}
@@ -1497,12 +1500,14 @@ unary_expression
 		TR_LOGGER.PushReduction("TILDE cast_expression -> unary_expression");
 		// Bitwise not operator 
 		// Must be a number 
+		$$ = $2;
 		if($2.front().data_is_valid){
+			$$.front().data_is_valid = true;
 			if(IsNumber($2.front()) ){
 				$$.front().data_value.long_long_val = ~($2.front().data_value.long_long_val);
 			}
 			else{
-				TR_LOGGER.Error("Unkown type conversion, check that data is of type, char, int, or double.", LINE, COLUMN);
+				TR_LOGGER.Error("Unkown type conversion, check that data is of type, char, int, float, or double.", LINE, COLUMN);
 			}
 		}
 
@@ -1512,15 +1517,34 @@ unary_expression
 	| BANG cast_expression {
 		// Log operation.
 		TR_LOGGER.PushReduction("BANG cast_expression -> unary_expression");
-
+		$$ = $2;
+		if($2.front().data_is_valid){
+			$$.front().data_is_valid = true;
+			if(IsNumber($2.front())){
+				if($2.front().data_value.long_long_val == 0){
+					$$.front().data_value.long_long_val = 1;
+				}
+				else{
+					$$.front().data_value.long_long_val = 0;
+				}
+			}
+			else{
+				TR_LOGGER.Error("Unkown type conversion, check that data is of type: char, int, float, or double.", LINE, COLUMN);
+			}
+		}
 		// if != 0 change to zero, change to 1 if not can be any number or pointer
 		// !(R, P) -> {0,1} : P = pointer
 	}
 	| SIZEOF unary_expression {
 		// Log operation.
 		TR_LOGGER.PushReduction("SIZEOF unary_expression -> unary_expression");
-
+		$$ = $2;
 		// Becomes an integer
+		if($2.front().data_is_valid){
+			$$.front().data_is_valid = true;
+			$$.front().type_specifier_list.push_front(SymbolTypes::INT);
+			$$.front().data_value.long_long_val = sizeof($2.front().type_specifier_list.front());
+		}
 	}
 	| SIZEOF OPEN_PAREN type_name CLOSE_PAREN {
 		// Log operation.
