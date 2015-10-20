@@ -14,6 +14,7 @@
 #include  "CommandLineFlags.h"
 #include  "SymbolTable.h"
 #include  "TokenReductionsLogger.h"
+#include 	"SymbolInfoUtil.h"
 
 using namespace std;
 
@@ -43,6 +44,10 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 %}
 "!!" {
 	S_TABLE.Print();
+}
+
+"!!!" {
+	Harris();
 }
 
 "auto"	{
@@ -404,6 +409,13 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 	} else {
 		yylval = *(new list<SymbolInfo>);
 		yylval.push_back(*(new SymbolInfo));
+		yylval.front().data_is_valid = true;
+		yylval.front().type_specifier_list 
+			= *(new list<SymbolTypes::SymbolType>());
+		yylval.front().type_specifier_list.push_back(SymbolTypes::UNSIGNED);
+		yylval.front().type_specifier_list.push_back(SymbolTypes::LONG);
+		yylval.front().type_specifier_list.push_back(SymbolTypes::LONG);
+		yylval.front().type_specifier_list.push_back(SymbolTypes::INT);
 		yylval.front().data_value.unsigned_long_long_val = input;
 	}
 
@@ -424,9 +436,16 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 	if(errno == ERANGE) {
 		TR_LOGGER.Error("Integer Constant Overflow", LINE, COLUMN);
 	} else {
+		yylval = *(new list<SymbolInfo>);
 		yylval.push_back(*(new SymbolInfo));
 		yylval.front().data_value.unsigned_long_long_val = input;
 		yylval.front().data_is_valid = true;
+		yylval.front().type_specifier_list 
+			= *(new list<SymbolTypes::SymbolType>());
+		yylval.front().type_specifier_list.push_back(SymbolTypes::UNSIGNED);
+		yylval.front().type_specifier_list.push_back(SymbolTypes::LONG);
+		yylval.front().type_specifier_list.push_back(SymbolTypes::LONG);
+		yylval.front().type_specifier_list.push_back(SymbolTypes::INT);
 	}
 
 	// Increment COLUMN counter and return
@@ -446,9 +465,18 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 	if(errno == ERANGE) {
 		TR_LOGGER.Error("Integer Constant Overflow", LINE, COLUMN);
 	} else {
+		yylval = *(new list<SymbolInfo>);
 		yylval.push_back(*(new SymbolInfo));
+		
 		yylval.front().data_value.unsigned_long_long_val = input;
 		yylval.front().data_is_valid = true;
+		yylval.front().type_specifier_list 
+			= *(new list<SymbolTypes::SymbolType>());
+		yylval.front().type_specifier_list.push_back(SymbolTypes::UNSIGNED);
+		yylval.front().type_specifier_list.push_back(SymbolTypes::LONG);
+		yylval.front().type_specifier_list.push_back(SymbolTypes::LONG);
+		yylval.front().type_specifier_list.push_back(SymbolTypes::INT);
+
 	}
 
 	// Increment COLUMN counter and return
@@ -469,9 +497,15 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 	if(errno == ERANGE) {
 		TR_LOGGER.Error("Floating Point Constant Overflow", LINE, COLUMN);
 	} else {
+		yylval = *(new list<SymbolInfo>);
 		yylval.push_back(*(new SymbolInfo));
+		
 		yylval.front().data_value.double_val = input;
 		yylval.front().data_is_valid = true;
+		yylval.front().type_specifier_list 
+			= *(new list<SymbolTypes::SymbolType>());
+		yylval.front().type_specifier_list.push_back(SymbolTypes::LONG);
+		yylval.front().type_specifier_list.push_back(SymbolTypes::DOUBLE);
 	}
 
 	// Increment COLUMN counter and return

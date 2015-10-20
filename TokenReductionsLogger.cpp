@@ -12,6 +12,9 @@
 #include <string>
 #include <vector>
 
+#include "Escape_Sequences_Colors.h"
+
+
 using namespace std;
 
 TokenReductionsLogger& TokenReductionsLogger::GetInstance() {
@@ -81,7 +84,7 @@ void TokenReductionsLogger::Error(
 	const std::string& error, int line, int COLUMN) {
 	LogTokenReductions();
 	if (console_output_) {
-		cerr << "ERROR: " << error << endl;
+		cerr <<  COLOR_BLINK_RED_BLACK << "ERROR: " <<  COLOR_NORMAL << error << endl;
 		cerr << "Line: " << line << " Column: " << COLUMN << endl;
 		cerr  << "Source: ";
 		for(string word : source_line_) {

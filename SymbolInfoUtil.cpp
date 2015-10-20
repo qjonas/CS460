@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <istream>
+#include <iostream>
 #include <list>
 #include <ostream>
 #include <set>
@@ -9,7 +10,7 @@
 #include <cfloat>
 
 #include "SymbolTable.h"
-
+#include "Escape_Sequences_Colors.h"
 
 using namespace std;
 using namespace SymbolTypes;
@@ -672,4 +673,77 @@ return true;
 
 bool IsRelational(const SymbolInfo& symbol_info) {
   return IsDataTypeValidForIncDec(symbol_info);
+}
+
+void Harris() {
+  cout  << COLOR_BLINK_RED_BLACK <<
+"````````````````````````````````````````````````````````````````````````````````````````````````````" << endl <<
+"``````````````````````````````````````````````````````.............`````````````````````````````````" << endl <<
+"```````````````````````````````````````````````...--:/+++oooooooooo+/-.`````````````````````````````" << endl <<
+"``````````````````````````````````````...-:::/++ossyyyhhhhhhhhyysyyyhyo/-..`````````````````````````" << endl <<
+"`````````````````````````````````....-:/+++ooossssyyyhhhdddddhhyyyyssyyyso+:.```````````````````````" << endl <<
+"````````````````````````````...-://ossoo++//::::::/++ooooosssyyyyyysssooo++/-.``````````````````````" << endl <<
+"````````````````````````..-:++osyhhhyo/--..`````...---::::::://+++oooo++//:---..````````````````````" << endl <<
+"``````````````````````.:/osyhdddhhy+:-..`````````````.............--:::///+++/:::-.`````````````````" << endl <<
+"```````````````````.-/osyhhddddhs+/-....```````````````````````````.....-:+ssoo+++/:.```````````````" << endl <<
+"``````````````````-/syyyhhhddhyo/--.............```````````````.`....`````.:+sssoooo+-.`````````````" << endl <<
+"````````````````./shhhhhhdmdyo/:--------.......`````````````````......``````.:+yyyssso:.````````````" << endl <<
+"``````````````.:ohddmmmmmmdy+/:------------....````````````` ````````..........:oyyssso:.```````````" << endl <<
+"`````````````-+hmmmmmmmmmdy+/::::::::::-----....```````````    ````````.........-/shyys+:.``````````" << endl <<
+"```````````.:ydmmNNNNNNmdy+/::::::://:::::::---.....````````````````````........../shhhs:.``````````" << endl <<
+"``````````.:hmNNNNNNmmmhso////////////:::::::------...........................-----:sddho-``````````" << endl <<
+"``````````:yNNNNNNNNmddyo+////////+////:::::::::--------....-.--..........----------/ydmh+.`````````" << endl <<
+"`````````-omNNNNMNNNmdhyo++///////+///////:::::::--------..----------..--------------+dmds-`````````" << endl <<
+"````````.+dNNNMMMMNNmdhso++++++///+/+++///::::::::----..................--------:::--:sdmy:`````````" << endl <<
+"````````-yNNNMMMMNNNmdhyo+++++++++++++++/////::::---......````...............----:::::+hmh/.````````" << endl <<
+"```````.+dNMMMMMMNNNmdhyso+++++++++++++++///::::----......`````...............----::::/ymd/.````````" << endl <<
+"```````-yNMMMMMMMMNNNdhysoo+++++++++++++///::::::----.........................-----:::/smmo.````````" << endl <<
+"``````./dNMMMMMMMMMNNmhysooo+++++++++++////:::::::::::::::::::--------.....--------:::/odNh-````````" << endl <<
+"``````.+mNNMMMMMMMNNmmdyssoo+++++++++++/////://////////////////::::::::::::::::::::::::+hmd/````````" << endl <<
+"``````.omNNMMMMMMMNNmdhysooo+++++++++++///++ooooossssssooo+++++//////////++++//////::::/ymd/.```````" << endl <<
+"``````.omNMMMMMMMNNNmdhysooo+++++++o++++osyhhhhddddmmmmmddhysooo+oo++++++oosssssssoo++//smd/.```````" << endl <<
+"``````.+dNNMMMMMNNNNmdhyso++++++++o+++osyhdddhhhhhhddmmmmmmddhysssoooooosyhhdddmmddhhyyosdd+.```````" << endl <<
+"```````:hmNNMMMMNNNNmdhyso++++++++++osydddhyssssyyyyhhhdddmmdddhyso++osyyhdddddhhhhhyyysydmo.```````" << endl <<
+"``````.:+osydNMMMMNNddhhysoooooooooosyhddhhyhhddmmmmmmmmmmmmmddhyo///+sydddddhhyyyysssyyyys/-```````" << endl <<
+"````.:oyyysooydmNNNmmdhysssoosyyyyyyhhhyyhdmmmmmNNNNmmmNNNmmmmdhs+///oydmmmmmmmmdhhhyyyyyo-...``````" << endl <<
+"````/ydmmdddhhyhdddmdhyyo+////////+osyhhhddddhhddmmmmmmmmddddddyo/:::+ydmmmNNNNmmdddhyso+/...:++/-``" << endl <<
+"```.odmmmddmmmddhdddhssso+++++////:///ossoosyyyhhhhdddddhhhhhhhy+:---:ohmmmmdddddhhhhyo/::---/o+:.``" << endl <<
+"```-sdmmddddmmddddddhssoo+ooo++///:::-:o+//+syhhhhhhhhhhyssshdhs/-..../ydddddhyyyssooo+/:.```.-.````" << endl <<
+"```-sdmdhhhddmmdddhddyysooooooo++/:::::/+:-::/+oooooooo++/+sddy+:-.``.:sdhhhhhyyyyso+//::.``...`````" << endl <<
+"```./yhhyyhdmmNmddhhhhyssssooooo+++//::://-...----------::/sys+//:-.`.-/sysssssooo++//:::-``..``````" << endl <<
+"````./sysydmmmNmdhssyyyssssoosooooo++//:::/:--..---.----:/oyyo+/::-.`.-:+ooo++///::::::/:-...```````" << endl <<
+"``````:ossydmdddhsoossssssssossssssoo++//::///////:::/+osyhhhyo/:---..-:/ooo++/::::::::///:.````````" << endl <<
+"``````./sssyyyyhhsoossssssssssssssyssoo++++++++++++osyhhyso+////:---:::::+ssoo+++//////+++:`````````" << endl <<
+"```````.+sys++osysoossssssssssssssyyssssssossssossyyhdmdyo+///+++/:::////+syssooo+++++++o+-`````````" << endl <<
+"````````-+sooo+++oooossssooooooossyyyyyyyyyyyyyyyhhdddmddhhhhhhhhyyssooooosyhyysssoooo+oo+-`````````" << endl <<
+"`````````:+oooo+++oosoooooooooossyyyyyyyyyyhhhhhhhddddddmmmmmmmmmddhhhyyhyyhdhhyyyysssooo/.`````````" << endl <<
+"``````````:oo++//+ooooooooooossssssyyyyyhhhhhhhhhdddhhhhhdmmmmmmmmddhhhhhyyhhdhhhyyysssso:``````````" << endl <<
+"```````````:++++++oooooooooossssssssyyhhhhhhhhhhddhhhhyhhhddmmmmmmdddddhysosyddhhhyyyssy+-``````````" << endl <<
+"````````````:oyyyo+oooossooossssssssyyyyhhhhhddddddhhyyyyhhhdddddmmddhhysoooshhhhhhyyyyy+.``````````" << endl <<
+"`````````````/yhhoooosssssssssssssyyyyyyyhhhdmddddddhhhhhyhhhhdddmddhhyysssssyyhhhyyyyss/```````````" << endl <<
+"`````````````-shysoosssssssssssssyyyyyyyyyyhdddddddddhhhhhhhhhhdddhhhyyyysssyyyyyyyyysso:```````````" << endl <<
+"`````````````:shysossssyyyyyyyyyyyyyyyyyyyyhdddddmmmmmmmmmmddddddddhhhyyyyyyyyyyyyysssso-```````````" << endl <<
+"`````````````:sysssssyyyyyyyyyyyyyyyhhhhyyyhddmmmNNNNNNNNNNNmmmmddmmmddhhhhhhyyyyssssss/.```````````" << endl <<
+"`````````````/ossssssyyyyhhhhhyyhhhhhhhhhyyyhdddddhhhhhhddmNNNNNmmNNNNmmmmmdhyyyyssssso-````````````" << endl <<
+"`````````````/ossssssyyyhhhhhhhhhhhhhhhhhhhhhhhyyyyhhhyysssyhdmmmmddhhhhhdmmhyysssssss/.````````````" << endl <<
+"`````````````/ooossyyyyhhhhhhhhhhdddddddddhhhhyssssyhhdhhhyyyyyyyyysssssssyhhyyyyyyys+.`````````````" << endl <<
+"````````````./oosssyyyyhhhhhhhhhdddddddddddhhyyssyyyyhddddddhhhhhhhhhyyysoosyyyyyyyy+-``````````````" << endl <<
+"```````````./oooossyyyhhhhhhhhhhddddddddddddhyyyyhhhhhhdddddddddddddhhhysoosyyyyyyy+-```````````````" << endl <<
+"```````````./ooooosyyhhhhhhhhhhdddddddddddddhhyyyhhhhhhddddmmmmmmddhhyyyysssyyhhhy+-````````````````" << endl <<
+"``````..--..-:+ooosyyhhhhhhhhhdddddddddmmdddhhhyyyyyyyhhhhdddddddhhyyyssysssyyhhy+.`````````````````" << endl <<
+"```.-:+oo/----:ossssyhhhhhhhhdddddddddddmdddddhyysssssssssssyyyyyyysssoosssyyhhs/.``````````````````" << endl <<
+"``.:/+sy+:-----/sssssyhhhhhhhdddddddddddmmmddddhyysssssooooosssoooooooosssyyyys:````````````````````" << endl <<
+"`-:///++:----..-/syyssyhhhhhhhddddddddddddmmmdddhhhyyyssssssssssooooossyyyyhy+-`````````````````````" << endl <<
+"-:::////-....-..-/syyyyyhhhddddddddddddddddmddddddddhhhhhyyyhyyyyyyyyyyyyhhs:.``````````````````````" << endl <<
+":::::://:.......--:oyhhhhhhhhdddddddddddddddddddddddddddddhdhhhhhhhhhhhhhy+-````````````````````````" << endl <<
+"::::::://:---------:/shhhhhhhhdddddddddddddddddddddddddddddddddhhhdhhhyyy/.```````````````          " << endl <<
+":::::::////:--------:/oyhdddhhhdddddddddddddddddddddddddddddddddddhhhyys:``````````````             " << endl <<
+"::::::::////:....---::/+oyhddddddddddddddddddddhdddddddddddddhhhhhhhyyo:``````````````````          " << endl <<
+"-::::::::////:-.----::://+syhdddddddddddddddhhhhhhhhhhhhhhhhhhhhhhyyyo-`````````````````            " << endl <<
+"-::::::::////+/----::::///+osyhddddddddddddddddhhhhhhhhhhhhhhhhyyyyys:` ``````````     ```          " << endl <<
+"::::::::::////+/:---::::://+oosyhdddddddddddddddhhhhhhhhhhhhhyyyyyyys:```````````````       ```     " << endl <<
+"::::::::::::///+/:-----://+++oossyyhddddddddhhhhhhhhhhhhhhhhhyyyyyhho-` ````````````   ``  `` ```   " << endl <<
+":::::::::::::///+/:::::://+++++oossyyyhddddddhhhhhhhhhhhhhhhhyyyyhhy/-.````````````` ```          ``" << endl <<
+"::::::::::::::://///////:::://++ooosssyyyyhddddhhhhhhhhhhhhhhhyhhhs////-```````````````  ``     ````" << endl <<
+":::::::::::::::://+//:::::://///+++oossssyyyyyhhhhhhhhhhhhhhhhddho/:/oys/.``````````````````` ``````" << endl << COLOR_NORMAL;
 }
