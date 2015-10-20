@@ -1318,7 +1318,10 @@ additive_expression
 
 multiplicative_expression
 	: cast_expression {
+		// Log reduction
 		TR_LOGGER.PushReduction("cast_expression -> multiplicative_expression");
+		// Pass through
+		$$ = $1;
 	}
 	| multiplicative_expression ASTERISK cast_expression {
 		TR_LOGGER.PushReduction(
@@ -1341,6 +1344,33 @@ multiplicative_expression
 			"multiplicative_expression PERCENT cast_expression "
 			"-> multiplicative_expression");
 		// Check if the $3 is equal to zero
+		if(!IsInteger($1.front()) || !IsInteger($3.front())) {
+			TR_LOGGER.Error("Cannot modulo something of not integer type", LINE, COLUMN);
+		}
+		if($3.front().data_is_valid && 
+			 $3.front().data_value.unsigned_long_long_val == 0) {
+			TR_LOGGER.Error("Cannot modulo something of not integer type", LINE, COLUMN);
+		}
+
+		// Perform the modulo operation.
+		if($3.front().data_is_valid && $1.front().data_is_valid) {
+			if(IsUnsigned($1.front()) && IsUnsigned($3.front())) {
+				$1.front().data_value.unsigned_long_long_val 
+						%= $3.front().data_value.unsigned_long_long_val;
+			} else if (!IsUnsigned($1.front()) && IsUnsigned($3.front())) {
+				$1.front().data_value.long_long_val 
+						%= $3.front().data_value.unsigned_long_long_val;
+			} else if (IsUnsigned($1.front()) && !IsUnsigned($3.front())) {
+				$1.front().data_value.long_long_val 
+						%= $3.front().data_value.unsigned_long_long_val;
+			} else {
+				$1.front().data_value.long_long_val 
+						%= $3.front().data_value.long_long_val;
+			}
+		}
+
+		// Pass through
+		$$ = $1;
 	}
 	;
 
@@ -1368,12 +1398,18 @@ cast_expression
 			} else if (SizeOfNumber($2.front()) > SizeOfNumber($4.front())) {
 				TR_LOGGER.Warning("Down casting", LINE, COLUMN);
 			}
+			$4.front().type_specifier_list = $2.front().type_specifier_list;
+			$4.front().type_qualifier_list = $2.front().type_qualifier_list;
+			$4.front().storage_class_specifier = $2.front().storage_class_specifier;
 		}
 
 		// Check if both pointers
 		if($2.front().array_sizes.size() > 0 &&
 			 $4.front().array_sizes.size() > 0) {
-
+			$4.front().array_sizes = $2.front().array_sizes;
+			$4.front().type_specifier_list = $2.front().type_specifier_list;
+			$4.front().type_qualifier_list = $2.front().type_qualifier_list;
+			$4.front().storage_class_specifier = $2.front().storage_class_specifier;
 		}
 
 		// Not gonna deal with structs 
