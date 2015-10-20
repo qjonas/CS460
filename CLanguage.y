@@ -1324,6 +1324,8 @@ multiplicative_expression
 		TR_LOGGER.PushReduction(
 			"multiplicative_expression ASTERISK cast_expression "
 			"-> multiplicative_expression");
+		//$$ = $1 * $2;
+		//long Double maxValue(SymbolInfo)
 	}
 	| multiplicative_expression FORWARD_SLASH cast_expression {
 			if($2.front().data_value.long_long_val == 0) {
@@ -1331,7 +1333,7 @@ multiplicative_expression
 			TR_LOGGER.Error("Cannot divide by 0, seriously, stop that.",
 											LINE, COLUMN);
 			}
-		TR_LOGGER.PushReduction(
+		TR_LOGGER.PushReduction(	
 			"multiplicative_expression FORWARD_SLASH cast_expression "
 			"-> multiplicative_expression");
 	}
