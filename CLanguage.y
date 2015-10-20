@@ -379,9 +379,14 @@ type_qualifier
 
 struct_or_union_specifier
 	: struct_or_union identifier open_curly struct_declaration_list close_curly {
+		// Log Reduction
 		TR_LOGGER.PushReduction("struct_or_union identifier open_curly "
 														"struct_declaration_list close_curly "
 														"-> struct_or_union_specifier");
+		// Copy the symbol table from the struct declaration list.
+
+
+
 	}
 	| struct_or_union open_curly struct_declaration_list close_curly {
 		TR_LOGGER.PushReduction("struct_or_union open_curly "
@@ -542,7 +547,7 @@ declarator
 	}
 	| pointer direct_declarator {
 		// Log reduction
-		TR_LOGGER.PushReduction("pointer_direct_declarator -> declarator");
+		TR_LOGGER.PushReduction("pointer direct_declarator -> declarator");
 
 		// Combine type qualifier lists
 		cout << "HERE: " << $1.front().type_qualifier_list.size() << endl;
@@ -562,8 +567,10 @@ declarator
 			TR_LOGGER.Error("Qualifier is invalid.", LINE, COLUMN);
 		}
 
-		// Copy pointer_count
-		$2.front().pointer_count = $1.front().pointer_count;
+		// Copy array_sizes
+		for(int array_size : $1.front().array_sizes) {
+			$2.front().array_sizes.push_back(array_size);
+		}
 
 		// Get the symbol in the symbol table and assign it to what is here.
 		SymbolInfo* temp = S_TABLE.GetMostRecentSymbolInfo($2.front().identifier_name);
@@ -699,14 +706,14 @@ pointer
 
 		$$ = *(new list<SymbolInfo>());
 		$$.push_back(*(new SymbolInfo()));
-		$$.front().pointer_count = 1;
+		$$.front().array_sizes.push_back(SymbolTypes::NO_ARRAY_SIZE);
 	}
 	| ASTERISK type_qualifier_list {
 		// Log reduction
 		TR_LOGGER.PushReduction("ASTERISK type_qualifier_list -> pointer");
 
-		// Make point count 1
-		$2.front().pointer_count = 1;
+		// Push back an undefined array size.
+		$2.front().array_sizes.push_back(SymbolTypes::NO_ARRAY_SIZE);
 
 		// Pass through
 		$$ = $2;
@@ -715,13 +722,22 @@ pointer
 		// Log reduction
 		TR_LOGGER.PushReduction("ASTERISK pointer -> pointer");
 
-		// increase pointer count
-		$2.front().pointer_count++;
+		// Push back an undefined array size.
+		$2.front().array_sizes.push_back(SymbolTypes::NO_ARRAY_SIZE);
 
 		$$ = $2;
 	}
 	| ASTERISK type_qualifier_list pointer {
+		// Log reduction
 		TR_LOGGER.PushReduction("ASTERISK type_qualifier_list pointer -> pointer");
+
+		// Push back an undefined array size.
+		for(int size : $3.front().array_sizes) {
+			$2.front().array_sizes.push_back(size);
+		}
+		$2.front().array_sizes.push_back(SymbolTypes::NO_ARRAY_SIZE);
+
+		$$ = $2;
 	}
 	;
 
@@ -770,11 +786,19 @@ parameter_list
 
 parameter_declaration
 	: declaration_specifiers declarator {
+		// Log reduction
 		TR_LOGGER.PushReduction(
 			"declaration_specifiers declarator -> parameter_declaration");
+
+		// Pass through declaration_specifiers
+		$$ = $1;
 	}
 	| declaration_specifiers  {
+		// Log reduction
 		TR_LOGGER.PushReduction("declaration_specifiers -> parameter_declaration");
+
+		// Pass through declaration_specifiers
+		$$ = $1;
 	}
 	| declaration_specifiers abstract_declarator {
 		TR_LOGGER.PushReduction(
@@ -1295,97 +1319,288 @@ cast_expression
 
 unary_expression
 	: postfix_expression {
+		// Log reduction
 		TR_LOGGER.PushReduction("postfix_expression -> unary_expression");
+		// Pass through
+		$$ = $1;
 	}
 	| INC_OP unary_expression {
+		// Log reduction
 		TR_LOGGER.PushReduction("INC_OP unary_expression -> unary_expression");
+
+		// Check if the increment operation is possible
+		if(!IsDataTypeValidForIncDec($2.front())) { // Check if it is a regular type
+			TR_LOGGER.Error("Data type invalid for incrementation.", LINE, COLUMN);
+		}
+		if(IsConst($2.front())) { // Check if const
+			TR_LOGGER.Error("Const value cannot be incremented.", LINE, COLUMN);
+		}
+		if(!S_TABLE.Has($2.front().identifier_name)) { // Check if it is an lval
+			TR_LOGGER.Error("Lval needed for increment operation.", LINE, COLUMN);
+		}
+		
+		// Pass through
+		SymbolInfo* temp = 
+				S_TABLE.GetMostRecentSymbolInfo($2.front().identifier_name);
+		// TODO: Overflow Checking
+		IncrementSymbolInfoBy(temp, 1);
+		$$ = *(new list<SymbolInfo>({*(new SymbolInfo(*temp))}));
 	}
 	| DEC_OP unary_expression {
+		// Log reduction
 		TR_LOGGER.PushReduction("DEC_OP unary_expression -> unary_expression");
+
+		// Check if the increment operation is possible
+		if(!IsDataTypeValidForIncDec($2.front())) { // Check if it is a regular type
+			TR_LOGGER.Error("Data type invalid for incrementation.", LINE, COLUMN);
+		}
+		if(IsConst($2.front())) { // Check if const
+			TR_LOGGER.Error("Const value cannot be incremented.", LINE, COLUMN);
+		}
+		if(!S_TABLE.Has($2.front().identifier_name)) { // Check if it is an lval
+			TR_LOGGER.Error("Lval needed for increment operation.", LINE, COLUMN);
+		}
+		
+		// Pass through
+		SymbolInfo* temp = 
+				S_TABLE.GetMostRecentSymbolInfo($2.front().identifier_name);
+		// TODO: Overflow Checking
+		IncrementSymbolInfoBy(temp, -1);
+		$$ = *(new list<SymbolInfo>({*(new SymbolInfo(*temp))}));
 	}
-	| unary_operator cast_expression {
-		TR_LOGGER.PushReduction(
-			"unary_operator cast_expression -> unary_expression");
+	| AMPERSAND cast_expression {
+		// Log reduction
+		TR_LOGGER.PushReduction("AMPERSAND cast_expression -> unary_expression");
+
+		// Check to see if it is an lval
+		if(!S_TABLE.Has($2.front().identifier_name)) { // Check if it is an lval
+			TR_LOGGER.Error("Lval needed for increment operation.", LINE, COLUMN);
+		}
+
+		$2.front().identifier_name = "";
+		$2.front().array_sizes.push_back(SymbolTypes::NO_ARRAY_SIZE);
+		$$ = $2;
+	}
+	| ASTERISK cast_expression {
+		// Log reduction.
+		TR_LOGGER.PushReduction("ASTERISK cast_expression -> unary_expression");
+
+		// Check if it can be dereferenced.
+		if($2.front().array_sizes.size() == 0) {
+			TR_LOGGER.Error("Address needed for dereference.", LINE, COLUMN);
+		}
+
+		// Identifier name is no longer needed
+		$2.front().identifier_name = "";
+
+		// Dereference
+		$2.front().array_sizes.pop_back();
+		$$ = $2;
+	}
+	| PLUS cast_expression {
+		// Log reduction
+		TR_LOGGER.PushReduction("PLUS cast_expression -> unary_expression");
+
+		// Make the data_value positive. Probably something like pushing a 0 to the 
+		// highest bit.
+		$$ = $2;
+	}
+	| MINUS cast_expression {
+		// Log reduction
+		TR_LOGGER.PushReduction("MINUS cast_expression -> unary_expression");
+
+		// Check if unsigned.
+
+		// Make the data_value negative. Probably something like pushing a 0 to the 
+		// highest bit.
+	}
+	| TILDE cast_expression {
+		// Log reduction
+		TR_LOGGER.PushReduction("TILDE cast_expression -> unary_expression");
+
+		// Logical not operator 
+		// Must be integer based
+		// ~n = -(n+1)
+		// Do this and pass through 
+	}
+	| BANG cast_expression {
+		// Log operation.
+		TR_LOGGER.PushReduction("BANG cast_expression -> unary_expression");
+
+		// if != 0 change to zero, change to 1 if not can be any number or pointer
+		// !(R, P) -> {0,1} : P = pointer
 	}
 	| SIZEOF unary_expression {
+		// Log operation.
 		TR_LOGGER.PushReduction("SIZEOF unary_expression -> unary_expression");
+
+		// Becomes an integer
 	}
 	| SIZEOF OPEN_PAREN type_name CLOSE_PAREN {
+		// Log operation.
 		TR_LOGGER.PushReduction(
 			"SIZEOF OPEN_PAREN type_name CLOSE_PAREN -> unary_expression");
+
+		// Becomes an integer
 	}
 	;
 
-unary_operator
-	: AMPERSAND {
-		TR_LOGGER.PushReduction("AMPERSAND -> unary_operator");
-	}
-	| ASTERISK {
-		TR_LOGGER.PushReduction("ASTERISK -> unary_operator");
-	}
-	| PLUS {
-		TR_LOGGER.PushReduction("PLUS -> unary_operator");
-	}
-	| MINUS {
-		TR_LOGGER.PushReduction("MINUS -> unary_operator");
-	}
-	| TILDE {
-		TR_LOGGER.PushReduction("TILDE -> unary_operator");
-	}
-	| BANG {
-		TR_LOGGER.PushReduction("BANG -> unary_operator");
-	}
-	;
 
 postfix_expression
 	: primary_expression {
+		// Log Reduction
 		TR_LOGGER.PushReduction("primary_expression -> postfix_expression");
+		// Pass through
+		$$ = $1;
 	}
 	| postfix_expression OPEN_SQUARE expression CLOSE_SQUARE {
+		// Log reduction.
 		TR_LOGGER.PushReduction(
 			"postfix_expression OPEN_SQUARE expression CLOSE_SQUARE "
 			"-> postfix_expression");
+
+		// Check and see if there is any array_sizes
+		if($1.front().array_sizes.size() == 0) {
+			TR_LOGGER.Error("Cannot use expression as an array.", LINE, COLUMN);
+		}
+
+		if(!(IsExpressionValidArraySubscript($3.front()))) {
+			TR_LOGGER.Error("Cannot use expression as an array subscript.", 
+											LINE, COLUMN);
+		}
+		// Create new symbol info to be placed in $$
+		$$ = *(new list<SymbolInfo>());
+		$$.push_front(*(new SymbolInfo($1.front())));
+
+		// Update value such that $$ has one less pointer or array.
+		if($1.front().array_sizes.size() > 0) {
+			$$.front().array_sizes.pop_back();
+		}
 	}
 	| postfix_expression OPEN_PAREN CLOSE_PAREN {
+		// Log Reduction
 		TR_LOGGER.PushReduction(
 			"postfix_expression OPEN_PAREN CLOSE_PAREN -> postfix_expression");
+		// Check if expression is a function
+		if(!$1.front().is_function) {
+			TR_LOGGER.Error("Cannot use expression as a function.", LINE, COLUMN);
+		}
+		if($1.front().parameters_types.size() != 0) {
+			TR_LOGGER.Error("Invalid number of parameters.", LINE, COLUMN);
+		} 
+
+		// Create new symbol info to be placed in $$
+		$$ = *(new list<SymbolInfo>());
+		$$.push_front(*(new SymbolInfo($1.front())));
+
+		// Change symbol info to act like it has been called.
+		$$.front().data_is_valid = false;
+		$$.front().is_function = false;
+		$$.front().identifier_name = string("");
 	}
 	| postfix_expression OPEN_PAREN argument_expression_list CLOSE_PAREN {
+		// Log reduction
 		TR_LOGGER.PushReduction(
 			"postfix_expression OPEN_PAREN argument_expression_list CLOSE_PAREN "
 			"-> postfix_expression");
+		// Check if expression is a function
+		if(!$1.front().is_function) {
+			TR_LOGGER.Error("Cannot use expression as a function.", LINE, COLUMN);
+		}
+		if($1.front().parameters_types.size() != $3.size()) {
+			TR_LOGGER.Error("Invalid number of parameters.", LINE, COLUMN);
+		} 
+		// TODO: Check each parameter type
+
+		// Create new symbol info to be placed in $$
+		$$ = *(new list<SymbolInfo>());
+		$$.push_front(*(new SymbolInfo($1.front())));
+
+		// Change function
+		$$.front().data_is_valid = false;
+		$$.front().is_function = false;
+		$$.front().identifier_name = string("");
 	}
 	| postfix_expression DOT identifier {
+		// Struct operation hold off on this.
+		// Log reduction
 		TR_LOGGER.PushReduction(
 			"postfix_expression DOT identifier -> postfix_expression");
 	}
 	| postfix_expression PTR_OP identifier {
+		// Struct operation hold off on this.
+		// Log Reduction
 		TR_LOGGER.PushReduction(
 			"postfix_expression PTR_OP identifier -> postfix_expression");
 	}
 	| postfix_expression INC_OP {
+		// Log Reduction
 		TR_LOGGER.PushReduction(
 			"postfix_expression INC_OP -> postfix_expression");
+		// Check if the increment operation is possible
+		if(!IsDataTypeValidForIncDec($1.front())) { // Check if it is a regular type
+			TR_LOGGER.Error("Data type invalid for incrementation.", LINE, COLUMN);
+		}
+		if(IsConst($1.front())) { // Check if const
+			TR_LOGGER.Error("Const value cannot be incremented.", LINE, COLUMN);
+		}
+		if(!S_TABLE.Has($2.front().identifier_name)) { // Check if it is an lval
+			TR_LOGGER.Error("Lval needed for increment operation.", LINE, COLUMN);
+		}
+
+		// Pass through
+		SymbolInfo* temp = 
+				S_TABLE.GetMostRecentSymbolInfo($1.front().identifier_name);
+		// TODO: Overflow Checking
+		temp->postfix_increment++;
+		$$ = *(new list<SymbolInfo>({*(new SymbolInfo(*temp))}));
 	}
 	| postfix_expression DEC_OP {
 		TR_LOGGER.PushReduction(
 			"postfix_expression DEC_OP -> postfix_expression");
+		// Check if the increment operation is possible
+		if(!IsDataTypeValidForIncDec($1.front())) { // Check if it is a regular type
+			TR_LOGGER.Error("Data type invalid for incrementation.", LINE, COLUMN);
+		}
+		if(IsConst($1.front())) { // Check if const
+			TR_LOGGER.Error("Const value cannot be incremented.", LINE, COLUMN);
+		}
+		if(!S_TABLE.Has($2.front().identifier_name)) { // Check if it is an lval
+			TR_LOGGER.Error("Lval needed for increment operation.", LINE, COLUMN);
+		}
+
+		// Pass through
+		SymbolInfo* temp = 
+				S_TABLE.GetMostRecentSymbolInfo($1.front().identifier_name);
+		// TODO: Overflow Checking
+		temp->postfix_increment++;
+		$$ = *(new list<SymbolInfo>({*(new SymbolInfo(*temp))}));
 	}
 	;
 
 primary_expression
 	: identifier {
+		// Log reduction.
 		TR_LOGGER.PushReduction("identifier -> primary_expression");
+		// Pass through
 	}
 	| constant {
+		// Log reduction
 		TR_LOGGER.PushReduction("constant -> primary_expression");
+		// Pass through
 	}
 	| string {
+		// Log reduction
 		TR_LOGGER.PushReduction("string -> primary_expression");
+		// Pass through
+		$$ = $1;
 	}
 	| OPEN_PAREN expression CLOSE_PAREN {
+		// Log reduction
 		TR_LOGGER.PushReduction(
 			"OPEN_PAREN expression CLOSE_PAREN -> primary_expression");
+		// Pass through
+		$$ = $1;
 	}
 	;
 

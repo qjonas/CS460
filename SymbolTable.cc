@@ -107,7 +107,6 @@ void SymbolTable::Print() const {
 				cout << "} ";
 			}
 			cout << endl;
-      cout << "\t\tpointer_count: " << ident_tuple.second.pointer_count << endl;
 			cout << "\t\tarray_sizes: ";
 			for(auto size : ident_tuple.second.array_sizes) {
 				cout << size << " ";
@@ -144,7 +143,23 @@ void SymbolTable::CopyFromFile(const string& file_name) {
 }
 
 SymbolInfo::SymbolInfo() : storage_class_specifier(NONE), is_function(false),
-	data_is_valid(false), pointer_count(0), range_start(-1) {}
+	data_is_valid(false), range_start(-1), postfix_increment(0) 
+  {}
+
+SymbolInfo::SymbolInfo(const SymbolInfo& other) : identifier_name(other.identifier_name),
+data_value(other.data_value),
+data_is_valid(other.data_is_valid), 
+type_specifier_list(other.type_specifier_list),
+storage_class_specifier(other.storage_class_specifier),
+type_qualifier_list(other.type_qualifier_list),
+typedef_name(other.typedef_name), 
+struct_or_union_values(other.struct_or_union_values),
+array_sizes(other.array_sizes),
+is_function(other.is_function),
+parameters_types(other.parameters_types),
+range_start(other.range_start),
+postfix_increment(other.postfix_increment){}
+
 
 ostream& operator <<(ostream &os, SymbolType symbol_type) {
   switch (symbol_type) {

@@ -402,6 +402,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 	if(errno == ERANGE) {
 		TR_LOGGER.Error("Integer Constant Overflow", LINE, COLUMN);
 	} else {
+		yylval = *(new list<SymbolInfo>);
 		yylval.push_back(*(new SymbolInfo));
 		yylval.front().data_value.unsigned_long_long_val = input;
 	}

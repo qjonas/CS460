@@ -187,7 +187,8 @@ bool IsDataTypeValidForIncDec(const SymbolInfo& symbol_info) {
   }
 
   return (valid_data_types.find(symbol_info.type_specifier_list) 
-          != valid_data_types.end());
+          != valid_data_types.end() || 
+          symbol_info.array_sizes.size() > 0);
 }
 
 bool IsConst(const SymbolInfo& symbol_info) {
@@ -207,6 +208,9 @@ bool IsConst(const SymbolInfo& symbol_info) {
 }
 
 void IncrementSymbolInfoBy(SymbolInfo* symbol_info, int value) {
+  if(!symbol_info->data_is_valid) {
+    return;
+  }
   // Char data types
   if(symbol_info->type_specifier_list == list<SymbolType>({CHAR})
     || symbol_info->type_specifier_list == list<SymbolType>({SIGNED, CHAR})

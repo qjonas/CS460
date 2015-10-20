@@ -69,6 +69,9 @@ public:
 	// Copies the output of a previous symbol table.
 	void CopyFromFile(const std::string& file_name);
 
+	// Searches through 
+	void PerformPostfixIncrement();
+
 	std::list< std::map<std::string, SymbolInfo> > table_;
 };
 
@@ -86,6 +89,7 @@ union SymbolValue {
 // SymbolInfo will store all of the information of the identifier.
 typedef struct SymbolInfo {
 	SymbolInfo();
+	SymbolInfo(const SymbolInfo& other);
 
 	/* Basic SymbolInfo */
 	// Identifier name will store the name of the identifier.
@@ -113,10 +117,6 @@ typedef struct SymbolInfo {
 	// Values inside of struct
 	SymbolTable struct_or_union_values;
 
-	// Pointer Count will denote the number of '*' there are for a given identifier.
-	// ex: int** i; Will have a pointer_counter equal to 2
-	unsigned int pointer_count;
-
 	// Contains the sizes of the arrays declared with square brackets. Empty
 	// brackets will have an ambiguous size and the value in the list will be
 	// SymbolTypes::AMBIGUOUS_ARRAY_SIZE
@@ -141,6 +141,9 @@ typedef struct SymbolInfo {
 	// ex_3: int baz();
 	// range_start = -1
 	int range_start;
+
+	// Postfix Increment
+	int postfix_increment;
 } SymbolInfo;
 
 std::ostream& operator<<(std::ostream &os, SymbolTypes::SymbolType symbol_type);
