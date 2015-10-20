@@ -98,13 +98,25 @@ void SymbolTable::Print() const {
 			cout << endl;
 			cout << "\t\ttypedef_name: " << ident_tuple.second.typedef_name << endl;
 			cout << "\t\tis_function: " << ident_tuple.second.is_function << endl;
-			cout << "\t\tparameters_types: ";
+			cout << "\t\tparameters_types: " << endl;
 			for(auto list_ : ident_tuple.second.parameters_types) {
-				cout << "{ ";
-				for(auto type : list_) {
+				cout << "\t\t\t{ " << endl;
+        cout << "\t\t\ttype_specifier_list: ";
+				for(auto type : list_.type_specifier_list) {
 					cout << type << " ";
 				}
-				cout << "} ";
+        cout << endl;
+        cout << "\t\t\tstorage_class_specifier: " << list_.storage_class_specifier;
+        cout << endl;
+        for(auto type : list_.type_qualifier_list) {
+          cout << type << " ";
+        }
+        cout << endl;
+        cout << "\t\t\tarray_sizes: ";
+        for(auto size : list_.array_sizes) {
+          cout << size << " ";
+        }
+				cout << "\t\t\t} ";
 			}
 			cout << endl;
 			cout << "\t\tarray_sizes: ";

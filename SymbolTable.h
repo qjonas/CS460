@@ -75,7 +75,23 @@ public:
 	std::list< std::map<std::string, SymbolInfo> > table_;
 };
 
+struct FunctionParameter {
+	/* Members Deaing with Data Type */
+	// Data type will store the enumerated SymbolType value of the identifier.
+	std::list<SymbolTypes::SymbolType> type_specifier_list;
 
+	// This will store the storage classifier type
+	SymbolTypes::StorageClassSpecifier storage_class_specifier;
+
+	// This will store a list of type qualifiers
+	std::list<SymbolTypes::TypeQualifier> type_qualifier_list;
+
+	// Contains the sizes of the arrays declared with square brackets. Empty
+	// brackets will have an ambiguous size and the value in the list will be
+	// SymbolTypes::AMBIGUOUS_ARRAY_SIZE
+	// The size of the array_sizes list will be the number of square brackets.
+	std::list<int> array_sizes;
+};
 
 // SymbolValue will union the values of the identifiers.
 union SymbolValue {
@@ -131,7 +147,7 @@ typedef struct SymbolInfo {
 	// Parameter types will list the parameter types of a function.
 	// ex: int foo(int i, char c, double d);
 	// parameter_types = {{INT}, {CHAR}, {DOUBLE}};
-	std::list<std::list<SymbolTypes::SymbolType> > parameters_types;
+	std::list<FunctionParameter> parameters_types;
 
 	// Range start will denote which parameter holds the elipses.
 	// ex_1: int foo(int i, char c, ...);
