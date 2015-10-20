@@ -2285,7 +2285,7 @@ unary_expression
 		dummy.data_value.long_long_val = 1;
 		dummy.type_specifier_list = $$.front().type_specifier_list;
 		//overflow check
-		if(!subOverflow($$.front(), dummy)){
+		if(subOverflow($$.front(), dummy)){
 			TR_LOGGER.Error("subtraction overflow detected", LINE, COLUMN);
 		}
 	}
@@ -2522,6 +2522,17 @@ postfix_expression
 		// TODO: Overflow Checking
 		temp->postfix_increment++;
 		$$ = *(new list<SymbolInfo>({*(new SymbolInfo(*temp))}));
+
+		SymbolInfo dummy;
+		dummy.data_value.long_long_val = 1;
+		dummy.type_specifier_list = $$.front().type_specifier_list;
+		// TODO: TypeCheck
+		
+		// TODO: Overflow Checking
+		if(addOverflow($$.front(), dummy)){
+			TR_LOGGER.Error("addition overflow detected", LINE, COLUMN);
+		}
+
 	}
 	| postfix_expression DEC_OP {
 		TR_LOGGER.PushReduction(
@@ -2543,6 +2554,13 @@ postfix_expression
 		// TODO: Overflow Checking
 		temp->postfix_increment++;
 		$$ = *(new list<SymbolInfo>({*(new SymbolInfo(*temp))}));
+		SymbolInfo dummy;
+		dummy.data_value.long_long_val = 1;
+		dummy.type_specifier_list = $$.front().type_specifier_list;
+		//overflow check
+		if(subOverflow($$.front(), dummy)){
+			TR_LOGGER.Error("subtraction overflow detected", LINE, COLUMN);
+		}
 	}
 	;
 
