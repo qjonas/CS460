@@ -1322,7 +1322,21 @@ cast_expression
 		TR_LOGGER.PushReduction(
 			"OPEN_PAREN type_name CLOSE_PAREN cast_expression -> cast_expression");
 
-		// Check down casting / up casting
+		// Check down casting / up casting for numbers
+		if(IsNumber($2.front()) && IsNumber($4.front())) {
+			if (IsFloating($2.front()) && IsInteger($4.front())) {
+				TR_LOGGER.Warning("Up casting", LINE, COLUMN);
+			} else if (IsInteger($2.front()) && IsFloating($4.front())) {
+				
+			}
+
+
+
+		}
+
+		// Check both pointers
+
+		// Not gonna deal with structs 
 	}
 	;
 
