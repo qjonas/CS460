@@ -14,7 +14,8 @@ bool IsInteger(const SymbolInfo& symbol_info);
 bool IsFloating(const SymbolInfo& symbol_info);
 int SizeOfNumber(const SymbolInfo& symbol_info);
 bool IsUnsigned(const SymbolInfo& symbol_info);
-//if inc_or_dec true then increment, false then decrement.
 bool checkOverflow(const SymbolInfo& symbol_info);
 bool IsRelational(const SymbolInfo& symbol_info);
+long double maxValue(const SymbolInfo& symbol_info);
+long double minValue(const SymbolInfo& symbol_info);
 #endif //SYMBOLINFOUTIL_H_
