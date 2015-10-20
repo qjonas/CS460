@@ -674,8 +674,9 @@ direct_declarator
 
 		// Define the function to take in integers based on the num of identifiers
 		for(int i = 0; i < $3.size(); i++) {
-			$1.front().parameters_types
-					.push_back(*(new list<SymbolTypes::SymbolType>({SymbolTypes::INT})));
+			FunctionParameter temp;
+			temp.type_specifier_list.push_back(SymbolTypes::INT);
+			$1.front().parameters_types.push_back(temp);
 		}
 
 		// Get the symbol in the symbol table and assign it to what is here.
@@ -1300,20 +1301,28 @@ multiplicative_expression
 			"-> multiplicative_expression");
 	}
 	| multiplicative_expression PERCENT cast_expression {
-
+		// Log reduction
 		TR_LOGGER.PushReduction(
 			"multiplicative_expression PERCENT cast_expression "
 			"-> multiplicative_expression");
+		// Check if the $3 is equal to zero
 	}
 	;
 
 cast_expression
 	: unary_expression {
+		// Log reduction
 		TR_LOGGER.PushReduction("unary_expression -> cast_expression");
+
+		// Pass through
+		$$ = $1;
 	}
 	| OPEN_PAREN type_name CLOSE_PAREN cast_expression {
+		// Log Error
 		TR_LOGGER.PushReduction(
 			"OPEN_PAREN type_name CLOSE_PAREN cast_expression -> cast_expression");
+
+		// Check down casting / up casting
 	}
 	;
 
