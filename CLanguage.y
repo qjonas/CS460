@@ -1244,6 +1244,7 @@ and_expression
 		TR_LOGGER.PushReduction("equality_expression -> and_expression");
 	}
 	| and_expression AMPERSAND equality_expression {
+		// Log reduction
 		TR_LOGGER.PushReduction(
 			"and_expression AMPERSAND equality_expression -> and_expression");
 	}
@@ -1251,15 +1252,144 @@ and_expression
 
 equality_expression
 	: relational_expression {
+		// Log reduction.
 		TR_LOGGER.PushReduction("relational_expression -> equality_expression");
+		// Pass through.
+		$$ = $1;
 	}
 	| equality_expression EQ_OP relational_expression {
+		// Log reduction.
 		TR_LOGGER.PushReduction(
 			"equality_expression EQ_OP relational_expression -> equality_expression");
+		// Check if they are numbers
+		if(!IsRelational($1.front()) || !IsRelational($3.front())) {
+			TR_LOGGER.Error("Cannot calculate equality of non relational type", 
+											LINE, COLUMN);
+		}
+
+		// Perform the lesser
+		if($3.front().data_is_valid && $1.front().data_is_valid) {
+			// Integer lesser
+			if(IsInteger($1.front()) && IsInteger($3.front())) {
+				if(IsUnsigned($1.front()) && IsUnsigned($3.front())) {
+					$1.front().data_value.unsigned_long_long_val 
+							= $1.front().data_value.unsigned_long_long_val 
+									== $3.front().data_value.unsigned_long_long_val;
+				} else if (!IsUnsigned($1.front()) && IsUnsigned($3.front())) {
+					$1.front().data_value.unsigned_long_long_val 
+						= $1.front().data_value.long_long_val 
+							== $3.front().data_value.unsigned_long_long_val;
+				} else if (IsUnsigned($1.front()) && !IsUnsigned($3.front())) {
+					$1.front().data_value.unsigned_long_long_val 
+						= $1.front().data_value.long_long_val 
+							== $3.front().data_value.unsigned_long_long_val;
+				} else {
+					$1.front().data_value.unsigned_long_long_val 
+						= $1.front().data_value.long_long_val 
+							== $3.front().data_value.long_long_val;
+				}
+			// Both floating divide
+			} else if (IsFloating($1.front()) && IsFloating($3.front())) {
+				$1.front().data_value.unsigned_long_long_val 
+					= $1.front().data_value.double_val 
+						== $3.front().data_value.double_val;
+			// Single floating divide
+			} else if (IsFloating($1.front())) {
+				if(IsUnsigned($3.front())) {
+					$1.front().data_value.unsigned_long_long_val 
+						= $1.front().data_value.double_val 
+						 == $3.front().data_value.unsigned_long_long_val;
+				} else {
+					$1.front().data_value.unsigned_long_long_val 
+						= $1.front().data_value.double_val 
+							== $3.front().data_value.long_long_val;
+				}
+			} else {
+				if(IsUnsigned($1.front())) {
+					$1.front().data_value.unsigned_long_long_val 
+						= $1.front().data_value.unsigned_long_long_val 
+							== $3.front().data_value.double_val;
+				} else {
+					$1.front().data_value.unsigned_long_long_val 
+						= $1.front().data_value.long_long_val 
+							== $3.front().data_value.double_val;
+				}
+			}
+		} else {
+			$1.front().data_is_valid = false;
+		}
+
+		$1.front().type_specifier_list 
+			= *(new list<SymbolTypes::SymbolType>({SymbolTypes::INT}));
+
+		$$ = $1;
 	}
 	| equality_expression NE_OP relational_expression {
+		// Log reduction
 		TR_LOGGER.PushReduction(
 			"equality_expression NE_OP relational_expression -> equality_expression");
+		// Check if they are numbers
+		if(!IsRelational($1.front()) || !IsRelational($3.front())) {
+			TR_LOGGER.Error("Cannot calculate equality of non relational type", 
+											LINE, COLUMN);
+		}
+
+		// Perform the lesser
+		if($3.front().data_is_valid && $1.front().data_is_valid) {
+			// Integer lesser
+			if(IsInteger($1.front()) && IsInteger($3.front())) {
+				if(IsUnsigned($1.front()) && IsUnsigned($3.front())) {
+					$1.front().data_value.unsigned_long_long_val 
+							= $1.front().data_value.unsigned_long_long_val 
+									!= $3.front().data_value.unsigned_long_long_val;
+				} else if (!IsUnsigned($1.front()) && IsUnsigned($3.front())) {
+					$1.front().data_value.unsigned_long_long_val 
+						= $1.front().data_value.long_long_val 
+							!= $3.front().data_value.unsigned_long_long_val;
+				} else if (IsUnsigned($1.front()) && !IsUnsigned($3.front())) {
+					$1.front().data_value.unsigned_long_long_val 
+						= $1.front().data_value.long_long_val 
+							!= $3.front().data_value.unsigned_long_long_val;
+				} else {
+					$1.front().data_value.unsigned_long_long_val 
+						= $1.front().data_value.long_long_val 
+							!= $3.front().data_value.long_long_val;
+				}
+			// Both floating divide
+			} else if (IsFloating($1.front()) && IsFloating($3.front())) {
+				$1.front().data_value.unsigned_long_long_val 
+					= $1.front().data_value.double_val 
+						!= $3.front().data_value.double_val;
+			// Single floating divide
+			} else if (IsFloating($1.front())) {
+				if(IsUnsigned($3.front())) {
+					$1.front().data_value.unsigned_long_long_val 
+						= $1.front().data_value.double_val 
+						 != $3.front().data_value.unsigned_long_long_val;
+				} else {
+					$1.front().data_value.unsigned_long_long_val 
+						= $1.front().data_value.double_val 
+							!= $3.front().data_value.long_long_val;
+				}
+			} else {
+				if(IsUnsigned($1.front())) {
+					$1.front().data_value.unsigned_long_long_val 
+						= $1.front().data_value.unsigned_long_long_val 
+							!= $3.front().data_value.double_val;
+				} else {
+					$1.front().data_value.unsigned_long_long_val 
+						= $1.front().data_value.long_long_val 
+							!= $3.front().data_value.double_val;
+				}
+			}
+		} else {
+			$1.front().data_is_valid = false;
+		}
+
+		$1.front().type_specifier_list 
+			= *(new list<SymbolTypes::SymbolType>({SymbolTypes::INT}));
+
+		$$ = $1;
 	}
 	;
 
@@ -1345,7 +1475,7 @@ relational_expression
 
 		// Check if they are numbers
 		if(!IsRelational($1.front()) || !IsRelational($3.front())) {
-			TR_LOGGER.Error("Cannot calculate less of non relational type", 
+			TR_LOGGER.Error("Cannot calculate greater of non relational type", 
 											LINE, COLUMN);
 		}
 
@@ -1412,7 +1542,7 @@ relational_expression
 			"relational_expression LE_OP shift_expression -> relational_expression");
 		// Check if they are numbers
 		if(!IsRelational($1.front()) || !IsRelational($3.front())) {
-			TR_LOGGER.Error("Cannot calculate less of non relational type", 
+			TR_LOGGER.Error("Cannot calculate less or equal of non relational type", 
 											LINE, COLUMN);
 		}
 
@@ -1478,7 +1608,7 @@ relational_expression
 			"relational_expression GE_OP shift_expression -> relational_expression");
 		// Check if they are numbers
 		if(!IsRelational($1.front()) || !IsRelational($3.front())) {
-			TR_LOGGER.Error("Cannot calculate less of non relational type", 
+			TR_LOGGER.Error("Cannot calculate greater or equal of non relational type", 
 											LINE, COLUMN);
 		}
 
