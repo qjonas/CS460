@@ -461,19 +461,49 @@ struct_declaration
 	;
 
 specifier_qualifier_list
-	: type_specifier {
+	: type_specifier { 
+		// Log reduction
 		TR_LOGGER.PushReduction("type_specifier -> specifier_qualifier_list");
+
+		// Pass through
+		$$ = $1;
 	}
 	| type_specifier specifier_qualifier_list {
+		// Log reduction
 		TR_LOGGER.PushReduction(
 			"type_specifier specifier_qualifier_list -> specifier_qualifier_list");
+
+		// Add type specifier to declaration specifier
+		$2.front().type_specifier_list.push_front($1.front().type_specifier_list.front());
+		$$ = $2;
+
+		// Check if the data type is valid
+		if(!(IsDataTypeValid($2.front()))) {
+			TR_LOGGER.Error("Data Type not valid.", LINE, COLUMN);
+		}
 	}
 	| type_qualifier {
+		// Log reduction.
 		TR_LOGGER.PushReduction("type_qualifier -> specifier_qualifier_list");
+
+		// Pass through
+		$$ = $1;
 	}
 	| type_qualifier specifier_qualifier_list {
+		// Log reduction.
 		TR_LOGGER.PushReduction(
 			"type_qualifier specifier_qualifier_list -> specifier_qualifier_list");
+
+		// Push type qualifier to the front
+		$2.front().type_qualifier_list.push_front($1.front().type_qualifier_list.front());
+
+		// Assign $$ to $2
+		$$ = $2;
+
+		// Check if the Type qualifier is valid if not Error.
+		if(!(IsTypeQualifierValid($2.front()))) {
+			TR_LOGGER.Error("Repeated type qualifier.", LINE, COLUMN);
+		}
 	}
 	;
 
@@ -856,9 +886,14 @@ initializer_list
 
 type_name
 	: specifier_qualifier_list {
+		// Log reduction.
 		TR_LOGGER.PushReduction("specifier_qualifier_list -> type_name");
+
+		// Pass through
+		$$ = $1;
 	}
 	| specifier_qualifier_list abstract_declarator {
+		// Ain't gonna do this.
 		TR_LOGGER.PushReduction(
 			"specifier_qualifier_list abstract_declarator -> type_name");
 	}
@@ -1327,14 +1362,19 @@ cast_expression
 			if (IsFloating($2.front()) && IsInteger($4.front())) {
 				TR_LOGGER.Warning("Up casting", LINE, COLUMN);
 			} else if (IsInteger($2.front()) && IsFloating($4.front())) {
-				
+				TR_LOGGER.Warning("Down casting", LINE, COLUMN);
+			} else if (SizeOfNumber($2.front()) > SizeOfNumber($4.front())) {
+				TR_LOGGER.Warning("Up casting", LINE, COLUMN);
+			} else if (SizeOfNumber($2.front()) > SizeOfNumber($4.front())) {
+				TR_LOGGER.Warning("Down casting", LINE, COLUMN);
 			}
-
-
-
 		}
 
-		// Check both pointers
+		// Check if both pointers
+		if($2.front().array_sizes.size() > 0 &&
+			 $4.front().array_sizes.size() > 0) {
+
+		}
 
 		// Not gonna deal with structs 
 	}
@@ -1423,10 +1463,11 @@ unary_expression
 	| PLUS cast_expression {
 		// Log reduction
 		TR_LOGGER.PushReduction("PLUS cast_expression -> unary_expression");
-
+		$$ = $2;
 		// Make the data_value positive. Probably something like pushing a 0 to the 
 		// highest bit.
 		if($2.front().data_is_valid){
+			$$.front().data_is_valid = true;
 			if(IsNumber($2.front()) ){
 
 				if( (($2.front().data_value.long_long_val) < 0) ){
@@ -1434,7 +1475,7 @@ unary_expression
 				}
 			}
 			else{
-				TR_LOGGER.Error("Unkown type conversion, check that data is of type, char, int, or double.", LINE, COLUMN);
+				TR_LOGGER.Error("Unkown type conversion, check that data is of type, char, int, float, or double.", LINE, COLUMN);
 			}
 		}
 	}
@@ -1442,13 +1483,15 @@ unary_expression
 		// Log reduction
 		TR_LOGGER.PushReduction("MINUS cast_expression -> unary_expression");
 
-		// Check if unsigned. TODO
+		// Check if unsigned. TODO: Warning message, C allows this but it is nonsensical
+		$$ = $2;
 		if($2.front().data_is_valid){
+			$$.front().data_is_valid = true;
 			if(IsNumber($2.front()) ){
 				$$.front().data_value.long_long_val = (-1)*($2.front().data_value.long_long_val);
 			}
 			else{
-				TR_LOGGER.Error("Unkown type conversion, check that data is of type, char, int, or double.", LINE, COLUMN);
+				TR_LOGGER.Error("Unkown type conversion, check that data is of type, char, int, float, or double.", LINE, COLUMN);
 			}
 		}
 	}
@@ -1457,12 +1500,14 @@ unary_expression
 		TR_LOGGER.PushReduction("TILDE cast_expression -> unary_expression");
 		// Bitwise not operator 
 		// Must be a number 
+		$$ = $2;
 		if($2.front().data_is_valid){
+			$$.front().data_is_valid = true;
 			if(IsNumber($2.front()) ){
 				$$.front().data_value.long_long_val = ~($2.front().data_value.long_long_val);
 			}
 			else{
-				TR_LOGGER.Error("Unkown type conversion, check that data is of type, char, int, or double.", LINE, COLUMN);
+				TR_LOGGER.Error("Unkown type conversion, check that data is of type, char, int, float, or double.", LINE, COLUMN);
 			}
 		}
 
@@ -1472,15 +1517,34 @@ unary_expression
 	| BANG cast_expression {
 		// Log operation.
 		TR_LOGGER.PushReduction("BANG cast_expression -> unary_expression");
-
+		$$ = $2;
+		if($2.front().data_is_valid){
+			$$.front().data_is_valid = true;
+			if(IsNumber($2.front())){
+				if($2.front().data_value.long_long_val == 0){
+					$$.front().data_value.long_long_val = 1;
+				}
+				else{
+					$$.front().data_value.long_long_val = 0;
+				}
+			}
+			else{
+				TR_LOGGER.Error("Unkown type conversion, check that data is of type: char, int, float, or double.", LINE, COLUMN);
+			}
+		}
 		// if != 0 change to zero, change to 1 if not can be any number or pointer
 		// !(R, P) -> {0,1} : P = pointer
 	}
 	| SIZEOF unary_expression {
 		// Log operation.
 		TR_LOGGER.PushReduction("SIZEOF unary_expression -> unary_expression");
-
+		$$ = $2;
 		// Becomes an integer
+		if($2.front().data_is_valid){
+			$$.front().data_is_valid = true;
+			$$.front().type_specifier_list.push_front(SymbolTypes::INT);
+			$$.front().data_value.long_long_val = sizeof($2.front().type_specifier_list.front());
+		}
 	}
 	| SIZEOF OPEN_PAREN type_name CLOSE_PAREN {
 		// Log operation.

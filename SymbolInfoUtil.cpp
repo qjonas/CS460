@@ -266,6 +266,11 @@ bool IsNumber(const SymbolInfo& symbol_info) {
   static set<list<SymbolType>> valid_data_types;
   static bool valid_data_types_initialized = false;
 
+  // Check Pointer
+  if(symbol_info.array_sizes.size() > 0) {
+    return false;
+  }
+
   // Initialize the set with valid data types.
   if(!valid_data_types_initialized) {
     // Char data types
@@ -321,6 +326,11 @@ bool IsInteger(const SymbolInfo& symbol_info) {
   static set<list<SymbolType>> valid_data_types;
   static bool valid_data_types_initialized = false;
 
+  // Check Pointer
+  if(symbol_info.array_sizes.size() > 0) {
+    return false;
+  }
+
   // Initialize the set with valid data types.
   if(!valid_data_types_initialized) {
     // Char data types
@@ -371,6 +381,11 @@ bool IsFloating(const SymbolInfo& symbol_info) {
   static set<list<SymbolType>> valid_data_types;
   static bool valid_data_types_initialized = false;
 
+  // Check Pointer
+  if(symbol_info.array_sizes.size() > 0) {
+    return false;
+  }
+  
   // Initialize the set with valid data types.
   if(!valid_data_types_initialized) {
     // Floating point data types
