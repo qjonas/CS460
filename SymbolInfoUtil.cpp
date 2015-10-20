@@ -455,3 +455,31 @@ int SizeOfNumber(const SymbolInfo& symbol_info) {
 
   return data_types_to_size[symbol_info.type_specifier_list];
 }
+
+bool checkOverflow(const SymbolInfo& symbol_info, bool inc_or_dec){
+	//Declare to check overflow addition and substraction
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+}
