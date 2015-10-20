@@ -2168,7 +2168,7 @@ unary_expression
 		// TODO: TypeCheck
 		
 		// TODO: Overflow Checking
-		if(!addOverflow($$.front(), dummy)){
+		if(addOverflow($$.front(), dummy)){
 			TR_LOGGER.Error("addition overflow detected", LINE, COLUMN);
 		}
 	}
