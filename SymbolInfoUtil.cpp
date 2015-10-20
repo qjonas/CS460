@@ -599,3 +599,6 @@ long double minValue(const SymbolInfo& symbol_info){
   return min_value[symbol_info.type_specifier_list];
 }
 
+bool IsRelational(const SymbolInfo& symbol_info) {
+  return IsDataTypeValidForIncDec(symbol_info);
+}
