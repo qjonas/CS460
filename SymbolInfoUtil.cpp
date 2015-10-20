@@ -601,7 +601,7 @@ long double minValue(const SymbolInfo& symbol_info){
 
 bool multOverflow(const SymbolInfo& symbol_info_LH, const SymbolInfo& symbol_info_RH){
 
-
+return true;
 }
 bool addOverflow(const SymbolInfo& symbol_info_LH, const SymbolInfo& symbol_info_RH){
 //check if int
@@ -632,12 +632,12 @@ if(IsFloating(symbol_info_LH)){
 else{
  
 }
-
+return false;
 }
 
 bool subOverflow(const SymbolInfo& symbol_info_LH, const SymbolInfo& symbol_info_RH){
 
-
+return true;
 }
 
 bool IsRelational(const SymbolInfo& symbol_info) {
