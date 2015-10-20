@@ -1329,14 +1329,67 @@ multiplicative_expression
 			"-> multiplicative_expression");
 	}
 	| multiplicative_expression FORWARD_SLASH cast_expression {
-			if($2.front().data_value.long_long_val == 0) {
-			// Error division by 0
-			TR_LOGGER.Error("Cannot divide by 0, seriously, stop that.",
-											LINE, COLUMN);
-			}
+		// Log reduction
 		TR_LOGGER.PushReduction(
 			"multiplicative_expression FORWARD_SLASH cast_expression "
 			"-> multiplicative_expression");
+		// Check if they are numbers
+		if(!IsNumber($1.front()) || !IsNumber($3.front())) {
+			TR_LOGGER.Error("Cannot divide something of not number type", 
+											LINE, COLUMN);
+		}
+		// Check if data is == 0
+		if($3.front().data_is_valid) {
+			if(	(IsInteger($3.front()) && 
+					 $3.front().data_value.unsigned_long_long_val == 0) ||
+					(IsFloating($3.front()) &&
+					 $3.front().data_value.double_val == 0.0) ) {
+				TR_LOGGER.Error("Cannot divide by 0", LINE, COLUMN);
+			}
+		}
+
+		// Perform the divide
+		if($3.front().data_is_valid && $1.front().data_is_valid) {
+			// Integer divide
+			if(IsInteger($1.front()) && IsInteger($3.front())) {
+				if(IsUnsigned($1.front()) && IsUnsigned($3.front())) {
+					$1.front().data_value.unsigned_long_long_val 
+							/= $3.front().data_value.unsigned_long_long_val;
+				} else if (!IsUnsigned($1.front()) && IsUnsigned($3.front())) {
+					$1.front().data_value.long_long_val 
+							/= $3.front().data_value.unsigned_long_long_val;
+				} else if (IsUnsigned($1.front()) && !IsUnsigned($3.front())) {
+					$1.front().data_value.long_long_val 
+							/= $3.front().data_value.unsigned_long_long_val;
+				} else {
+					$1.front().data_value.long_long_val 
+							/= $3.front().data_value.long_long_val;
+				}
+			// Both floating divide
+			} else if (IsFloating($1.front()) && IsFloating($3.front())) {
+				$1.front().data_value.double_val /= $3.front().data_value.double_val;
+			// Single floating divide
+			} else if (IsFloating($1.front())) {
+				if(IsUnsigned($3.front())) {
+					$1.front().data_value.double_val 
+						/= $3.front().data_value.unsigned_long_long_val;
+				} else {
+					$1.front().data_value.double_val 
+						/= $3.front().data_value.long_long_val;
+				}
+			} else {
+				if(IsUnsigned($1.front())) {
+					$1.front().data_value.double_val 
+						= $1.front().data_value.unsigned_long_long_val 
+								/ $3.front().data_value.double_val;
+				} else {
+					$1.front().data_value.double_val 
+						= $1.front().data_value.long_long_val 
+								/ $3.front().data_value.double_val;
+				}
+				$1.front().type_specifier_list = $3.front().type_specifier_list;
+			}
+		}
 	}
 	| multiplicative_expression PERCENT cast_expression {
 		// Log reduction
