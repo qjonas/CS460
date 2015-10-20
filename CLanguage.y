@@ -1288,15 +1288,64 @@ relational_expression
 
 shift_expression
 	: additive_expression {
+		// Log reduction.
 		TR_LOGGER.PushReduction("additive_expression -> shift_expression");
+		// Pass through
+		$$ = $1;
 	}
 	| shift_expression LEFT_OP additive_expression {
+		// Log reduction.
 		TR_LOGGER.PushReduction(
 			"shift_expression LEFT_OP additive_expression -> shift_expression");
+		// Check if the $3 is equal to zero
+		if(!IsInteger($1.front()) || !IsInteger($3.front())) {
+			TR_LOGGER.Error("Cannot left shift something of not integer type", 
+											LINE, COLUMN);
+		}
+		// Perform the left shift operation.
+		if($3.front().data_is_valid && $1.front().data_is_valid) {
+			if(IsUnsigned($1.front()) && IsUnsigned($3.front())) {
+				$1.front().data_value.unsigned_long_long_val 
+						<<= $3.front().data_value.unsigned_long_long_val;
+			} else if (!IsUnsigned($1.front()) && IsUnsigned($3.front())) {
+				$1.front().data_value.long_long_val 
+						<<= $3.front().data_value.unsigned_long_long_val;
+			} else if (IsUnsigned($1.front()) && !IsUnsigned($3.front())) {
+				$1.front().data_value.long_long_val 
+						<<= $3.front().data_value.unsigned_long_long_val;
+			} else {
+				$1.front().data_value.long_long_val 
+						<<= $3.front().data_value.long_long_val;
+			}
+		}
+		$$ = $1;
 	}
 	| shift_expression RIGHT_OP additive_expression {
+		// Log reduction
 		TR_LOGGER.PushReduction(
 			"shift_expression RIGHT_OP additive_expression -> shift_expression");
+		// Check if either are not integers
+		if(!IsInteger($1.front()) || !IsInteger($3.front())) {
+			TR_LOGGER.Error("Cannot right shift something of not integer type", 
+											LINE, COLUMN);
+		}
+		// Perform the right shift operation.
+		if($3.front().data_is_valid && $1.front().data_is_valid) {
+			if(IsUnsigned($1.front()) && IsUnsigned($3.front())) {
+				$1.front().data_value.unsigned_long_long_val 
+						>>= $3.front().data_value.unsigned_long_long_val;
+			} else if (!IsUnsigned($1.front()) && IsUnsigned($3.front())) {
+				$1.front().data_value.long_long_val 
+						>>= $3.front().data_value.unsigned_long_long_val;
+			} else if (IsUnsigned($1.front()) && !IsUnsigned($3.front())) {
+				$1.front().data_value.long_long_val 
+						>>= $3.front().data_value.unsigned_long_long_val;
+			} else {
+				$1.front().data_value.long_long_val 
+						>>= $3.front().data_value.long_long_val;
+			}
+		}
+		$$ = $1;
 	}
 	;
 
