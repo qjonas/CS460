@@ -631,11 +631,41 @@ if(IsFloating(symbol_info_LH)){
 //error
 else{
  
-}
-return false;
+
+  }
+
+return true;
 }
 
 bool subOverflow(const SymbolInfo& symbol_info_LH, const SymbolInfo& symbol_info_RH){
+//check if int
+if(IsInteger(symbol_info_LH)){
+	//check if unsigned
+	if(IsUnsigned(symbol_info_LH)){
+	unsigned long long min = minValue(symbol_info_LH);
+	unsigned long long val_LH = symbol_info_LH.data_value.unsigned_long_long_val;
+	unsigned long long val_RH = symbol_info_RH.data_value.unsigned_long_long_val;
+  return((min + val_LH) > val_RH);
+	}
+	//check else signed
+	else{
+	long long min = minValue(symbol_info_LH);
+	long long val_LH = symbol_info_LH.data_value.long_long_val;
+	long long val_RH = symbol_info_RH.data_value.long_long_val;
+  return((min + val_LH) > val_RH);
+	}
+}
+
+if(IsFloating(symbol_info_LH)){
+  long double min = minValue(symbol_info_LH);
+  long double val_LH = symbol_info_LH.data_value.double_val;
+  long double val_RH = symbol_info_RH.data_value.double_val;
+  return((min + val_LH) > val_RH);
+  }
+//error
+else{
+ 
+  }
 
 return true;
 }

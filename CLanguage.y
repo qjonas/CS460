@@ -2227,9 +2227,20 @@ unary_expression
 		// Pass through
 		SymbolInfo* temp = 
 				S_TABLE.GetMostRecentSymbolInfo($2.front().identifier_name);
-		// TODO: Overflow Checking
+		
+		
 		IncrementSymbolInfoBy(temp, 1);
 		$$ = *(new list<SymbolInfo>({*(new SymbolInfo(*temp))}));
+
+		SymbolInfo dummy;
+		dummy.data_value.long_long_val = 1;
+		dummy.type_specifier_list = $$.front().type_specifier_list;
+		// TODO: TypeCheck
+		
+		// TODO: Overflow Checking
+		if(!addOverflow($$.front(), dummy)){
+			TR_LOGGER.Error("addition overflow detected", LINE, COLUMN);
+		}
 	}
 	| DEC_OP unary_expression {
 		// Log reduction
@@ -2249,9 +2260,17 @@ unary_expression
 		// Pass through
 		SymbolInfo* temp = 
 				S_TABLE.GetMostRecentSymbolInfo($2.front().identifier_name);
-		// TODO: Overflow Checking
+
 		IncrementSymbolInfoBy(temp, -1);
 		$$ = *(new list<SymbolInfo>({*(new SymbolInfo(*temp))}));
+
+		SymbolInfo dummy;
+		dummy.data_value.long_long_val = 1;
+		dummy.type_specifier_list = $$.front().type_specifier_list;
+		//overflow check
+		if(!subOverflow($$.front(), dummy)){
+			TR_LOGGER.Error("subtraction overflow detected", LINE, COLUMN);
+		}
 	}
 	| AMPERSAND cast_expression {
 		// Log reduction
