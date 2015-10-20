@@ -96,6 +96,7 @@ void SymbolTable::Print() const {
 				cout << qualifier << " ";
 			}
 			cout << endl;
+      cout << "\t\tdata_value: " << ident_tuple.second.data_value.long_long_val << endl;
 			cout << "\t\ttypedef_name: " << ident_tuple.second.typedef_name << endl;
 			cout << "\t\tis_function: " << ident_tuple.second.is_function << endl;
 			cout << "\t\tparameters_types: " << endl;

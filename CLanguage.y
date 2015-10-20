@@ -446,8 +446,63 @@ init_declarator
 		// Log reduction
 		TR_LOGGER.PushReduction(
 			"declarator EQUALS_SIGN initializer -> init_declarator");
-		// Assign value of declarator to the initializer
-		
+
+		// declarator will take on type specifier list
+		$1.front().type_specifier_list = $3.front().type_specifier_list;
+
+		// Check if they are numbers
+		if(!IsRelational($1.front()) || !IsRelational($3.front())) {
+			TR_LOGGER.Error("Cannot assign non relational type", 
+											LINE, COLUMN);
+		}
+
+		// Perform the lesser
+		if($3.front().data_is_valid) {
+			// Integer lesser
+			if(IsInteger($1.front()) && IsInteger($3.front())) {
+				if(IsUnsigned($1.front()) && IsUnsigned($3.front())) {
+					$1.front().data_value.unsigned_long_long_val 
+							= $3.front().data_value.unsigned_long_long_val;
+				} else if (!IsUnsigned($1.front()) && IsUnsigned($3.front())) {
+					$1.front().data_value.long_long_val 
+						= $3.front().data_value.unsigned_long_long_val;
+				} else if (IsUnsigned($1.front()) && !IsUnsigned($3.front())) {
+					$1.front().data_value.unsigned_long_long_val 
+						= $3.front().data_value.long_long_val;
+				} else {
+					$1.front().data_value.long_long_val 
+						= $3.front().data_value.long_long_val;
+				}
+			// Both floating divide
+			} else if (IsFloating($1.front()) && IsFloating($3.front())) {
+				$1.front().data_value.unsigned_long_long_val 
+					= $3.front().data_value.double_val;
+			// Single floating divide
+			} else if (IsFloating($1.front())) {
+				if(IsUnsigned($3.front())) {
+					$1.front().data_value.double_val
+						= (long double) $3.front().data_value.unsigned_long_long_val;
+				} else {
+					$1.front().data_value.double_val 
+						= (long double) $3.front().data_value.long_long_val;
+				}
+			} else {
+				if(IsUnsigned($1.front())) {
+					$1.front().data_value.unsigned_long_long_val 
+						= (unsigned long long) $3.front().data_value.double_val;
+				} else {
+					$1.front().data_value.unsigned_long_long_val 
+						= (long long) $3.front().data_value.double_val;
+				}
+			}
+		} else {
+			$1.front().data_is_valid = false;
+		}
+
+		SymbolInfo* temp = S_TABLE.GetMostRecentSymbolInfo($1.front().identifier_name);
+		*temp = $1.front();
+
+		$$ = *(new list<SymbolInfo>({*temp}));
 
 	}
 	;
@@ -1121,7 +1176,10 @@ jump_statement
 
 expression
 	: assignment_expression {
+		// Log reduction
 		TR_LOGGER.PushReduction("assignment_expression -> expression");
+		// Pass through 
+		$$ = $1;
 	}
 	| expression COMMA assignment_expression {
 		TR_LOGGER.PushReduction(
@@ -1131,7 +1189,10 @@ expression
 
 assignment_expression
 	: conditional_expression {
+		// Log reduction
 		TR_LOGGER.PushReduction("conditional_expression -> assignment_expression");
+		// Pass through
+		$$ = $1;
 	}
 	| unary_expression assignment_operator assignment_expression {
 		TR_LOGGER.PushReduction(
@@ -1178,7 +1239,10 @@ assignment_operator
 
 conditional_expression
 	: logical_or_expression {
+		// Log reduction.
 		TR_LOGGER.PushReduction("logical_or_expression -> conditional_expression");
+		// Pass through
+		$$ = $1;
 	}
 	| logical_or_expression QUESTION expression COLON conditional_expression {
 		TR_LOGGER.PushReduction(
@@ -1195,82 +1259,38 @@ constant_expression
 
 logical_or_expression
 	: logical_and_expression {
+		// Log reduction.
 		TR_LOGGER.PushReduction("logical_and_expression -> logical_or_expression");
+		// Pass through
 	}
 	| logical_or_expression OR_OP logical_and_expression {
+		// Log reduction.
 		TR_LOGGER.PushReduction(
 			"logical_or_expression OR_OP logical_and_expression "
 			"-> logical_or_expression");
-	}
-	;
-
-logical_and_expression
-	: inclusive_or_expression {
-		// Log reduction
-		TR_LOGGER.PushReduction(
-			"inclusive_or_expression -> logical_and_expression");
-
-		// Pass through
-		$$ = $1;
-	}
-	| logical_and_expression AND_OP inclusive_or_expression {
-		// Log reduction.
-		TR_LOGGER.PushReduction(
-			"logical_and_expression AND_OP inclusive_or_expression "
-			"-> logical_and_expression");
-		// Check if they are numbers
-		if(!IsRelational($1.front()) || !IsRelational($3.front())) {
-			TR_LOGGER.Error("Cannot calculate equality of non relational type", 
+		// Check if they are integers
+		if(!IsInteger($1.front()) || !IsInteger($3.front())) {
+			TR_LOGGER.Error("Cannot perform boolean calculation on not integer type", 
 											LINE, COLUMN);
 		}
-
-		// Perform the lesser
+		// Perform the logical and operation.
 		if($3.front().data_is_valid && $1.front().data_is_valid) {
-			// Integer lesser
-			if(IsInteger($1.front()) && IsInteger($3.front())) {
-				if(IsUnsigned($1.front()) && IsUnsigned($3.front())) {
-					$1.front().data_value.unsigned_long_long_val 
-							= $1.front().data_value.unsigned_long_long_val 
-									&& $3.front().data_value.unsigned_long_long_val;
-				} else if (!IsUnsigned($1.front()) && IsUnsigned($3.front())) {
-					$1.front().data_value.unsigned_long_long_val 
-						= $1.front().data_value.long_long_val 
-							&& $3.front().data_value.unsigned_long_long_val;
-				} else if (IsUnsigned($1.front()) && !IsUnsigned($3.front())) {
-					$1.front().data_value.unsigned_long_long_val 
-						= $1.front().data_value.long_long_val 
-							&& $3.front().data_value.unsigned_long_long_val;
-				} else {
-					$1.front().data_value.unsigned_long_long_val 
-						= $1.front().data_value.long_long_val 
-							&& $3.front().data_value.long_long_val;
-				}
-			// Both floating divide
-			} else if (IsFloating($1.front()) && IsFloating($3.front())) {
-				$1.front().data_value.unsigned_long_long_val 
-					= $1.front().data_value.double_val 
-						&& $3.front().data_value.double_val;
-			// Single floating divide
-			} else if (IsFloating($1.front())) {
-				if(IsUnsigned($3.front())) {
-					$1.front().data_value.unsigned_long_long_val 
-						= $1.front().data_value.double_val 
-						 && $3.front().data_value.unsigned_long_long_val;
-				} else {
-					$1.front().data_value.unsigned_long_long_val 
-						= $1.front().data_value.double_val 
-							&& $3.front().data_value.long_long_val;
-				}
+			if(IsUnsigned($1.front()) && IsUnsigned($3.front())) {
+				$1.front().data_value.unsigned_long_long_val
+					= $1.front().data_value.unsigned_long_long_val 
+						&& $3.front().data_value.unsigned_long_long_val;
+			} else if (!IsUnsigned($1.front()) && IsUnsigned($3.front())) {
+				$1.front().data_value.unsigned_long_long_val
+					= $1.front().data_value.long_long_val 
+						&& $3.front().data_value.unsigned_long_long_val;
+			} else if (IsUnsigned($1.front()) && !IsUnsigned($3.front())) {
+				$1.front().data_value.unsigned_long_long_val
+					= $1.front().data_value.long_long_val 
+						&& $3.front().data_value.unsigned_long_long_val;
 			} else {
-				if(IsUnsigned($1.front())) {
-					$1.front().data_value.unsigned_long_long_val 
-						= $1.front().data_value.unsigned_long_long_val 
-							&& $3.front().data_value.double_val;
-				} else {
-					$1.front().data_value.unsigned_long_long_val 
-						= $1.front().data_value.long_long_val 
-							&& $3.front().data_value.double_val;
-				}
+				$1.front().data_value.unsigned_long_long_val
+					= $1.front().data_value.long_long_val 
+						&& $3.front().data_value.long_long_val;
 			}
 		} else {
 			$1.front().data_is_valid = false;
@@ -1279,6 +1299,56 @@ logical_and_expression
 		$1.front().type_specifier_list 
 			= *(new list<SymbolTypes::SymbolType>({SymbolTypes::INT}));
 
+		// Pass through.
+		$$ = $1;
+	}
+	;
+
+logical_and_expression
+	: inclusive_or_expression {
+		// Log reduction
+		TR_LOGGER.PushReduction(
+			"inclusive_or_expression -> logical_and_expression");
+		// Pass through
+		$$ = $1;
+	}
+	| logical_and_expression AND_OP inclusive_or_expression {
+		// Log reduction.
+		TR_LOGGER.PushReduction(
+			"logical_and_expression AND_OP inclusive_or_expression "
+			"-> logical_and_expression");
+		// Check if the $3 is equal to zero
+		if(!IsInteger($1.front()) || !IsInteger($3.front())) {
+			TR_LOGGER.Error("Cannot perform boolean calculation on not integer type", 
+											LINE, COLUMN);
+		}
+		// Perform the logical and operation.
+		if($3.front().data_is_valid && $1.front().data_is_valid) {
+			if(IsUnsigned($1.front()) && IsUnsigned($3.front())) {
+				$1.front().data_value.unsigned_long_long_val
+					= $1.front().data_value.unsigned_long_long_val 
+						&& $3.front().data_value.unsigned_long_long_val;
+			} else if (!IsUnsigned($1.front()) && IsUnsigned($3.front())) {
+				$1.front().data_value.unsigned_long_long_val
+					= $1.front().data_value.long_long_val 
+						&& $3.front().data_value.unsigned_long_long_val;
+			} else if (IsUnsigned($1.front()) && !IsUnsigned($3.front())) {
+				$1.front().data_value.unsigned_long_long_val
+					= $1.front().data_value.long_long_val 
+						&& $3.front().data_value.unsigned_long_long_val;
+			} else {
+				$1.front().data_value.unsigned_long_long_val
+					= $1.front().data_value.long_long_val 
+						&& $3.front().data_value.long_long_val;
+			}
+		} else {
+			$1.front().data_is_valid = false;
+		}
+
+		$1.front().type_specifier_list 
+			= *(new list<SymbolTypes::SymbolType>({SymbolTypes::INT}));
+
+		// Pass through.
 		$$ = $1;
 	}
 	;
@@ -2445,11 +2515,14 @@ primary_expression
 		// Log reduction.
 		TR_LOGGER.PushReduction("identifier -> primary_expression");
 		// Pass through
+		$$ = $1;
 	}
 	| constant {
 		// Log reduction
 		TR_LOGGER.PushReduction("constant -> primary_expression");
 		// Pass through
+		$$ = $1;
+		cout << "VALUE: " << $$.front().data_value.unsigned_long_long_val << endl;
 	}
 	| string {
 		// Log reduction
