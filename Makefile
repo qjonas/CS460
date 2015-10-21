@@ -20,7 +20,7 @@ LIBS	= -L/usr/local/lib -ll
 BUILDOBJS =  CLanguage.tab.o lex.yy.o SymbolTable.o CommandLineFlags.o 
 BUILDOBJS += Globals.o TokenReductionsLogger.o SymbolInfoUtil.o
 
-CLanguage: $(BUILDOBJS)
+CLanguage: $(BUILDOBJS) SymbolTableDriver
 	$(CC) $(C11) -o CLanguage $(BUILDOBJS) $(LIBS)
 
 CLanguage.tab.o: CLanguage.tab.cc
@@ -49,6 +49,9 @@ TokenReductionsLogger.o:
 
 SymbolInfoUtil.o: SymbolInfoUtil.cpp
 	$(CC) $(C11) -c SymbolInfoUtil.cpp
+
+SymbolTableDriver: SymbolTableDriver.cpp SymbolTable.o
+	$(CC) $(C11) -o SymbolTableDriver SymbolTableDriver.cpp SymbolTable.o
 
 clean:
 	rm *.o CLanguage.tab.cc CLanguage.tab.hh lex.yy.cc  CLanguage

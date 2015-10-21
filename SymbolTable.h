@@ -57,6 +57,8 @@ public:
 
 	void Print() const;
 
+	void DriverPrint() const;
+
 	// Creates a new stack frame.
 	void PushFrame();
 	

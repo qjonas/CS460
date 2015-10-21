@@ -15,6 +15,8 @@
 #include <stack>
 #include <string>
 
+#include "Escape_Sequences_Colors.h"
+
 using namespace std;
 using namespace SymbolTypes;
 
@@ -132,6 +134,20 @@ void SymbolTable::Print() const {
 	}
 }
 
+void SymbolTable::DriverPrint() const {
+  cout << COLOR_GREEN_NORMAL << "Symbol Table" << COLOR_NORMAL << endl;
+  cout << COLOR_GREEN_NORMAL << "============" << COLOR_NORMAL << endl;
+
+  cout << "Number of stack frames: " << table_.size() << endl;
+  int stack_frames = table_.size() - 1;
+  for(auto table_map : table_) {
+    cout << "Stack Frame: " << stack_frames-- << endl;
+    cout << "\tNumber of identifiers: " << table_map.size() << endl;
+    for(auto ident_tuple : table_map) {
+      cout << "\t\tidentifier_name: " << ident_tuple.second.identifier_name << endl;
+    }
+  }
+}
 
 void SymbolTable::PushFrame() {
 	table_.push_front(*(new map<string, SymbolInfo>));
