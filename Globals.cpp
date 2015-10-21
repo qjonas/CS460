@@ -9,3 +9,4 @@ bool INSERT_MODE = true;
 bool IN_SWITCH = false;
 int COLUMN = 1;
 int LINE = 1;
+int IN_FUNCTION = 0;

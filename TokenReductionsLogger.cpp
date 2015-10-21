@@ -12,6 +12,7 @@
 #include <string>
 #include <vector>
 
+#include "CommandLineFlags.h"
 #include "Escape_Sequences_Colors.h"
 
 
@@ -26,8 +27,12 @@ void TokenReductionsLogger::AddOutputToFile(const string& file_name) {
 	file_out_ = new ofstream(file_name);
 }
 
-void TokenReductionsLogger::OutputToConsole(bool yes_or_no) {
-	console_output_ = yes_or_no;
+void TokenReductionsLogger::SetDebugType(DebugType debug) {
+	debug_type = debug;
+}
+
+void TokenReductionsLogger::SetSymbolTable(SymbolTable* table) {
+	symbol_table = table;
 }
 
 void TokenReductionsLogger::PushToken(const string& token) {
@@ -36,10 +41,13 @@ void TokenReductionsLogger::PushToken(const string& token) {
 	}
 	token_reductions_.push_back((new string("Token : "))->append(COLOR_MAGENTA_NORMAL).append(token).append(COLOR_NORMAL));
 	token_reductions_.push_back("Reductions: ");
+	tokens_.push_back((new string("Token : "))->append(COLOR_MAGENTA_NORMAL).append(token).append(COLOR_NORMAL));
 }
 
 void TokenReductionsLogger::PushReduction(const string& reduct) {
 	token_reductions_.push_back( (new string("\t"))->append(COLOR_CYAN_NORMAL).append(reduct).append(COLOR_NORMAL));
+	reductions_.push_back( (new string("Reduction: "))->append(COLOR_CYAN_NORMAL).append(reduct).append(COLOR_NORMAL));
+
 }
 
 void TokenReductionsLogger::PushSourceWord(const string& word) {
@@ -47,12 +55,36 @@ void TokenReductionsLogger::PushSourceWord(const string& word) {
 }
 
 void TokenReductionsLogger::LogTokenReductions() {
-	if (console_output_) {
+	if(debug_type == TOKENS_AND_REDUCTIONS || 
+		 debug_type == TOKENS_AND_REDUCTIONS_AND_SYMBOL_TABLE) {
 		for(string str : token_reductions_) {
 			cout  << str << endl;
 		}
 	}
 
+	if(debug_type == TOKENS || 
+		 debug_type == TOKENS_AND_SYMBOL_TABLE) {
+		for(string str : tokens_) {
+			cout  << str << endl;
+		}
+	}
+
+	if(debug_type == REDUCTIONS || 
+		 debug_type == REDUCTIONS_AND_SYMBOL_TABLE) {
+		for(string str : reductions_) {
+			cout  << str << endl;
+		}
+	}
+
+if(debug_type == TOKENS_AND_SYMBOL_TABLE ||
+	 debug_type == REDUCTIONS_AND_SYMBOL_TABLE ||
+	 debug_type == TOKENS_AND_REDUCTIONS_AND_SYMBOL_TABLE) {
+	if (symbol_table != NULL) {
+		symbol_table->Print();
+	}
+}
+
+	
 	if (file_out_ != NULL) {
 		for(string str : token_reductions_) {
 			*(file_out_) << str << endl;
@@ -62,7 +94,7 @@ void TokenReductionsLogger::LogTokenReductions() {
 }
 
 void TokenReductionsLogger::LogSourceLine() {
-	if (console_output_) {
+	if (debug_type != NO_DEBUGGING) {
 		cout <<  "Source: " << COLOR_GREEN_NORMAL;
 		for(string word : source_line_) {
 			cout << word;
@@ -83,17 +115,15 @@ void TokenReductionsLogger::LogSourceLine() {
 void TokenReductionsLogger::Error(
 	const std::string& error, int line, int COLUMN) {
 	LogTokenReductions();
-	if (console_output_) {
-		cerr <<  COLOR_BLINK_RED_NORMAL << "ERROR: " <<  COLOR_NORMAL << error << endl;
-		cerr << "Line: " << line << " Column: " << COLUMN << endl;
-		cerr  << "Source: ";
-		for(string word : source_line_) {
-			cerr << word;
-		}
-		cerr << endl;
-		for(int i = 0; i < COLUMN + 7; i++) cerr << " ";
-		cerr << "^" << endl;
+	cerr <<  COLOR_BLINK_RED_NORMAL << "ERROR: " <<  COLOR_NORMAL << error << endl;
+	cerr << "Line: " << line << " Column: " << COLUMN << endl;
+	cerr  << "Source: ";
+	for(string word : source_line_) {
+		cerr << word;
 	}
+	cerr << endl;
+	for(int i = 0; i < COLUMN + 7; i++) cerr << " ";
+	cerr << "^" << endl;
 
 	if (file_out_ != NULL) {
 		*(file_out_) << "ERROR: " << error <<  endl;
@@ -111,18 +141,16 @@ void TokenReductionsLogger::Error(
 
 void TokenReductionsLogger::Warning(
 	const std::string& error, int line, int COLUMN) {
-	if (console_output_) {
-		cerr << COLOR_BLINK_YELLOW_NORMAL << "WARNING: " << COLOR_NORMAL 
-				 << error << endl;
-		cerr << "Line: " << line << " Column: " << COLUMN << endl;
-		cerr  << "Source: ";
-		for(string word : source_line_) {
-			cerr << word;
-		}
-		cerr << endl;
-		for(int i = 0; i < COLUMN + 9; i++) cerr << " ";
-		cerr << "^" << endl;
+	cerr << COLOR_BLINK_YELLOW_NORMAL << "WARNING: " << COLOR_NORMAL 
+			 << error << endl;
+	cerr << "Line: " << line << " Column: " << COLUMN << endl;
+	cerr  << "Source: ";
+	for(string word : source_line_) {
+		cerr << word;
 	}
+	cerr << endl;
+	for(int i = 0; i < COLUMN + 9; i++) cerr << " ";
+	cerr << "^" << endl;
 
 	if (file_out_ != NULL) {
 		*(file_out_) << "WARNING: " << error <<  endl;
@@ -137,4 +165,5 @@ void TokenReductionsLogger::Warning(
 	}
 }
 
-TokenReductionsLogger::TokenReductionsLogger() : file_out_(NULL), console_output_(true) {}
+TokenReductionsLogger::TokenReductionsLogger() : file_out_(NULL), 
+debug_type(NO_DEBUGGING), symbol_table(NULL) {}

@@ -13,11 +13,15 @@
 #include <string>
 #include <vector>
 
+#include "CommandLineFlags.h"
+#include "SymbolTable.h"
+
 class TokenReductionsLogger {
 public:
 	static TokenReductionsLogger& GetInstance();
 	void AddOutputToFile(const std::string& file_name);
-	void OutputToConsole(bool yes_or_no);
+	void SetSymbolTable(SymbolTable* table);
+	void SetDebugType(DebugType debug_type);
 	void PushToken(const std::string& token);
 	void PushReduction(const std::string& reduct);
 	void PushSourceWord(const std::string& word);
@@ -28,10 +32,13 @@ public:
 
 private:
 	TokenReductionsLogger();
-	bool console_output_;
 	std::vector<std::string> token_reductions_;
+	std::vector<std::string> tokens_;
+	std::vector<std::string> reductions_;
 	std::vector<std::string> source_line_;
 	std::ofstream* file_out_;
+	SymbolTable* symbol_table;
+	DebugType debug_type;
 };
 
 #endif /* TOKENREDUCTIONSLOGGER_H_ */

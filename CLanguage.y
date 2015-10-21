@@ -36,6 +36,7 @@ extern bool INSERT_MODE;
 extern bool IN_SWITCH;
 extern int LINE;
 extern int COLUMN;
+extern int IN_FUNCTION;
 
 /* Functions from Flex */
 extern int yylex();
@@ -165,6 +166,11 @@ external_declaration
 	}
 	| declaration {
 		TR_LOGGER.PushReduction("declaration -> external_declaration");
+
+		if(IN_FUNCTION > 0) {
+			IN_FUNCTION--;
+			S_TABLE.PopFrame();
+		}
 	}
 	;
 
@@ -892,7 +898,7 @@ open_paren_scope
 close_paren_scope
 	: CLOSE_PAREN {
 		IN_SWITCH = false;
-		S_TABLE.PopFrame();
+		IN_FUNCTION++;
 	}
 	;
 
@@ -1218,20 +1224,40 @@ expression_statement
 compound_statement
 	: open_curly close_curly {
 		TR_LOGGER.PushReduction("open_curly close_curly -> expression_statement");
+
+		if(IN_FUNCTION > 0) {
+			IN_FUNCTION--;
+			S_TABLE.PopFrame();
+		}
 	}
 	| open_curly statement_list close_curly {
 		TR_LOGGER.PushReduction(
 			"open_curly statement_list close_curly -> expression_statement");
+
+		if(IN_FUNCTION > 0) {
+			IN_FUNCTION--;
+			S_TABLE.PopFrame();
+		}
 	}
 	| open_curly declaration_list close_curly {
 		TR_LOGGER.PushReduction(
 			"open_curly declaration_list close_curly -> expression_statement");
+
+		if(IN_FUNCTION > 0) {
+			IN_FUNCTION--;
+			S_TABLE.PopFrame();
+		}
 	}
 	| open_curly declaration_list statement_list 
 		close_curly {
 		TR_LOGGER.PushReduction(
 			"open_curly declaration_list statement_list close_curly "
 			"-> expression_statement");
+
+		if(IN_FUNCTION > 0) {
+			IN_FUNCTION--;
+			S_TABLE.PopFrame();
+		}
 	}
 	;
 
@@ -1364,7 +1390,9 @@ assignment_expression
 		$1.front().data_is_valid = true;
 
 		SymbolInfo* temp = S_TABLE.GetMostRecentSymbolInfo($1.front().identifier_name);
-		*temp = $1.front();
+		if(temp != NULL) {
+			*temp = $1.front();
+		} 
 
 		// Pass through
 		$$ = $1;
@@ -2591,6 +2619,7 @@ postfix_expression
 		// Create new symbol info to be placed in $$
 		$$ = *(new list<SymbolInfo>());
 		$$.push_front(*(new SymbolInfo($1.front())));
+		$$.front().identifier_name = "";
 
 		// Update value such that $$ has one less pointer or array.
 		if($1.front().array_sizes.size() > 0) {
@@ -2829,7 +2858,11 @@ close_curly
 /******************************************************************************/
 /* User Written Code */
 /******************************************************************************/
-int main() {
+int main(int argc, char** argv) {
+	CL_FLAGS.InitializeFlags(argc, argv);
+	TR_LOGGER.SetDebugType(TOKENS_AND_REDUCTIONS);
+	// TR_LOGGER.SetDebugType(CL_FLAGS.GetDebugType());
+	TR_LOGGER.SetSymbolTable(&S_TABLE);
 	return yyparse(); 
 }
 
