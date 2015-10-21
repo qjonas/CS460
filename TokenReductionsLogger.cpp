@@ -34,12 +34,12 @@ void TokenReductionsLogger::PushToken(const string& token) {
 	if(!token_reductions_.empty() && token_reductions_.back() == "Reductions: ") {
 		token_reductions_.pop_back();
 	}
-	token_reductions_.push_back((new string("Token : "))->append(token));
+	token_reductions_.push_back((new string("Token : "))->append(COLOR_MAGENTA_NORMAL).append(token).append(COLOR_NORMAL));
 	token_reductions_.push_back("Reductions: ");
 }
 
 void TokenReductionsLogger::PushReduction(const string& reduct) {
-	token_reductions_.push_back( (new string("\t"))->append(reduct));
+	token_reductions_.push_back( (new string("\t"))->append(COLOR_CYAN_NORMAL).append(reduct).append(COLOR_NORMAL));
 }
 
 void TokenReductionsLogger::PushSourceWord(const string& word) {
@@ -49,7 +49,7 @@ void TokenReductionsLogger::PushSourceWord(const string& word) {
 void TokenReductionsLogger::LogTokenReductions() {
 	if (console_output_) {
 		for(string str : token_reductions_) {
-			cout << str << endl;
+			cout  << str << endl;
 		}
 	}
 
@@ -63,11 +63,11 @@ void TokenReductionsLogger::LogTokenReductions() {
 
 void TokenReductionsLogger::LogSourceLine() {
 	if (console_output_) {
-		cout << "Source: ";
+		cout <<  "Source: " << COLOR_GREEN_NORMAL;
 		for(string word : source_line_) {
 			cout << word;
 		}
-		cout << endl;
+		cout << COLOR_NORMAL << endl;
 	}
 
 	if (file_out_ != NULL) {
@@ -84,7 +84,7 @@ void TokenReductionsLogger::Error(
 	const std::string& error, int line, int COLUMN) {
 	LogTokenReductions();
 	if (console_output_) {
-		cerr <<  COLOR_BLINK_RED_BLACK << "ERROR: " <<  COLOR_NORMAL << error << endl;
+		cerr <<  COLOR_BLINK_RED_NORMAL << "ERROR: " <<  COLOR_NORMAL << error << endl;
 		cerr << "Line: " << line << " Column: " << COLUMN << endl;
 		cerr  << "Source: ";
 		for(string word : source_line_) {
@@ -112,7 +112,8 @@ void TokenReductionsLogger::Error(
 void TokenReductionsLogger::Warning(
 	const std::string& error, int line, int COLUMN) {
 	if (console_output_) {
-		cerr << "WARNING: " << error << endl;
+		cerr << COLOR_BLINK_YELLOW_NORMAL << "WARNING: " << COLOR_NORMAL 
+				 << error << endl;
 		cerr << "Line: " << line << " Column: " << COLUMN << endl;
 		cerr  << "Source: ";
 		for(string word : source_line_) {
