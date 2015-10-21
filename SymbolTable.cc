@@ -110,6 +110,7 @@ void SymbolTable::Print() const {
         cout << endl;
         cout << "\t\t\tstorage_class_specifier: " << list_.storage_class_specifier;
         cout << endl;
+        cout << "\t\t\ttype_qualifier_list: ";
         for(auto type : list_.type_qualifier_list) {
           cout << type << " ";
         }
@@ -118,7 +119,9 @@ void SymbolTable::Print() const {
         for(auto size : list_.array_sizes) {
           cout << size << " ";
         }
+        cout << endl;
 				cout << "\t\t\t} ";
+        cout << endl;
 			}
 			cout << endl;
 			cout << "\t\tarray_sizes: ";

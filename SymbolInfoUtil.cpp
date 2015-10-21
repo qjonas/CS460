@@ -675,8 +675,30 @@ bool IsRelational(const SymbolInfo& symbol_info) {
   return IsDataTypeValidForIncDec(symbol_info);
 }
 
+bool CompareTypeSpecifierList(const list<SymbolTypes::SymbolType> list_one,
+                              const list<SymbolTypes::SymbolType> list_two) {
+  SymbolInfo temp_one, temp_two;
+  temp_one.type_specifier_list = list_one;
+  temp_two.type_specifier_list = list_two;
+
+  return ((IsNumber(temp_one) && IsNumber(temp_two))) || (list_one == list_two);
+}
+
+bool CompareParamToArgument(const FunctionParameter& function_param, const SymbolInfo& symbol_info) {
+  if(function_param.array_sizes.size() > 0 && 
+     symbol_info.array_sizes.size() > 0) {
+    return true;
+  } else if (function_param.array_sizes.size() > 0 ||
+     symbol_info.array_sizes.size() > 0) {
+    return false;
+  } else {
+    return CompareTypeSpecifierList(function_param.type_specifier_list, 
+                                  symbol_info.type_specifier_list);
+  }
+}
+
 void Harris() {
-  cout  << COLOR_BLINK_RED_BLACK <<
+  cout  << COLOR_BLINK_RED_NORMAL <<
 "````````````````````````````````````````````````````````````````````````````````````````````````````" << endl <<
 "``````````````````````````````````````````````````````.............`````````````````````````````````" << endl <<
 "```````````````````````````````````````````````...--:/+++oooooooooo+/-.`````````````````````````````" << endl <<

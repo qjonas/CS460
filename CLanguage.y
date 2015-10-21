@@ -169,23 +169,89 @@ external_declaration
 
 function_definition
 	:	declarator compound_statement {
+		// Log reduction.
 		TR_LOGGER.PushReduction(
 			"declarator compound_statement -> function_definition");
+
+		// Check if $1 is function
+		if(!$1.front().is_function) {
+			TR_LOGGER.Error("Invalid function defininition.", LINE, COLUMN);
+		}
+
+		// Output warning
+		TR_LOGGER.Warning("Function has no type specifier", LINE, COLUMN);
+
+		// Give each identifier in the list the type from the 
+		// declaration specifiers.
+		SymbolInfo* temp = S_TABLE.GetMostRecentSymbolInfo($2.front().identifier_name);
+		temp->type_specifier_list.push_front(SymbolTypes::INT);
 	}
 	|	declarator declaration_list compound_statement {
-			TR_LOGGER.PushReduction(
-			"declarator declaration_list compound_statement "
-			"-> function_definition");
+		// Log reduction
+		TR_LOGGER.PushReduction(
+		"declarator declaration_list compound_statement "
+		"-> function_definition");
+
+		// Check if $1 is function
+		if(!$1.front().is_function) {
+			TR_LOGGER.Error("Invalid function defininition.", LINE, COLUMN);
 		}
+
+		// Output warning
+		TR_LOGGER.Warning("Function has no type specifier", LINE, COLUMN);
+
+		// Give each identifier in the list the type from the 
+		// declaration specifiers.
+		SymbolInfo* temp = S_TABLE.GetMostRecentSymbolInfo($2.front().identifier_name);
+		temp->type_specifier_list.push_front(SymbolTypes::INT);
+	}
 	| declaration_specifiers declarator compound_statement {
+		// Log reduction.
 		TR_LOGGER.PushReduction(
 			"declaration_specifiers declarator compound_statement "
 			"-> function_definition");
+
+		// Check if $1 is function
+		if(!$1.front().is_function) {
+			TR_LOGGER.Error("Invalid function defininition.", LINE, COLUMN);
+		}
+
+		// Give each identifier in the list the type from the 
+		// declaration specifiers.
+		SymbolInfo* temp = S_TABLE.GetMostRecentSymbolInfo($2.front().identifier_name);
+		temp->type_specifier_list = $1.front().type_specifier_list;
+		for(auto qualifier : $1.front().type_qualifier_list) {
+			temp->type_qualifier_list.push_back(qualifier);
+		}
+		temp->storage_class_specifier = $1.front().storage_class_specifier;
+
+		if(!(IsTypeQualifierValid(*temp))) {
+			TR_LOGGER.Error("Qualifier not valid.", LINE, COLUMN);
+		}
 	}
 	| declaration_specifiers declarator declaration_list compound_statement {
+		// Log reduction.
 		TR_LOGGER.PushReduction(
 			"declaration_specifiers declarator declaration_list compound_statement "
 			"-> function_definition");
+
+		// Check if $1 is function
+		if(!$1.front().is_function) {
+			TR_LOGGER.Error("Invalid function defininition.", LINE, COLUMN);
+		}
+
+		// Give each identifier in the list the type from the 
+		// declaration specifiers.
+		SymbolInfo* temp = S_TABLE.GetMostRecentSymbolInfo($2.front().identifier_name);
+		temp->type_specifier_list = $1.front().type_specifier_list;
+		for(auto qualifier : $1.front().type_qualifier_list) {
+			temp->type_qualifier_list.push_back(qualifier);
+		}
+		temp->storage_class_specifier = $1.front().storage_class_specifier;
+
+		if(!(IsTypeQualifierValid(*temp))) {
+			TR_LOGGER.Error("Qualifier not valid.", LINE, COLUMN);
+		}
 	}
 	;
 
@@ -432,6 +498,7 @@ init_declarator_list
 			"init_declarator_list COMMA init_declarator -> init_declarator_list");
 
 		// Add new declarator to the back and pass through
+		$1.push_back($3.front());
 		$$ = $1;
 	}
 	;
@@ -505,7 +572,6 @@ init_declarator
 		*temp = $1.front();
 
 		$$ = *(new list<SymbolInfo>({*temp}));
-		INSERT_MODE = true;
 	}
 	;
 
@@ -681,7 +747,6 @@ direct_declarator
 		// Pass through
 		$$ = $1;
 
-		INSERT_MODE = false;
 	}
 	| OPEN_PAREN declarator CLOSE_PAREN {
 		TR_LOGGER.PushReduction(
@@ -738,9 +803,21 @@ direct_declarator
 		$$ = $1;
 	}
 	| direct_declarator open_paren_scope parameter_type_list close_paren_scope  {
+		// Log reduction
 		TR_LOGGER.PushReduction(
 			"direct_declarator OPEN_PAREN parameter_type_list CLOSE_PAREN "
 			"-> direct_declarator");
+
+		// Pass param type list and range start
+		$1.front().parameters_types = $3.front().parameters_types;
+		$1.front().range_start = $3.front().range_start;
+		$1.front().is_function = true;
+
+		// Get the symbol in the symbol table and assign it to what is here.
+		SymbolInfo* temp = S_TABLE.GetMostRecentSymbolInfo($1.front().identifier_name);
+		*temp = $1.front();
+
+		$$ = $1;
 	}
 	| direct_declarator open_paren_scope identifier_list close_paren_scope {
 		// Log Reduction
@@ -857,21 +934,37 @@ type_qualifier_list
 
 parameter_type_list
 	: parameter_list {
+		// Log reduction.
 		TR_LOGGER.PushReduction("parameter_list -> parameter_type_list");
+
+		// Pass through.
+		$$ = $1;
 	}
 	| parameter_list COMMA ELLIPSIS {
+		// Log reduction.
 		TR_LOGGER.PushReduction(
 			"parameter_list COMMA ELLIPSIS -> parameter_type_list");
+
+		// Range start stuff
+		$1.front().range_start = $1.front().parameters_types.size() + 1;
+		$$ = $1;
 	}
 	;
 
 parameter_list
 	: parameter_declaration {
+		// Log reduction
 		TR_LOGGER.PushReduction("parameter_declaration -> parameter_list");
+		// Pass through
+		$$ = $1;
 	}
 	| parameter_list COMMA parameter_declaration {
+		// Log reduction.
 		TR_LOGGER.PushReduction(
 			"parameter_list COMMA parameter_declaration -> parameter_list");
+		// Push_back and pass through
+		$1.front().parameters_types.push_back($3.front().parameters_types.front());
+		$$ = $1;
 	}
 	;
 
@@ -881,19 +974,47 @@ parameter_declaration
 		TR_LOGGER.PushReduction(
 			"declaration_specifiers declarator -> parameter_declaration");
 
-		// Pass through declaration_specifiers
-		$$ = $1;
+		// Give each identifier in the list the type from the 
+		// declaration specifiers.
+		FunctionParameter* temp = new FunctionParameter();
+
+		temp->type_specifier_list = $1.front().type_specifier_list;
+		temp->type_qualifier_list = $1.front().type_qualifier_list;
+		temp->storage_class_specifier = $1.front().storage_class_specifier;
+
+		for(auto qualifier : $2.front().type_qualifier_list) {
+			temp->type_qualifier_list.push_back(qualifier);
+		}
+
+		temp->array_sizes = $2.front().array_sizes;
+
+		$2.front().parameters_types.push_front(*temp);
+
+		$$ = $2;
 	}
 	| declaration_specifiers  {
 		// Log reduction
 		TR_LOGGER.PushReduction("declaration_specifiers -> parameter_declaration");
 
+		FunctionParameter* temp = new FunctionParameter();
+
+		temp->type_specifier_list = $1.front().type_specifier_list;
+		temp->type_qualifier_list = $1.front().type_qualifier_list;
+		temp->storage_class_specifier = $1.front().storage_class_specifier;
+
+		$1.front().parameters_types.push_front(*temp);
+
 		// Pass through declaration_specifiers
 		$$ = $1;
 	}
 	| declaration_specifiers abstract_declarator {
+		// Log reduction
 		TR_LOGGER.PushReduction(
 			"declaration_specifiers abstract_declarator -> parameter_declaration");
+		
+		TR_LOGGER.Warning("abstract_declarator not implemented.", LINE, COLUMN);
+
+		$$ = $2;
 	}
 	;
 
@@ -2478,7 +2599,22 @@ postfix_expression
 		if($1.front().parameters_types.size() != $3.size()) {
 			TR_LOGGER.Error("Invalid number of parameters.", LINE, COLUMN);
 		} 
-		// TODO: Check each parameter type
+
+		// Compare parameters
+		list<FunctionParameter>::iterator param_iter 
+				= $1.front().parameters_types.begin();
+
+		list<SymbolInfo>::iterator argument_iter
+				= $3.begin();
+
+		while(param_iter != $1.front().parameters_types.end() &&
+					argument_iter != $3.end()) {
+			if( !CompareParamToArgument(*param_iter, *argument_iter)) {
+				TR_LOGGER.Error("Invalid function parameter.", LINE, COLUMN);
+			}
+			param_iter++;
+			argument_iter++;
+		}
 
 		// Create new symbol info to be placed in $$
 		$$ = *(new list<SymbolInfo>());
@@ -2578,13 +2714,21 @@ primary_expression
 
 argument_expression_list
 	: assignment_expression {
+		// Log reduction.
 		TR_LOGGER.PushReduction(
 			"assignment_expression -> argument_expression_list");
+		// Pass through
+		$$ = $1;
 	}
 	| argument_expression_list COMMA assignment_expression {
+		// Log reduction
 		TR_LOGGER.PushReduction(
 			"argument_expression_list COMMA assignment_expression "
 			"-> argument_expression_list");
+
+		// Pass through
+		$1.push_back(*(new SymbolInfo($3.front())));
+		$$ = $1;
 	}
 	;
 
