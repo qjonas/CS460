@@ -2184,11 +2184,211 @@ additive_expression
 		TR_LOGGER.PushReduction(
 			"additive_expression PLUS multiplicative_expression "
 			"-> additive_expression");
+	//long Double maxValue(SymbolInfo)
+		if(!IsNumber($1.front()) || !IsNumber($3.front())){
+			TR_LOGGER.Error("Cannot add minus something not of NUMBER type.",
+											LINE, COLUMN);	
+		}
+		// data is valid
+		// Integer MULT
+			if(IsInteger($1.front()) && IsInteger($3.front())) {
+				if(IsUnsigned($1.front()) && IsUnsigned($3.front())) {
+          //Check overflow
+          if(addOverflow($1.front(), $3.front())){
+			    TR_LOGGER.Error("addition overflow detected", LINE, COLUMN);
+		      }
+          else{
+					$$.front().data_value.unsigned_long_long_val = 
+							$1.front().data_value.unsigned_long_long_val 
+							+ $3.front().data_value.unsigned_long_long_val;
+          }
+				} else if (!IsUnsigned($1.front()) && IsUnsigned($3.front())) {
+          //Check overflow
+          if(addOverflow($1.front(), $3.front())){
+          TR_LOGGER.Error("addition overflow detected", LINE, COLUMN);
+		      }
+          else{
+					$$.front().data_value.long_long_val = $1.front().data_value.long_long_val 
+							+ $3.front().data_value.unsigned_long_long_val;
+          }
+				} else if (IsUnsigned($1.front()) && !IsUnsigned($3.front())) {
+          //Check overflow
+          if(addOverflow($1.front(), $3.front())){
+          TR_LOGGER.Error("addition overflow detected", LINE, COLUMN);
+		      }
+          else{
+					$$.front().data_value.long_long_val = $1.front().data_value.long_long_val 
+							+ $3.front().data_value.unsigned_long_long_val;
+          }
+				} else {
+          //check overflow
+          if(addOverflow($1.front(), $3.front())){
+          TR_LOGGER.Error("addition overflow detected", LINE, COLUMN);
+		      }
+          else{
+					$$.front().data_value.long_long_val = $1.front().data_value.long_long_val 
+							+ $3.front().data_value.long_long_val;
+          }
+				}
+			// Both floating divide
+			} else if (IsFloating($1.front()) && IsFloating($3.front())) {
+          //check overflow
+          if(addOverflow($1.front(), $3.front())){
+          TR_LOGGER.Error("addition overflow detected", LINE, COLUMN);
+		      }
+				  else{
+          $$.front().data_value.double_val = $1.front().data_value.double_val + $3.front().data_value.double_val;
+          }
+			// Single floating divide
+			} else if (IsFloating($1.front())) {
+				if(IsUnsigned($3.front())) {
+          //check overflow
+          if(addOverflow($1.front(),$3.front())){
+          TR_LOGGER.Error("addition overflow detected", LINE, COLUMN);
+		      }
+          else{
+					$$.front().data_value.double_val = $1.front().data_value.double_val 
+						+ $3.front().data_value.unsigned_long_long_val;
+          }
+				} else {
+          //check overflow
+          if(addOverflow($1.front(),$3.front())){
+          TR_LOGGER.Error("addition overflow detected", LINE, COLUMN);
+		      }
+          else{
+					$$.front().data_value.double_val = $1.front().data_value.double_val 
+						+ $3.front().data_value.long_long_val;
+          }
+				}
+			} else {
+				if(IsUnsigned($1.front())) {
+          //check overflow
+          if(addOverflow($1.front(),$3.front())){
+          TR_LOGGER.Error("addition overflow detected", LINE, COLUMN);
+		      }
+          else{
+					$$.front().data_value.double_val 
+						= $1.front().data_value.unsigned_long_long_val 
+								+ $3.front().data_value.double_val;
+          }
+				} else {
+          //check overflow
+          if(addOverflow($1.front(),$3.front())){
+          TR_LOGGER.Error("addition overflow detected", LINE, COLUMN);
+		      }
+          else{
+					$$.front().data_value.double_val 
+						= $1.front().data_value.long_long_val 
+						+ $3.front().data_value.double_val;
+          }
+				}
+				$$.front().type_specifier_list = $3.front().type_specifier_list;
+			}
 	}
 	| additive_expression MINUS multiplicative_expression {
 		TR_LOGGER.PushReduction(
 			"additive_expression MINUS multiplicative_expression "
 			"-> additive_expression");
+    //long Double maxValue(SymbolInfo)
+		if(!IsNumber($1.front()) || !IsNumber($3.front())){
+			TR_LOGGER.Error("Cannot add subtract something not of NUMBER type.",
+											LINE, COLUMN);	
+		}
+		// data is valid
+		// Integer MULT
+			if(IsInteger($1.front()) && IsInteger($3.front())) {
+				if(IsUnsigned($1.front()) && IsUnsigned($3.front())) {
+          //Check overflow
+          if(subOverflow($1.front(), $3.front())){
+			    TR_LOGGER.Error("subtraction overflow detected", LINE, COLUMN);
+		      }
+          else{
+					$$.front().data_value.unsigned_long_long_val = 
+							$1.front().data_value.unsigned_long_long_val 
+							- $3.front().data_value.unsigned_long_long_val;
+          }
+				} else if (!IsUnsigned($1.front()) && IsUnsigned($3.front())) {
+          //Check overflow
+          if(subOverflow($1.front(), $3.front())){
+          TR_LOGGER.Error("subtraction overflow detected", LINE, COLUMN);
+		      }
+          else{
+					$$.front().data_value.long_long_val = $1.front().data_value.long_long_val 
+							- $3.front().data_value.unsigned_long_long_val;
+          }
+				} else if (IsUnsigned($1.front()) && !IsUnsigned($3.front())) {
+          //Check overflow
+          if(subOverflow($1.front(), $3.front())){
+          TR_LOGGER.Error("subtraction overflow detected", LINE, COLUMN);
+		      }
+          else{
+					$$.front().data_value.long_long_val = $1.front().data_value.long_long_val 
+							- $3.front().data_value.unsigned_long_long_val;
+          }
+				} else {
+          //check overflow
+          if(subOverflow($1.front(), $3.front())){
+          TR_LOGGER.Error("subtraction overflow detected", LINE, COLUMN);
+		      }
+          else{
+					$$.front().data_value.long_long_val = $1.front().data_value.long_long_val 
+							- $3.front().data_value.long_long_val;
+          }
+				}
+			// Both floating divide
+			} else if (IsFloating($1.front()) && IsFloating($3.front())) {
+          //check overflow
+          if(subOverflow($1.front(), $3.front())){
+          TR_LOGGER.Error("subtraction overflow detected", LINE, COLUMN);
+		      }
+				  else{
+          $$.front().data_value.double_val = $1.front().data_value.double_val - $3.front().data_value.double_val;
+          }
+			// Single floating divide
+			} else if (IsFloating($1.front())) {
+				if(IsUnsigned($3.front())) {
+          //check overflow
+          if(subOverflow($1.front(),$3.front())){
+          TR_LOGGER.Error("subtraction overflow detected", LINE, COLUMN);
+		      }
+          else{
+					$$.front().data_value.double_val = $1.front().data_value.double_val 
+						- $3.front().data_value.unsigned_long_long_val;
+          }
+				} else {
+          //check overflow
+          if(subOverflow($1.front(),$3.front())){
+          TR_LOGGER.Error("subtraction overflow detected", LINE, COLUMN);
+		      }
+          else{
+					$$.front().data_value.double_val = $1.front().data_value.double_val 
+						- $3.front().data_value.long_long_val;
+          }
+				}
+			} else {
+				if(IsUnsigned($1.front())) {
+          //check overflow
+          if(subOverflow($1.front(),$3.front())){
+          TR_LOGGER.Error("subtraction overflow detected", LINE, COLUMN);
+		      }
+          else{
+					$$.front().data_value.double_val 
+						= $1.front().data_value.unsigned_long_long_val 
+								- $3.front().data_value.double_val;
+          }
+				} else {
+          //check overflow
+          if(subOverflow($1.front(),$3.front())){
+          TR_LOGGER.Error("subtraction overflow detected", LINE, COLUMN);
+		      }
+          else{
+					$$.front().data_value.double_val 
+						= $1.front().data_value.long_long_val 
+						- $3.front().data_value.double_val;
+          }
+				}
+				$$.front().type_specifier_list = $3.front().type_specifier_list;
+			}
 	}
 	;
 
