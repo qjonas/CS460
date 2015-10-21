@@ -41,6 +41,7 @@ extern int IN_FUNCTION;
 /* Functions from Flex */
 extern int yylex();
 void yyerror(const char * err);
+extern FILE * yyin;
 %}
 
 /* Expect 1 S/R conflict from dangling else */
@@ -219,7 +220,7 @@ function_definition
 			"-> function_definition");
 
 		// Check if $1 is function
-		if(!$1.front().is_function) {
+		if(!$2.front().is_function) {
 			TR_LOGGER.Error("Invalid function defininition.", LINE, COLUMN);
 		}
 
@@ -243,7 +244,7 @@ function_definition
 			"-> function_definition");
 
 		// Check if $1 is function
-		if(!$1.front().is_function) {
+		if(!$2.front().is_function) {
 			TR_LOGGER.Error("Invalid function defininition.", LINE, COLUMN);
 		}
 
@@ -498,6 +499,7 @@ init_declarator_list
 		TR_LOGGER.PushReduction("init_declarator -> init_declarator_list");
 		// Pass through
 		$$ = $1;
+
 	}
 	| init_declarator_list COMMA init_declarator {
 		// Log Reduction
@@ -518,6 +520,7 @@ init_declarator
 		$$ = $1;
 	}
 	| declarator EQUALS_SIGN initializer {
+
 		// Log reduction
 		TR_LOGGER.PushReduction(
 			"declarator EQUALS_SIGN initializer -> init_declarator");
@@ -526,49 +529,25 @@ init_declarator
 		$1.front().type_specifier_list = $3.front().type_specifier_list;
 
 		// Check if they are numbers
-		if(!IsRelational($1.front()) || !IsRelational($3.front())) {
+		if(!IsRelational($3.front())) {
 			TR_LOGGER.Error("Cannot assign non relational type", 
 											LINE, COLUMN);
 		}
 
-		// Perform the lesser
+		// Perform the 
 		if($3.front().data_is_valid) {
-			// Integer lesser
-			if(IsInteger($1.front()) && IsInteger($3.front())) {
-				if(IsUnsigned($1.front()) && IsUnsigned($3.front())) {
-					$1.front().data_value.unsigned_long_long_val 
-							= $3.front().data_value.unsigned_long_long_val;
-				} else if (!IsUnsigned($1.front()) && IsUnsigned($3.front())) {
-					$1.front().data_value.long_long_val 
-						= $3.front().data_value.unsigned_long_long_val;
-				} else if (IsUnsigned($1.front()) && !IsUnsigned($3.front())) {
-					$1.front().data_value.unsigned_long_long_val 
-						= $3.front().data_value.long_long_val;
-				} else {
-					$1.front().data_value.long_long_val 
-						= $3.front().data_value.long_long_val;
-				}
-			// Both floating divide
-			} else if (IsFloating($1.front()) && IsFloating($3.front())) {
-				$1.front().data_value.unsigned_long_long_val 
-					= $3.front().data_value.double_val;
-			// Single floating divide
-			} else if (IsFloating($1.front())) {
+			// Integer 
+			if(IsInteger($3.front())) {
 				if(IsUnsigned($3.front())) {
-					$1.front().data_value.double_val
-						= (long double) $3.front().data_value.unsigned_long_long_val;
+					$1.front().data_value.unsigned_long_long_val
+						= $3.front().data_value.unsigned_long_long_val;
 				} else {
-					$1.front().data_value.double_val 
-						= (long double) $3.front().data_value.long_long_val;
+					$1.front().data_value.long_long_val
+						= $3.front().data_value.long_long_val;
 				}
-			} else {
-				if(IsUnsigned($1.front())) {
-					$1.front().data_value.unsigned_long_long_val 
-						= (unsigned long long) $3.front().data_value.double_val;
-				} else {
-					$1.front().data_value.unsigned_long_long_val 
-						= (long long) $3.front().data_value.double_val;
-				}
+			}
+			if(IsFloating($3.front())) {
+				$1.front().data_value.double_val = $3.front().data_value.double_val;
 			}
 			$1.front().data_is_valid = true;
 		} else {
@@ -576,9 +555,10 @@ init_declarator
 		}
 
 		SymbolInfo* temp = S_TABLE.GetMostRecentSymbolInfo($1.front().identifier_name);
-		*temp = $1.front();
+		if(temp != NULL) *temp = $1.front();
 
 		$$ = *(new list<SymbolInfo>({*temp}));
+
 	}
 	;
 
@@ -705,23 +685,21 @@ declarator
 		// Pass through
 		$$ = $1;
 
+		INSERT_MODE = false;
+
 	}
 	| pointer direct_declarator {
 		// Log reduction
 		TR_LOGGER.PushReduction("pointer direct_declarator -> declarator");
 
 		// Combine type qualifier lists
-		cout << "HERE: " << $1.front().type_qualifier_list.size() << endl;
-
 		for(list<SymbolTypes::TypeQualifier>::iterator iter = $1.front().type_qualifier_list.begin();
 		iter != $1.front().type_qualifier_list.end(); iter++) {
-			cout << "PUSHING: " << *iter << endl;
 			$2.front().type_qualifier_list.push_back(*iter);
 		}
 
 		for(list<SymbolTypes::TypeQualifier>::iterator iter = $2.front().type_qualifier_list.begin();
 		iter != $2.front().type_qualifier_list.end(); iter++) {
-			cout << "PUSHED: " << *iter << endl;
 		}
 
 		if(!(IsTypeQualifierValid($2.front()))){
@@ -736,11 +714,6 @@ declarator
 		// Get the symbol in the symbol table and assign it to what is here.
 		SymbolInfo* temp = S_TABLE.GetMostRecentSymbolInfo($2.front().identifier_name);
 		*temp = $2.front();
-
-		for(list<SymbolTypes::TypeQualifier>::iterator iter = temp->type_qualifier_list.begin();
-		iter != temp->type_qualifier_list.end(); iter++) {
-			cout << "ST_HAS: " << *iter << endl;
-		}
 
 		$$ = $2;
 	}
@@ -2764,7 +2737,6 @@ primary_expression
 		TR_LOGGER.PushReduction("identifier -> primary_expression");
 		// Pass through
 		$$ = $1;
-		cout << "VALUE: " << $$.front().data_value.unsigned_long_long_val << endl;
 
 	}
 	| constant {
@@ -2852,6 +2824,7 @@ close_curly
 	: CLOSE_CURLY {
 		S_TABLE.PopFrame();
 		TR_LOGGER.PushReduction("CLOSE_CURLY -> close_curly");
+		INSERT_MODE = true;
 	}
 
 %%
@@ -2863,6 +2836,10 @@ int main(int argc, char** argv) {
 	TR_LOGGER.SetDebugType(TOKENS_AND_REDUCTIONS);
 	// TR_LOGGER.SetDebugType(CL_FLAGS.GetDebugType());
 	TR_LOGGER.SetSymbolTable(&S_TABLE);
+
+	if((new ifstream(CL_FLAGS.GetInputFile()))->good()) {
+		yyin = fopen(CL_FLAGS.GetInputFile().c_str(), "r");
+	}
 	return yyparse(); 
 }
 

@@ -73,6 +73,10 @@ string CommandLineFlags::GetOutputFile() {
 	return flag_output_file;
 }
 
+string CommandLineFlags::GetInputFile() {
+	return flag_input_file;
+}
+
 void CommandLineFlags::Print() {
 	switch (flag_debug) {
 	case NO_DEBUGGING:

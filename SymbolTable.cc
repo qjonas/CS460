@@ -34,12 +34,10 @@ SymbolInfo* SymbolTable::GetMostRecentSymbolInfo(
 		const string& search_name) {
 	for(list<map<string, SymbolInfo>>::iterator list_iter = table_.begin();
 			list_iter != table_.end(); list_iter++) {
-    cout << "Searching for " << search_name << endl;
 		if(list_iter->find(search_name) != list_iter->end()) {
 			return &((*list_iter)[search_name]);
 		}
 	}
-	cout << "Warning returning null pointer." << endl;
 	return NULL;
 }
 
