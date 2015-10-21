@@ -144,6 +144,9 @@ typedef struct SymbolInfo {
 	// Is const denotes whether an identifier is function.
 	bool is_function;
 
+	// Will denote if the function has been defined or not.
+	bool function_defined;
+
 	// Parameter types will list the parameter types of a function.
 	// ex: int foo(int i, char c, double d);
 	// parameter_types = {{INT}, {CHAR}, {DOUBLE}};
