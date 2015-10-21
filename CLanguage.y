@@ -274,7 +274,8 @@ declaration
 			"declaration_specifiers init_declarator_list SEMI -> declaration");
 		// Give each identifier in the list the type from the 
 		// declaration specifiers.
-		SymbolInfo* temp = S_TABLE.GetMostRecentSymbolInfo($2.front().identifier_name);
+    for(auto info : $2){
+		SymbolInfo* temp = S_TABLE.GetMostRecentSymbolInfo(info.identifier_name);
 		temp->type_specifier_list = $1.front().type_specifier_list;
 		for(auto qualifier : $1.front().type_qualifier_list) {
 			temp->type_qualifier_list.push_back(qualifier);
@@ -284,6 +285,7 @@ declaration
 		if(!(IsTypeQualifierValid(*temp))) {
 			TR_LOGGER.Error("Qualifier not valid.", LINE, COLUMN);
 		}
+    }
 	}
 	;
 
@@ -517,7 +519,7 @@ init_declarator
 		// Pass through
 		$$ = $1;
 	}
-	| declarator EQUALS_SIGN initializer {
+	| declarator EQUALS_SIGN initializer{
 		// Log reduction
 		TR_LOGGER.PushReduction(
 			"declarator EQUALS_SIGN initializer -> init_declarator");
