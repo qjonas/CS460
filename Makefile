@@ -54,4 +54,4 @@ SymbolTableDriver: SymbolTableDriver.cpp SymbolTable.o
 	$(CC) $(C11) -o SymbolTableDriver SymbolTableDriver.cpp SymbolTable.o
 
 clean:
-	rm *.o CLanguage.tab.cc CLanguage.tab.hh lex.yy.cc  CLanguage
+	rm *.o CLanguage.tab.cc CLanguage.tab.hh lex.yy.cc  CLanguage SymbolTableDriver
