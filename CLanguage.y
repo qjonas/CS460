@@ -710,7 +710,34 @@ direct_declarator
 		TR_LOGGER.PushReduction(
 			"direct_declarator OPEN_SQUARE constant_expression CLOSE_SQUARE "
 			"-> direct_declarator");
-	}
+
+		if($1.front().is_function) {
+			TR_LOGGER.Error("Cannot make an array from a function.", LINE, COLUMN);
+		}
+
+    //check valid array subscripts
+    if(IsExpressionValidArraySubscript($3.front())){
+        if($3.front().data_is_valid){
+        //push array size if valid data
+        $1.front().array_sizes.push_back($3.front().data_value.long_long_val);
+        }
+        //if not push -1
+        else{
+        $1.front().array_sizes.push_back(-1);
+        }
+    }
+    else{
+    TR_LOGGER.Error("not valid array subscript",
+		  								  LINE, COLUMN);
+	  }
+
+    // Get the symbol in the symbol table and assign it to what is here.
+		SymbolInfo* temp = S_TABLE.GetMostRecentSymbolInfo($1.front().identifier_name);
+		*temp = $1.front();
+
+		// Pass through
+		$$ = $1;
+  }
 	| direct_declarator open_paren_scope close_paren_scope {
 		// Log Reduction
 		TR_LOGGER.PushReduction(
@@ -2252,9 +2279,8 @@ unary_expression
 		SymbolInfo dummy;
 		dummy.data_value.long_long_val = 1;
 		dummy.type_specifier_list = $$.front().type_specifier_list;
-		// TODO: TypeCheck
 		
-		// TODO: Overflow Checking
+		// Overflow Checking
 		if(addOverflow($$.front(), dummy)){
 			TR_LOGGER.Error("addition overflow detected", LINE, COLUMN);
 		}
@@ -2519,16 +2545,14 @@ postfix_expression
 		// Pass through
 		SymbolInfo* temp = 
 				S_TABLE.GetMostRecentSymbolInfo($1.front().identifier_name);
-		// TODO: Overflow Checking
+
 		temp->postfix_increment++;
 		$$ = *(new list<SymbolInfo>({*(new SymbolInfo(*temp))}));
 
+		//overflow check
 		SymbolInfo dummy;
 		dummy.data_value.long_long_val = 1;
 		dummy.type_specifier_list = $$.front().type_specifier_list;
-		// TODO: TypeCheck
-		
-		// TODO: Overflow Checking
 		if(addOverflow($$.front(), dummy)){
 			TR_LOGGER.Error("addition overflow detected", LINE, COLUMN);
 		}
@@ -2551,7 +2575,7 @@ postfix_expression
 		// Pass through
 		SymbolInfo* temp = 
 				S_TABLE.GetMostRecentSymbolInfo($1.front().identifier_name);
-		// TODO: Overflow Checking
+
 		temp->postfix_increment++;
 		$$ = *(new list<SymbolInfo>({*(new SymbolInfo(*temp))}));
 		SymbolInfo dummy;
