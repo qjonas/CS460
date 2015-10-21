@@ -76,15 +76,14 @@ void TokenReductionsLogger::LogTokenReductions() {
 		}
 	}
 
-if(debug_type == TOKENS_AND_SYMBOL_TABLE ||
-	 debug_type == REDUCTIONS_AND_SYMBOL_TABLE ||
-	 debug_type == TOKENS_AND_REDUCTIONS_AND_SYMBOL_TABLE) {
-	if (symbol_table != NULL) {
-		symbol_table->Print();
-	}
-}
+	if(debug_type == TOKENS_AND_SYMBOL_TABLE ||
+		 debug_type == REDUCTIONS_AND_SYMBOL_TABLE ||
+		 debug_type == TOKENS_AND_REDUCTIONS_AND_SYMBOL_TABLE) {
+		if (symbol_table != NULL) {
+			symbol_table->Print();
+		}
+	} 
 
-	
 	if (file_out_ != NULL) {
 		for(string str : token_reductions_) {
 			*(file_out_) << str << endl;

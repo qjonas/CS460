@@ -158,7 +158,8 @@ void SymbolTable::CopyFromFile(const string& file_name) {
 }
 
 SymbolInfo::SymbolInfo() : storage_class_specifier(NONE), is_function(false),
-	data_is_valid(false), range_start(-1), postfix_increment(0) 
+	data_is_valid(false), range_start(-1), postfix_increment(0), 
+  function_defined(false) 
   {}
 
 SymbolInfo::SymbolInfo(const SymbolInfo& other) : identifier_name(other.identifier_name),
@@ -171,6 +172,7 @@ typedef_name(other.typedef_name),
 struct_or_union_values(other.struct_or_union_values),
 array_sizes(other.array_sizes),
 is_function(other.is_function),
+function_defined(other.function_defined),
 parameters_types(other.parameters_types),
 range_start(other.range_start),
 postfix_increment(other.postfix_increment){}

@@ -164,6 +164,9 @@ translation_unit
 external_declaration
 	: function_definition {
 		TR_LOGGER.PushReduction("function_definition -> external_declaration");
+
+		SymbolInfo* temp = S_TABLE.GetMostRecentSymbolInfo($1.front().identifier_name);
+		temp->function_defined = true;
 	}
 	| declaration {
 		TR_LOGGER.PushReduction("declaration -> external_declaration");
@@ -191,8 +194,10 @@ function_definition
 
 		// Give each identifier in the list the type from the 
 		// declaration specifiers.
-		SymbolInfo* temp = S_TABLE.GetMostRecentSymbolInfo($2.front().identifier_name);
+		SymbolInfo* temp = S_TABLE.GetMostRecentSymbolInfo($1.front().identifier_name);
 		temp->type_specifier_list.push_front(SymbolTypes::INT);
+
+		$$ = $1;
 	}
 	|	declarator declaration_list compound_statement {
 		// Log reduction
@@ -210,8 +215,10 @@ function_definition
 
 		// Give each identifier in the list the type from the 
 		// declaration specifiers.
-		SymbolInfo* temp = S_TABLE.GetMostRecentSymbolInfo($2.front().identifier_name);
+		SymbolInfo* temp = S_TABLE.GetMostRecentSymbolInfo($1.front().identifier_name);
 		temp->type_specifier_list.push_front(SymbolTypes::INT);
+
+		$$ = $1;
 	}
 	| declaration_specifiers declarator compound_statement {
 		// Log reduction.
@@ -236,6 +243,8 @@ function_definition
 		if(!(IsTypeQualifierValid(*temp))) {
 			TR_LOGGER.Error("Qualifier not valid.", LINE, COLUMN);
 		}
+
+		$$ = $2;
 	}
 	| declaration_specifiers declarator declaration_list compound_statement {
 		// Log reduction.
@@ -260,6 +269,8 @@ function_definition
 		if(!(IsTypeQualifierValid(*temp))) {
 			TR_LOGGER.Error("Qualifier not valid.", LINE, COLUMN);
 		}
+
+		$$ = $2;
 	}
 	;
 
@@ -276,16 +287,16 @@ declaration
 		// Give each identifier in the list the type from the 
 		// declaration specifiers.
     for(auto info : $2){
-		SymbolInfo* temp = S_TABLE.GetMostRecentSymbolInfo(info.identifier_name);
-		temp->type_specifier_list = $1.front().type_specifier_list;
-		for(auto qualifier : $1.front().type_qualifier_list) {
-			temp->type_qualifier_list.push_back(qualifier);
-		}
-		temp->storage_class_specifier = $1.front().storage_class_specifier;
+			SymbolInfo* temp = S_TABLE.GetMostRecentSymbolInfo(info.identifier_name);
+			temp->type_specifier_list = $1.front().type_specifier_list;
+			for(auto qualifier : $1.front().type_qualifier_list) {
+				temp->type_qualifier_list.push_back(qualifier);
+			}
+			temp->storage_class_specifier = $1.front().storage_class_specifier;
 
-		if(!(IsTypeQualifierValid(*temp))) {
-			TR_LOGGER.Error("Qualifier not valid.", LINE, COLUMN);
-		}
+			if(!(IsTypeQualifierValid(*temp))) {
+				TR_LOGGER.Error("Qualifier not valid.", LINE, COLUMN);
+			}
     }
 	}
 	;
@@ -502,6 +513,9 @@ init_declarator_list
 		// Pass through
 		$$ = $1;
 
+		// Set insert mode
+		INSERT_MODE = true;
+
 	}
 	| init_declarator_list COMMA init_declarator {
 		// Log Reduction
@@ -511,6 +525,9 @@ init_declarator_list
 		// Add new declarator to the back and pass through
 		$1.push_back($3.front());
 		$$ = $1;
+
+		// Set insert mode
+		INSERT_MODE = true;
 	}
 	;
 
@@ -966,6 +983,8 @@ parameter_list
 		TR_LOGGER.PushReduction("parameter_declaration -> parameter_list");
 		// Pass through
 		$$ = $1;
+
+		INSERT_MODE = true;
 	}
 	| parameter_list COMMA parameter_declaration {
 		// Log reduction.
@@ -974,6 +993,9 @@ parameter_list
 		// Push_back and pass through
 		$1.front().parameters_types.push_back($3.front().parameters_types.front());
 		$$ = $1;
+
+		INSERT_MODE = true;
+
 	}
 	;
 
@@ -985,6 +1007,13 @@ parameter_declaration
 
 		// Give each identifier in the list the type from the 
 		// declaration specifiers.
+		SymbolInfo* st_temp = S_TABLE.GetMostRecentSymbolInfo($2.front().identifier_name);
+		st_temp->type_specifier_list = $1.front().type_specifier_list;
+		for(auto qualifier : $1.front().type_qualifier_list) {
+			st_temp->type_qualifier_list.push_back(qualifier);
+		}
+		st_temp->storage_class_specifier = $1.front().storage_class_specifier;
+
 		FunctionParameter* temp = new FunctionParameter();
 
 		temp->type_specifier_list = $1.front().type_specifier_list;
@@ -2447,11 +2476,6 @@ unary_expression
 		// Log reduction
 		TR_LOGGER.PushReduction("AMPERSAND cast_expression -> unary_expression");
 
-		// Check to see if it is an lval
-		if(!S_TABLE.Has($2.front().identifier_name)) { // Check if it is an lval
-			TR_LOGGER.Error("Lval needed for increment operation.", LINE, COLUMN);
-		}
-
 		$2.front().identifier_name = "";
 		$2.front().array_sizes.push_back(SymbolTypes::NO_ARRAY_SIZE);
 		$$ = $2;
@@ -2834,8 +2858,8 @@ close_curly
 /******************************************************************************/
 int main(int argc, char** argv) {
 	CL_FLAGS.InitializeFlags(argc, argv);
-	TR_LOGGER.SetDebugType(TOKENS_AND_REDUCTIONS);
-	// TR_LOGGER.SetDebugType(CL_FLAGS.GetDebugType());
+	// TR_LOGGER.SetDebugType(TOKENS_AND_REDUCTIONS);
+	TR_LOGGER.SetDebugType(CL_FLAGS.GetDebugType());
 	TR_LOGGER.SetSymbolTable(&S_TABLE);
 
 	if((new ifstream(CL_FLAGS.GetInputFile()))->good()) {

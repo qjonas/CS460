@@ -352,10 +352,17 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 	}
 	// Check insert mode.
 	if (INSERT_MODE) {
-		if (CL_FLAGS.GetDebugType() != NO_DEBUGGING) {
+		if (CL_FLAGS.GetDebugType() == TOKENS_AND_REDUCTIONS_AND_SYMBOL_TABLE) {
 			cout << "In insert mode." << endl;
 		}
 		if (S_TABLE.HasInScope(yytext)) {
+			 if(S_TABLE.GetMostRecentSymbolInfo(yytext)->is_function &&
+				!S_TABLE.GetMostRecentSymbolInfo(yytext)->function_defined) {
+				yylval = *(new list<SymbolInfo>);
+				yylval.push_front(*S_TABLE.GetMostRecentSymbolInfo(yytext));
+				return IDENTIFIER;
+			 }
+
 			// If the identifier is in the scope. There is an error. Log and return.
 			TR_LOGGER.Error("Identifier already declared in scope.", 
 				LINE, COLUMN - yyleng);
@@ -381,7 +388,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 		return IDENTIFIER;
 
 	} else { // Lookup mode.
-		if (CL_FLAGS.GetDebugType() != NO_DEBUGGING) {
+		if (CL_FLAGS.GetDebugType() == TOKENS_AND_REDUCTIONS_AND_SYMBOL_TABLE) {
 			cout << "In lookup mode." << endl;
 		}
 		if(S_TABLE.Has(yytext)) { // The info can be accessed
