@@ -23,6 +23,7 @@ extern CommandLineFlags CL_FLAGS;
 extern SymbolTable S_TABLE;
 extern TokenReductionsLogger TR_LOGGER;
 extern bool INSERT_MODE;
+extern bool IN_SWITCH;
 extern int LINE;
 extern int COLUMN;
 %}
@@ -269,6 +270,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 
 "switch"	{
 	TR_LOGGER.PushToken("SWITCH");
+	IN_SWITCH = true;
 	TR_LOGGER.PushSourceWord(yytext);
 	COLUMN += yyleng;
 	return SWITCH;

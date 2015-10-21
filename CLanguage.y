@@ -33,6 +33,7 @@ extern CommandLineFlags CL_FLAGS;
 extern SymbolTable S_TABLE;
 extern TokenReductionsLogger TR_LOGGER;
 extern bool INSERT_MODE;
+extern bool IN_SWITCH;
 extern int LINE;
 extern int COLUMN;
 
@@ -786,6 +787,7 @@ open_paren_scope
 
 close_paren_scope
 	: CLOSE_PAREN {
+		IN_SWITCH = false;
 		S_TABLE.PopFrame();
 	}
 	;
@@ -1045,6 +1047,9 @@ labeled_statement
 		TR_LOGGER.PushReduction("identifier COLON statement -> labeled_statement");
 	}
 	| CASE constant_expression COLON statement {
+		  if(!IN_SWITCH){
+			TR_LOGGER.Error("CASE reached outside of Switch scope", LINE, COLUMN);
+		}
 		TR_LOGGER.PushReduction(
 			"CASE constant_expression COLON statement -> labeled_statement");
 	}
@@ -1102,7 +1107,7 @@ selection_statement
 			"IF OPEN_PAREN expression CLOSE_PAREN statement ELSE statement "
 			"-> selection_statement");
 	}
-	| SWITCH OPEN_PAREN expression CLOSE_PAREN statement {
+	| SWITCH OPEN_PAREN expression CLOSE_PAREN statement  {
 		TR_LOGGER.PushReduction(
 			"SWITCH OPEN_PAREN expression CLOSE_PAREN statement "
 			"-> selection_statement");
