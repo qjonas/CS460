@@ -1,7 +1,7 @@
 #include <iostream>
 
-#include "Escape_Sequences_Colors.h"
-#include "SymbolTable.H"
+#include "../helpers/Escape_Sequences_Colors.h"
+#include "SymbolTable.h"
 
 using namespace std;
 

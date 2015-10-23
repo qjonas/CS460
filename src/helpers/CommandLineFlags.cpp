@@ -6,8 +6,10 @@
  */
 
 #include "CommandLineFlags.h"
+
 #include <iostream>
 #include <fstream>
+ 
 using namespace std;
 
 CommandLineFlags& CommandLineFlags::GetInstance() {

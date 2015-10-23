@@ -10,7 +10,7 @@
 #include <cfloat>
 
 #include "SymbolTable.h"
-#include "Escape_Sequences_Colors.h"
+#include "../helpers/Escape_Sequences_Colors.h"
 
 using namespace std;
 using namespace SymbolTypes;

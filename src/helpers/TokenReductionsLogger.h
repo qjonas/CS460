@@ -14,7 +14,7 @@
 #include <vector>
 
 #include "CommandLineFlags.h"
-#include "SymbolTable.h"
+#include "../symbol_table/SymbolTable.h"
 
 class TokenReductionsLogger {
 public:

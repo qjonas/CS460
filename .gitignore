@@ -5,6 +5,7 @@
 *.dll
 *.exe
 *.o
+*.out
 *.so
 
 # Packages #
@@ -40,8 +41,6 @@ Thumbs.db
 ################################
 *.tab.*
 lex.yy.*
-CLanguage
-SymbolTableDriver
 
 # Backup Files #
 ################

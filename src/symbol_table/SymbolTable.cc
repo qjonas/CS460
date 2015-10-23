@@ -15,7 +15,7 @@
 #include <stack>
 #include <string>
 
-#include "Escape_Sequences_Colors.h"
+#include "../helpers/Escape_Sequences_Colors.h"
 
 using namespace std;
 using namespace SymbolTypes;
