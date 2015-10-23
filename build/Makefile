@@ -16,16 +16,22 @@ LIBS	= -L/usr/local/lib -ll
 # Linux
 #LIBS	= -L/usr/local/lib -lfl -std=c++11 
 
+# Main target executable files
+TARGET = ../bin/CLanguage.out ../bin/SymbolTableDriver.out
+
 # CLanguage build objects
-BUILDOBJS =  ../bin/CLanguage.tab.o ../bin/lex.yy.o 
-BUILDOBJS += ../bin/SymbolTable.o ../bin/CommandLineFlags.o 
-BUILDOBJS += ../bin/Globals.o ../bin/TokenReductionsLogger.o 
-BUILDOBJS += ../bin/SymbolInfoUtil.o
+MAINOBJS =  ../bin/CLanguage.tab.o ../bin/lex.yy.o 
+MAINOBJS += ../bin/SymbolTable.o ../bin/CommandLineFlags.o 
+MAINOBJS += ../bin/Globals.o ../bin/TokenReductionsLogger.o 
+MAINOBJS += ../bin/SymbolInfoUtil.o
 
-all: ../bin/CLanguage.out ../bin/SymbolTableDriver.out
+# Cleanup
+CLEAN = ../bin/CLanguage.tab.cc ../bin/CLanguage.tab.hh ../bin/lex.yy.cc
 
-../bin/CLanguage.out: $(BUILDOBJS)
-	$(CC) $(C11) -o ../bin/CLanguage.out $(BUILDOBJS) $(LIBS)
+all: $(TARGET)
+
+../bin/CLanguage.out: $(MAINOBJS)
+	$(CC) $(C11) -o ../bin/CLanguage.out $(MAINOBJS) $(LIBS)
 
 ../bin/CLanguage.tab.o: ../bin/CLanguage.tab.cc
 	$(CC) $(C11) -c $< -o $@
@@ -58,5 +64,4 @@ all: ../bin/CLanguage.out ../bin/SymbolTableDriver.out
 	$(CC) $(C11) $< ../src/symbol_table/SymbolTableDriver.cpp ../bin/SymbolTable.o -o $@
 
 clean:
-	rm $(BUILDOBJS) ../bin/CLanguage.tab.cc ../bin/CLanguage.tab.hh ../bin/lex.yy.cc
-	rm ../bin/SymbolTableDriver.out
+	rm $(MAINOBJS) $(CLEAN) $(TARGET)
