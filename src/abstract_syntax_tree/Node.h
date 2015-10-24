@@ -21,7 +21,8 @@ public:
   void Generate3AC(std::ostream& os) const;
 
   // Generate Graphviz Code:
-  void GenerateGraphvizCode(std::ofstream& fout) const;
+  void GenerateGraphviz(const std::string& file_name) const;
+  void GenerateGraphvizHelper(std::ofstream& fout) const;
 
 private:
   static std::map<std::string, int> name_count_;

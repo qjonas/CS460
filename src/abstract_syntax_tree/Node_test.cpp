@@ -36,16 +36,7 @@ int main() {
   node_12->AddChild(node_13);
   node_9->AddChild(node_14);
 
-
-  ofstream fout("AST.dot");
-
-  fout << "digraph AST {" << endl;
-
-  node_1->GenerateGraphvizCode(fout);
-
-  fout << "}";
-
-  // system("rm AST.dot");
-
-  fout.close();
+  node_1->GenerateGraphviz("AST.dot");
+  system("dot -Tpng AST.dot -o AST.png");
+  system("rm AST.dot");
 }
