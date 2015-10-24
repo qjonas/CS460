@@ -13,11 +13,12 @@ YACC	= bison
 # Mac Users Library
 LIBS	= -L/usr/local/lib -ll
 
-# Linux
+# Linux Library
 #LIBS	= -L/usr/local/lib -lfl -std=c++11 
 
 # Main target executable files
 TARGET = ../bin/CLanguage.out ../bin/SymbolTableDriver.out
+TARGET += ../bin/Node_test.out
 
 # CLanguage build objects
 MAINOBJS =  ../bin/CLanguage.tab.o ../bin/lex.yy.o 
@@ -27,11 +28,12 @@ MAINOBJS += ../bin/SymbolInfoUtil.o
 
 # Cleanup
 CLEAN = ../bin/CLanguage.tab.cc ../bin/CLanguage.tab.hh ../bin/lex.yy.cc
+CLEAN += ../bin/Node.o ../bin/AST*
 
-all: $(TARGET)
+all: $(TARGET) ../bin/Node.o
 
 ../bin/CLanguage.out: $(MAINOBJS)
-	$(CC) $(C11) -o ../bin/CLanguage.out $(MAINOBJS) $(LIBS)
+	$(CC) $(C11) $(HEADERS) -o ../bin/CLanguage.out $(MAINOBJS) $(LIBS)
 
 ../bin/CLanguage.tab.o: ../bin/CLanguage.tab.cc
 	$(CC) $(C11) -c $< -o $@
@@ -60,8 +62,14 @@ all: $(TARGET)
 ../bin/SymbolInfoUtil.o: ../src/symbol_table/SymbolInfoUtil.cpp
 	$(CC) $(C11) -c $< -o $@
 
-../bin/SymbolTableDriver.out: 
-	$(CC) $(C11) $< ../src/symbol_table/SymbolTableDriver.cpp ../bin/SymbolTable.o -o $@
+../bin/SymbolTableDriver.out: ../src/symbol_table/SymbolTableDriver.cpp
+	$(CC) $(C11) $< ../bin/SymbolTable.o -o $@
+
+../bin/Node.o: ../src/abstract_syntax_tree/Node.cpp
+	$(CC) $(C11) -c $< -o $@
+
+../bin/Node_test.out: ../src/abstract_syntax_tree/Node_test.cpp ../bin/Node.o
+	$(CC) $(C11) $< ../bin/Node.o -o $@
 
 clean:
 	rm $(MAINOBJS) $(CLEAN) $(TARGET)

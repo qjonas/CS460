@@ -7,6 +7,8 @@
 *.o
 *.out
 *.so
+*.dot
+*.png
 
 # Packages #
 ############
