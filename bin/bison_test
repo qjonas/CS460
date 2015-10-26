@@ -1,0 +1,9 @@
+digraph AST {
+postfix_expression_1[label = "postfix_expression"]
+postfix_expression_1 -> primary_expression_1
+primary_expression_1[label = "primary_expression"]
+primary_expression_1 -> constant_1
+constant_1[label = "constant"]
+constant_1 -> INTEGER_CONSTANT_2
+INTEGER_CONSTANT_2[label = "INTEGER_CONSTANT"]
+}
