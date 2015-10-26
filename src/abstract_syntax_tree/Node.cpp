@@ -26,17 +26,24 @@ void Node::AddChild(Node * node) {
 
 
 void Node::GenerateGraphviz(const string& file_name) const {
-  // Create file stream
+  // Create file stream.
   ofstream fout(file_name);
 
-  // Create a digraph
+  // Create a digraph.
   fout << "digraph AST {" << endl;
 
-  // Create edges
+  // Create edges.
   GenerateGraphvizHelper(fout);
 
-  // Finish digraph
+  // Finish digraph.
   fout << "}";
+
+  // Close the file.
+  fout.close();
+
+  // Create the png of the AST.
+  system("dot -Tpng AST.dot -o AST.png");
+  system("rm AST.dot");
 }
 
 void Node::GenerateGraphvizHelper(ofstream& fout) const {

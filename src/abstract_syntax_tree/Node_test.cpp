@@ -37,6 +37,5 @@ int main() {
   node_9->AddChild(node_14);
 
   node_1->GenerateGraphviz("AST.dot");
-  system("dot -Tpng AST.dot -o AST.png");
-  system("rm AST.dot");
+
 }
