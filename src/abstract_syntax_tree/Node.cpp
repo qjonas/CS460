@@ -25,9 +25,9 @@ void Node::AddChild(Node * node) {
 }
 
 
-void Node::GenerateGraphviz(const string& file_name) const {
+void Node::GenerateGraphviz() const {
   // Create file stream.
-  ofstream fout(file_name);
+  ofstream fout("AST.dot");
 
   // Create a digraph.
   fout << "digraph AST {" << endl;

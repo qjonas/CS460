@@ -21,7 +21,7 @@ public:
   void Generate3AC(std::ostream& os) const;
 
   // Generate Graphviz Code:
-  void GenerateGraphviz(const std::string& file_name) const;
+  void GenerateGraphviz() const;
   void GenerateGraphvizHelper(std::ofstream& fout) const;
 
 private:
