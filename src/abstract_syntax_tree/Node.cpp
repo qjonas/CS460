@@ -59,7 +59,7 @@ void Node::GenerateGraphvizHelper(ofstream& fout) const {
   }
 }
 
-<<<<<<< HEAD
+
 AssignmentNode::AssignmentNode():Node("Assignment_Node"){
 
 }
@@ -67,6 +67,6 @@ AssignmentNode::AssignmentNode():Node("Assignment_Node"){
 DeclarationNode::DeclarationNode():Node("Declaration_Node"){
 
 }
-=======
+
 SelectionNode::SelectionNode() : Node("Selection_Node") {}
->>>>>>> 751369a0d2700bd19d58622c191e33546c37abd3
+
