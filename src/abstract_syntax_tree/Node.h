@@ -35,6 +35,7 @@ private:
 
 
 
+
 class AssignmentNode: public Node{
     public:
       // Constructors 
@@ -47,6 +48,13 @@ class DeclarationNode: public Node{
       DeclarationNode();
 };
 
+class SelectionNode : public Node {
+public:
+  SelectionNode();
+};
+
 }
+
+
 
 #endif // ABSTRACT_SYNTAX_TREE_NODE_H_

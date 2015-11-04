@@ -191,7 +191,8 @@ is_function(other.is_function),
 function_defined(other.function_defined),
 parameters_types(other.parameters_types),
 range_start(other.range_start),
-postfix_increment(other.postfix_increment){}
+postfix_increment(other.postfix_increment),
+node(NULL) {}
 
 
 ostream& operator <<(ostream &os, SymbolType symbol_type) {
