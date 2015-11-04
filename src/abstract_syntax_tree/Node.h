@@ -32,11 +32,6 @@ private:
   std::list<Node*> children_;
 };
 
-
-
-
-
-
 class AssignmentNode: public Node{
     public:
       // Constructors 
