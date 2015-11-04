@@ -1200,7 +1200,12 @@ statement
     $$.front().node = new Node("Statement", $$.front().node);
   }
   | iteration_statement {
+    // Log reduction.
     TR_LOGGER.PushReduction("iteration_statement -> statement");
+
+    // Pass through
+    $$ = $1;
+    $$.front().node = new Node("Statement", $$.front().node);
   }
   | jump_statement {
     TR_LOGGER.PushReduction("jump_statement -> statement");
@@ -1348,56 +1353,192 @@ iteration_statement
       "WHILE OPEN_PAREN expression CLOSE_PAREN statement "
       "-> iteration_statement");
 
+    // Pass through AST Node
     $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
     $$.front().node = new IterationNode();
     $$.front().node->AddChild(new Node("Expression"));
+    $$.front().node->AddChild(NULL);
+    $$.front().node->AddChild(NULL);
+    $$.front().node->AddChild(NULL);
     if($5.size() > 0 && $5.front().node != NULL) {
       $$.front().node->AddChild($5.front().node);
     }
   }
   | DO statement WHILE OPEN_PAREN expression CLOSE_PAREN SEMI {
+    // Log reduction
     TR_LOGGER.PushReduction(
       "DO statement WHILE OPEN_PAREN expression CLOSE_PAREN SEMI "
       "-> iteration_statement");
+
+    // Pass through AST Node
+    $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
+    bool is_post_check(true);
+    $$.front().node = new IterationNode(is_post_check);
+    $$.front().node->AddChild(new Node("Expression"));
+    $$.front().node->AddChild(NULL);
+    $$.front().node->AddChild(NULL);
+    $$.front().node->AddChild(NULL);
+    if($2.size() > 0 && $2.front().node != NULL) {
+      $$.front().node->AddChild($2.front().node);
+    }
   }
   | FOR OPEN_PAREN SEMI SEMI CLOSE_PAREN statement {
+    // Log reduction
     TR_LOGGER.PushReduction(
       "FOR OPEN_PAREN SEMI SEMI CLOSE_PAREN statement -> iteration_statement");
+
+    // Pass through AST Node
+    $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
+    $$.front().node = new IterationNode();
+    $$.front().node->AddChild(new Node("Expression"));
+    $$.front().node->AddChild(NULL);
+    $$.front().node->AddChild(NULL);
+    $$.front().node->AddChild(NULL);
+    if($6.size() > 0 && $6.front().node != NULL) {
+      $$.front().node->AddChild($6.front().node);
+    }
   }
   | FOR OPEN_PAREN SEMI SEMI expression CLOSE_PAREN statement {
+    // Log Reduction
     TR_LOGGER.PushReduction(
       "FOR OPEN_PAREN SEMI SEMI expression CLOSE_PAREN statement "
       "-> iteration_statement");
+
+    // Pass through AST Node
+    $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
+    $$.front().node = new IterationNode();
+    $$.front().node->AddChild(new Node("Expression"));
+    $$.front().node->AddChild(NULL);
+    $$.front().node->AddChild(NULL);
+    if($5.size() > 0 && $5.front().node != NULL) {
+      $$.front().node->AddChild($5.front().node);
+    }
+    if($7.size() > 0 && $7.front().node != NULL) {
+      $$.front().node->AddChild($7.front().node);
+    }
   }
   | FOR OPEN_PAREN SEMI expression SEMI CLOSE_PAREN statement {
+    // Log Reduction
     TR_LOGGER.PushReduction(
       "FOR OPEN_PAREN SEMI expression SEMI CLOSE_PAREN statement "
       "-> iteration_statement");
+
+    // Pass through AST Node
+    $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
+    $$.front().node = new IterationNode();
+    $$.front().node->AddChild(new Node("Expression"));
+    $$.front().node->AddChild(NULL);
+    if($4.size() > 0 && $4.front().node != NULL) {
+      $$.front().node->AddChild($4.front().node);
+    }
+    $$.front().node->AddChild(NULL);
+    if($7.size() > 0 && $7.front().node != NULL) {
+      $$.front().node->AddChild($7.front().node);
+    }
   }
   | FOR OPEN_PAREN SEMI expression SEMI expression CLOSE_PAREN statement {
+    // Log Reduction
     TR_LOGGER.PushReduction(
       "FOR OPEN_PAREN SEMI expression SEMI expression CLOSE_PAREN statement "
       "-> iteration_statement");
+    // Pass through AST Node
+    $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
+    $$.front().node = new IterationNode();
+    $$.front().node->AddChild(new Node("Expression"));
+    $$.front().node->AddChild(NULL);
+    if($4.size() > 0 && $4.front().node != NULL) {
+      $$.front().node->AddChild($4.front().node);
+    }
+    if($6.size() > 0 && $6.front().node != NULL) {
+      $$.front().node->AddChild($6.front().node);
+    }
+    if($8.size() > 0 && $8.front().node != NULL) {
+      $$.front().node->AddChild($8.front().node);
+    }
   }
   | FOR OPEN_PAREN expression SEMI SEMI CLOSE_PAREN statement {
+    // Log Reduction
     TR_LOGGER.PushReduction(
       "FOR OPEN_PAREN expression SEMI SEMI CLOSE_PAREN statement "
       "-> iteration_statement");
+
+    // Pass through AST Node
+    $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
+    $$.front().node = new IterationNode();
+    $$.front().node->AddChild(new Node("Expression"));
+    if($3.size() > 0 && $3.front().node != NULL) {
+      $$.front().node->AddChild($3.front().node);
+    }
+    $$.front().node->AddChild(NULL);
+    $$.front().node->AddChild(NULL);
+    if($7.size() > 0 && $7.front().node != NULL) {
+      $$.front().node->AddChild($7.front().node);
+    }
   }
   | FOR OPEN_PAREN expression SEMI SEMI expression CLOSE_PAREN statement {
+    // Log reduction
     TR_LOGGER.PushReduction(
       "FOR OPEN_PAREN expression SEMI SEMI expression CLOSE_PAREN statement "
       "-> iteration_statement");
+
+    // Pass through AST Node
+    $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
+    $$.front().node = new IterationNode();
+    $$.front().node->AddChild(new Node("Expression"));
+    if($3.size() > 0 && $3.front().node != NULL) {
+      $$.front().node->AddChild($3.front().node);
+    }
+    $$.front().node->AddChild(NULL);
+    if($6.size() > 0 && $6.front().node != NULL) {
+      $$.front().node->AddChild($6.front().node);
+    }
+    if($8.size() > 0 && $8.front().node != NULL) {
+      $$.front().node->AddChild($8.front().node);
+    }
   }
   | FOR OPEN_PAREN expression SEMI expression SEMI CLOSE_PAREN statement {
+    // Log reduction.
     TR_LOGGER.PushReduction(
       "FOR OPEN_PAREN expression SEMI expression SEMI CLOSE_PAREN statement "
       "-> iteration_statement");
+    
+    // Pass through AST Node
+    $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
+    $$.front().node = new IterationNode();
+    $$.front().node->AddChild(new Node("Expression"));
+    if($3.size() > 0 && $3.front().node != NULL) {
+      $$.front().node->AddChild($3.front().node);
+    }
+    if($5.size() > 0 && $5.front().node != NULL) {
+      $$.front().node->AddChild($5.front().node);
+    }
+    $$.front().node->AddChild(NULL);
+    if($8.size() > 0 && $8.front().node != NULL) {
+      $$.front().node->AddChild($8.front().node);
+    }
   }
   | FOR OPEN_PAREN expression SEMI expression SEMI expression CLOSE_PAREN statement {
+    // Log reduction
     TR_LOGGER.PushReduction(
       "FOR OPEN_PAREN expression SEMI expression SEMI expression CLOSE_PAREN statement "
       "-> iteration_statement");
+    
+    // Pass through AST Node
+    $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
+    $$.front().node = new IterationNode();
+    $$.front().node->AddChild(new Node("Expression"));
+    if($3.size() > 0 && $3.front().node != NULL) {
+      $$.front().node->AddChild($3.front().node);
+    }
+    if($5.size() > 0 && $5.front().node != NULL) {
+      $$.front().node->AddChild($5.front().node);
+    }
+    if($7.size() > 0 && $7.front().node != NULL) {
+      $$.front().node->AddChild($7.front().node);
+    }
+    if($9.size() > 0 && $9.front().node != NULL) {
+      $$.front().node->AddChild($9.front().node);
+    }
   }
   ;
 
