@@ -12,6 +12,7 @@
 /* Included C/C++ Libraries */
 #include <iostream>
 #include <list>
+#include <locale>
 
 /* Included Header Files */
 #include  "../src/helpers/CommandLineFlags.h"
@@ -3069,6 +3070,8 @@ int main(int argc, char** argv) {
 }
 
 void yyerror(const char * err) {
-  printf("%s\n", err);
+  string new_err(err);
+  new_err[0] = toupper(new_err[0], *(new locale));
+  TR_LOGGER.Error(new_err, LINE, COLUMN - 1);
 }
 
