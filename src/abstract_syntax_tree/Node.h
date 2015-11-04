@@ -12,6 +12,7 @@ class Node {
 public:
   // Constructors
   Node(const std::string& name);
+  Node(const std::string& name, Node * child);
   ~Node();
 
   // Add a child to node
