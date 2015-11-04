@@ -14,6 +14,8 @@
 #include <string>
 #include <vector>
 
+#include "../abstract_syntax_tree/Node.h"
+
 // SymbolType will enumerate the primitive data types in C.
 namespace SymbolTypes{
 enum SymbolType {
@@ -96,7 +98,7 @@ typedef struct SymbolInfo {
 	unsigned int pointer_count;
 
 	// This will hold the node
-	Node * node;
+	AST::Node * node;
 } SymbolInfo;
 
 std::ostream& operator <<(std::ostream &os, SymbolInfo &symbol_info);

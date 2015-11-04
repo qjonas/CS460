@@ -11,6 +11,7 @@
 
 /* Included Headers */
 #include  "../bin/CLanguage.tab.hh"
+#include  "../src/abstract_syntax_tree/Node.h"
 #include  "../src/helpers/CommandLineFlags.h"
 #include  "../src/helpers/TokenReductionsLogger.h"
 #include  "../src/symbol_table/SymbolTable.h"
