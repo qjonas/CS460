@@ -33,15 +33,13 @@ private:
 };
 
 class AssignmentNode: public Node{
-    public:
-      // Constructors 
-      AssignmentNode();
+public:
+  AssignmentNode();
 };
 
 class DeclarationNode: public Node{
-    public:
-      // Constructors 
-      DeclarationNode();
+public:
+  DeclarationNode();
 };
 
 class SelectionNode : public Node {
@@ -49,8 +47,22 @@ public:
   SelectionNode();
 };
 
+class IdentifierNode: public Node{
+public:
+  // constructor
+  IdentifierNode();
+
+private:
+  SymbolInfo* Id_info;
+};
+
+class ExpressNode: public Node{
+public:
+  ExpressNode();
+};
+
+
+
+
 }
-
-
-
 #endif // ABSTRACT_SYNTAX_TREE_NODE_H_

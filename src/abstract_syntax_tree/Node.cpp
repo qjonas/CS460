@@ -68,13 +68,15 @@ void Node::GenerateGraphvizHelper(ofstream& fout) const {
 }
 
 
-AssignmentNode::AssignmentNode():Node("Assignment_Node"){
+AssignmentNode::AssignmentNode() : Node("Assignment_Node"){
 
 }
 
-DeclarationNode::DeclarationNode():Node("Declaration_Node"){
+DeclarationNode::DeclarationNode() : Node("Declaration_Node"){
 
 }
 
 SelectionNode::SelectionNode() : Node("Selection_Node") {}
+
+IdentifierNode::IdentifierNode() : Node("Identifier_Node"){}
 

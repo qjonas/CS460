@@ -157,6 +157,8 @@ extern FILE * yyin;
 translation_unit
   : external_declaration {
     TR_LOGGER.PushReduction("external_declaration -> translation_unit");
+    // pass through
+    $$.front().node = new Node("External_Declaration", $$.front().node);
   }
   | translation_unit external_declaration {
     TR_LOGGER.PushReduction(
@@ -170,6 +172,8 @@ external_declaration
 
     SymbolInfo* temp = S_TABLE.GetMostRecentSymbolInfo($1.front().identifier_name);
     temp->function_defined = true;
+
+    $$.front().node = new Node("Function_Declaration", $$.front().node);
   }
   | declaration {
     TR_LOGGER.PushReduction("declaration -> external_declaration");
@@ -178,6 +182,8 @@ external_declaration
       IN_FUNCTION--;
       S_TABLE.PopFrame();
     }
+    // pass through
+    $$.front().node = new Node("Declaration", $$.front().node);
   }
   ;
 
@@ -3064,6 +3070,7 @@ string
 identifier
   : IDENTIFIER {
     $$ = $1;
+
     $$.front().node = new Node("Identifier", $$.front().node);
     TR_LOGGER.PushReduction("IDENTIFIER -> identifier");
   }
