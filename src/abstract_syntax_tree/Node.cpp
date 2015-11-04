@@ -61,20 +61,21 @@ void Node::GenerateGraphvizHelper(ofstream& fout) const {
 
   // Recursively generate the graphviz of each child.
   for(auto child : children_) {
+    if(child == NULL) continue;
     fout << name_ << "_" << id_ << " -> "; 
     fout << child->name_ << "_" << child->id_ << endl;
     child->GenerateGraphvizHelper(fout);
   }
 }
 
+AssignmentNode::AssignmentNode():Node("Assignment_Node") {}
 
-AssignmentNode::AssignmentNode():Node("Assignment_Node"){
+DeclarationNode::DeclarationNode():Node("Declaration_Node") {}
 
-}
+IterationNode::IterationNode(bool post_check) : Node("Iteration_Node"),
+is_post_check(post_check) {}
 
-DeclarationNode::DeclarationNode():Node("Declaration_Node"){
-
-}
+IterationNode::IterationNode() : IterationNode(false) {}
 
 SelectionNode::SelectionNode() : Node("Selection_Node") {}
 

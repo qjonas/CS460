@@ -198,7 +198,7 @@ function_definition
     // Give each identifier in the list the type from the 
     // declaration specifiers.
     SymbolInfo* temp = S_TABLE.GetMostRecentSymbolInfo($1.front().identifier_name);
-    temp->type_specifier_list.push_front(SymbolTypes::INT);
+    temp->type_specifier_list.push_front(SymbolTypes::INT);  
 
     $$ = $1;
   }
@@ -1234,12 +1234,18 @@ expression_statement
 
 compound_statement
   : open_curly close_curly {
+    // Log Reduction
     TR_LOGGER.PushReduction("open_curly close_curly -> expression_statement");
 
+    // Check if it is in a function.
     if(IN_FUNCTION > 0) {
       IN_FUNCTION--;
       S_TABLE.PopFrame();
     }
+
+    // Pass through
+    $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
+    $$.front().node = new Node("Compound_Statement");
   }
   | open_curly statement_list close_curly {
     TR_LOGGER.PushReduction(
@@ -1249,6 +1255,10 @@ compound_statement
       IN_FUNCTION--;
       S_TABLE.PopFrame();
     }
+
+    // Pass through
+    $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
+    $$.front().node = new Node("Compound_Statement", $2.front().node);
   }
   | open_curly declaration_list close_curly {
     TR_LOGGER.PushReduction(
@@ -1284,7 +1294,13 @@ statement_list
 
   }
   | statement_list statement {
+    // Log Reduction
     TR_LOGGER.PushReduction("statement_list statement -> statement_list");
+
+    // Pass through
+    $$ = $1;
+    $$.front().node->AddChild($2.front().node);
+    $$.front().node->GenerateGraphviz();
   }
   ;
 
@@ -1297,11 +1313,26 @@ selection_statement
 
     $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
     $$.front().node = new SelectionNode();
+    $$.front().node->AddChild(new Node("Expression"));
+    if($5.size() > 0 && $5.front().node != NULL) {
+      $$.front().node->AddChild($5.front().node);
+    }
   }
   | IF OPEN_PAREN expression CLOSE_PAREN statement ELSE statement {
     TR_LOGGER.PushReduction(
       "IF OPEN_PAREN expression CLOSE_PAREN statement ELSE statement "
       "-> selection_statement");
+
+    // Pass through
+    $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
+    $$.front().node = new SelectionNode();
+    $$.front().node->AddChild(new Node("Expression"));
+    if($5.size() > 0 && $5.front().node != NULL) {
+      $$.front().node->AddChild($5.front().node);
+    }
+    if($7.size() > 0 && $7.front().node != NULL ) {
+      $$.front().node->AddChild($7.front().node);
+    } 
   }
   | SWITCH OPEN_PAREN expression CLOSE_PAREN statement  {
     TR_LOGGER.PushReduction(
@@ -1312,9 +1343,17 @@ selection_statement
 
 iteration_statement
   : WHILE OPEN_PAREN expression CLOSE_PAREN statement {
+    // Log Reduction
     TR_LOGGER.PushReduction(
       "WHILE OPEN_PAREN expression CLOSE_PAREN statement "
       "-> iteration_statement");
+
+    $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
+    $$.front().node = new IterationNode();
+    $$.front().node->AddChild(new Node("Expression"));
+    if($5.size() > 0 && $5.front().node != NULL) {
+      $$.front().node->AddChild($5.front().node);
+    }
   }
   | DO statement WHILE OPEN_PAREN expression CLOSE_PAREN SEMI {
     TR_LOGGER.PushReduction(

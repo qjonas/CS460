@@ -37,16 +37,25 @@ private:
 
 
 
-class AssignmentNode: public Node{
-    public:
-      // Constructors 
-      AssignmentNode();
+class AssignmentNode : public Node {
+public:
+  // Constructors 
+  AssignmentNode();
 };
 
-class DeclarationNode: public Node{
-    public:
-      // Constructors 
-      DeclarationNode();
+class DeclarationNode : public Node {
+public:
+  // Constructors 
+  DeclarationNode();
+};
+
+class IterationNode : public Node {
+public:
+  IterationNode();
+  IterationNode(bool post_check);
+
+private:
+  bool is_post_check;
 };
 
 class SelectionNode : public Node {
