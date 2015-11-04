@@ -68,14 +68,18 @@ void Node::GenerateGraphvizHelper(ofstream& fout) const {
   }
 }
 
-AssignmentNode::AssignmentNode():Node("Assignment_Node") {}
+AssignmentNode::AssignmentNode():Node("Assignment") {}
 
-DeclarationNode::DeclarationNode():Node("Declaration_Node") {}
+DeclarationNode::DeclarationNode():Node("Declaration") {}
 
-IterationNode::IterationNode(bool post_check) : Node("Iteration_Node"),
+ExpressNode::ExpressNode() : Node("Expression")
+
+IterationNode::IterationNode(bool post_check) : Node("Iteration"),
 is_post_check(post_check) {}
 
 IterationNode::IterationNode() : IterationNode(false) {}
 
-SelectionNode::SelectionNode() : Node("Selection_Node") {}
+SelectionNode::SelectionNode() : Node("Selection") {}
+
+IdentifierNode::IdentifierNode() : Node("Identifier"){}
 

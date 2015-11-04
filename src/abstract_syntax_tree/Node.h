@@ -32,11 +32,6 @@ private:
   std::list<Node*> children_;
 };
 
-
-
-
-
-
 class AssignmentNode : public Node {
 public:
   // Constructors 
@@ -47,6 +42,11 @@ class DeclarationNode : public Node {
 public:
   // Constructors 
   DeclarationNode();
+};
+
+class ExpressNode: public Node{
+public:
+  ExpressNode();
 };
 
 class IterationNode : public Node {
@@ -63,8 +63,14 @@ public:
   SelectionNode();
 };
 
+class IdentifierNode: public Node{
+public:
+  // constructor
+  IdentifierNode();
+
+private:
+  SymbolInfo* Id_info;
+};
+
 }
-
-
-
 #endif // ABSTRACT_SYNTAX_TREE_NODE_H_

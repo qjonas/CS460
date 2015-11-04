@@ -157,6 +157,8 @@ extern FILE * yyin;
 translation_unit
   : external_declaration {
     TR_LOGGER.PushReduction("external_declaration -> translation_unit");
+    // pass through
+    $$.front().node = new Node("External_Declaration", $$.front().node);
   }
   | translation_unit external_declaration {
     TR_LOGGER.PushReduction(
@@ -170,6 +172,8 @@ external_declaration
 
     SymbolInfo* temp = S_TABLE.GetMostRecentSymbolInfo($1.front().identifier_name);
     temp->function_defined = true;
+
+    $$.front().node = new Node("Function_Declaration", $$.front().node);
   }
   | declaration {
     TR_LOGGER.PushReduction("declaration -> external_declaration");
@@ -178,6 +182,8 @@ external_declaration
       IN_FUNCTION--;
       S_TABLE.PopFrame();
     }
+    // pass through
+    $$.front().node = new Node("Declaration", $$.front().node);
   }
   ;
 
@@ -289,6 +295,8 @@ declaration
       "declaration_specifiers init_declarator_list SEMI -> declaration");
     // Give each identifier in the list the type from the 
     // declaration specifiers.
+    //TODO still working
+    //$$.front().node = new Node("Declaration", $$.front().node);
     for(auto info : $2){
       SymbolInfo* temp = S_TABLE.GetMostRecentSymbolInfo(info.identifier_name);
       temp->type_specifier_list = $1.front().type_specifier_list;
@@ -300,6 +308,7 @@ declaration
       if(!(IsTypeQualifierValid(*temp))) {
         TR_LOGGER.Error("Qualifier not valid.", LINE, COLUMN);
       }
+      
     }
   }
   ;
@@ -345,6 +354,7 @@ declaration_specifiers
 
     // Pass through symbol info
     $$ = $1;
+		$$.front().node = new Node("Declaration_Specifiers", $$.front().node);
   }
   | type_specifier declaration_specifiers {
     TR_LOGGER.PushReduction(
@@ -515,6 +525,7 @@ init_declarator_list
     TR_LOGGER.PushReduction("init_declarator -> init_declarator_list");
     // Pass through
     $$ = $1;
+    $$.front().node = new Node("Init_Declarator_List", $$.front().node);
 
     // Set insert mode
     INSERT_MODE = true;
@@ -528,6 +539,7 @@ init_declarator_list
     // Add new declarator to the back and pass through
     $1.push_back($3.front());
     $$ = $1;
+    $$.front().node = new Node("Init_Declarator_List", $$.front().node);
 
     // Set insert mode
     INSERT_MODE = true;
@@ -540,8 +552,10 @@ init_declarator
     TR_LOGGER.PushReduction("declarator -> init_declarator");
     // Pass through
     $$ = $1;
+    $$.front().node = new Node("Init_Declarator", $$.front().node);
   }
   | declarator EQUALS_SIGN initializer {
+    //TODO for initializing and declaring a variable in the same line
     // Log reduction
     TR_LOGGER.PushReduction(
       "declarator EQUALS_SIGN initializer -> init_declarator");
@@ -705,11 +719,13 @@ declarator
 
     // Pass through
     $$ = $1;
+    $$.front().node = new Node("Declarator", $$.front().node);
 
     INSERT_MODE = false;
 
   }
   | pointer direct_declarator {
+    //TODO for pointers
     // Log reduction
     TR_LOGGER.PushReduction("pointer direct_declarator -> declarator");
 
@@ -747,6 +763,7 @@ direct_declarator
 
     // Pass through
     $$ = $1;
+    $$.front().node = new Node("Direct_Declarator", $$.front().node);
 
   }
   | OPEN_PAREN declarator CLOSE_PAREN {
@@ -3233,6 +3250,8 @@ string
 identifier
   : IDENTIFIER {
     $$ = $1;
+
+    $$.front().node = new Node("Identifier", $$.front().node);
     TR_LOGGER.PushReduction("IDENTIFIER -> identifier");
   }
   ;
