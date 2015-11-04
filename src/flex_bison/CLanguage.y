@@ -1192,7 +1192,12 @@ statement
     TR_LOGGER.PushReduction("expression_statement -> statement");
   }
   | selection_statement {
+    // Log reduction
     TR_LOGGER.PushReduction("selection_statement -> statement");
+
+    //Pass through
+    $$ = $1;
+    $$.front().node = new Node("Statement", $$.front().node);
   }
   | iteration_statement {
     TR_LOGGER.PushReduction("iteration_statement -> statement");
@@ -1269,7 +1274,14 @@ compound_statement
 
 statement_list
   : statement {
+    // Log Reduction
     TR_LOGGER.PushReduction("statement -> statement_list");
+
+    // Pass through
+    $$ = $1;
+    $$.front().node = new Node("Statement_List", $$.front().node);
+    $$.front().node->GenerateGraphviz();
+
   }
   | statement_list statement {
     TR_LOGGER.PushReduction("statement_list statement -> statement_list");
@@ -1282,6 +1294,9 @@ selection_statement
     TR_LOGGER.PushReduction(
       "IF OPEN_PAREN expression CLOSE_PAREN statement "
       "-> selection_statement");
+
+    $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
+    $$.front().node = new SelectionNode();
   }
   | IF OPEN_PAREN expression CLOSE_PAREN statement ELSE statement {
     TR_LOGGER.PushReduction(

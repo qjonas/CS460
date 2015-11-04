@@ -20,6 +20,14 @@ Node::Node(const string& name) : name_(name) {
   id_ = to_string(name_count_[name]);
 }
 
+Node::Node(const string& name, Node * child) : Node(name) {
+  AddChild(child);
+}
+
+Node::~Node() {
+  
+}
+
 void Node::AddChild(Node * node) {
   children_.push_back(node);
 }
