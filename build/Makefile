@@ -24,7 +24,7 @@ TARGET += ../bin/Node_test.out
 MAINOBJS =  ../bin/CLanguage.tab.o ../bin/lex.yy.o 
 MAINOBJS += ../bin/SymbolTable.o ../bin/CommandLineFlags.o 
 MAINOBJS += ../bin/Globals.o ../bin/TokenReductionsLogger.o 
-MAINOBJS += ../bin/SymbolInfoUtil.o
+MAINOBJS += ../bin/SymbolInfoUtil.o ../bin/Node.o
 
 # Cleanup
 CLEAN = ../bin/CLanguage.tab.cc ../bin/CLanguage.tab.hh ../bin/lex.yy.cc

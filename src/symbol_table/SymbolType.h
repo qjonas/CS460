@@ -94,6 +94,9 @@ typedef struct SymbolInfo {
 	// Pointer Count will denote the number of '*' there are for a given identifier.
 	// ex: int** i; Will have a pointer_counter equal to 2
 	unsigned int pointer_count;
+
+	// This will hold the node
+	Node * node;
 } SymbolInfo;
 
 std::ostream& operator <<(std::ostream &os, SymbolInfo &symbol_info);

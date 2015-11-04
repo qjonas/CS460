@@ -96,7 +96,7 @@ istream& operator >>(istream &is, FunctionInfo &function_info) {
 }
 
 SymbolInfo::SymbolInfo() : storage_class_specifier(NONE), is_function(false),
-	data_is_valid(false), pointer_count(0) {}
+	data_is_valid(false), pointer_count(0), node(NULL) {}
 
 ostream& operator <<(ostream &os, SymbolInfo &symbol_info) {
 	// os << '{' << endl;
