@@ -49,6 +49,15 @@ public:
   ExpressNode();
 };
 
+class IdentifierNode: public Node{
+public:
+  // constructor
+  IdentifierNode();
+
+private:
+  SymbolInfo* Id_info;
+};
+
 class IterationNode : public Node {
 public:
   IterationNode();
@@ -61,15 +70,6 @@ private:
 class SelectionNode : public Node {
 public:
   SelectionNode();
-};
-
-class IdentifierNode: public Node{
-public:
-  // constructor
-  IdentifierNode();
-
-private:
-  SymbolInfo* Id_info;
 };
 
 }

@@ -72,7 +72,9 @@ AssignmentNode::AssignmentNode():Node("Assignment") {}
 
 DeclarationNode::DeclarationNode():Node("Declaration") {}
 
-ExpressNode::ExpressNode() : Node("Expression")
+ExpressNode::ExpressNode() : Node("Expression") {}
+
+IdentifierNode::IdentifierNode() : Node("Identifier") {}
 
 IterationNode::IterationNode(bool post_check) : Node("Iteration"),
 is_post_check(post_check) {}
@@ -81,5 +83,4 @@ IterationNode::IterationNode() : IterationNode(false) {}
 
 SelectionNode::SelectionNode() : Node("Selection") {}
 
-IdentifierNode::IdentifierNode() : Node("Identifier"){}
 
