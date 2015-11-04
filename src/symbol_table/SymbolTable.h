@@ -14,6 +14,8 @@
 #include <stack>
 #include <string>
 
+#include "../abstract_syntax_tree/Node.h"
+
 struct SymbolInfo;
 
 // SymbolType will enumerate the primitive data types in C.
@@ -165,6 +167,9 @@ typedef struct SymbolInfo {
 
 	// Postfix Increment
 	int postfix_increment;
+
+	// Node
+	AST::Node * node;
 } SymbolInfo;
 
 std::ostream& operator<<(std::ostream &os, SymbolTypes::SymbolType symbol_type);

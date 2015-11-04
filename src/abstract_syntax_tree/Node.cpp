@@ -43,7 +43,7 @@ void Node::GenerateGraphviz() const {
 
   // Create the png of the AST.
   system("dot -Tpng AST.dot -o AST.png");
-  system("rm AST.dot");
+  // system("rm AST.dot");
 }
 
 void Node::GenerateGraphvizHelper(ofstream& fout) const {
@@ -58,3 +58,5 @@ void Node::GenerateGraphvizHelper(ofstream& fout) const {
     child->GenerateGraphvizHelper(fout);
   }
 }
+
+SelectionNode::SelectionNode() : Node("Selection_Node") {}

@@ -21,6 +21,7 @@
 #include  "../src/helpers/TokenReductionsLogger.h"
 #include  "../src/symbol_table/SymbolInfoUtil.h"
 
+using namespace AST;
 using namespace std;
 %}
 
@@ -1277,8 +1278,9 @@ statement_list
 
 selection_statement
   : IF OPEN_PAREN expression CLOSE_PAREN statement {
+    // Log Reduction
     TR_LOGGER.PushReduction(
-      "IF OPEN_PAREN expression CLOSE_PAREN statement_list "
+      "IF OPEN_PAREN expression CLOSE_PAREN statement "
       "-> selection_statement");
   }
   | IF OPEN_PAREN expression CLOSE_PAREN statement ELSE statement {

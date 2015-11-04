@@ -30,6 +30,12 @@ private:
   std::string id_;
   std::list<Node*> children_;
 };
+
+class SelectionNode : public Node {
+public:
+  SelectionNode();
+};
+
 }
 
 #endif // ABSTRACT_SYNTAX_TREE_NODE_H_
