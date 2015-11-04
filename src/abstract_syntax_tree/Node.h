@@ -30,6 +30,23 @@ private:
   std::string id_;
   std::list<Node*> children_;
 };
+
+
+
+
+
+class AssignmentNode: public Node{
+    public:
+      // Constructors 
+      AssignmentNode();
+};
+
+class DeclarationNode: public Node{
+    public:
+      // Constructors 
+      DeclarationNode();
+};
+
 }
 
 #endif // ABSTRACT_SYNTAX_TREE_NODE_H_

@@ -58,3 +58,11 @@ void Node::GenerateGraphvizHelper(ofstream& fout) const {
     child->GenerateGraphvizHelper(fout);
   }
 }
+
+AssignmentNode::AssignmentNode():Node("Assignment_Node"){
+
+}
+
+DeclarationNode::DeclarationNode():Node("Declaration_Node"){
+
+}
