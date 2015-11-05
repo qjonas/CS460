@@ -15,7 +15,6 @@
 #include <locale>
 
 /* Included Header Files */
-#include  "../src/abstract_syntax_tree/Node.h"
 #include  "../src/helpers/CommandLineFlags.h"
 #include  "../src/helpers/Escape_Sequences_Colors.h"
 #include  "../src/helpers/TokenReductionsLogger.h"
@@ -26,6 +25,7 @@ using namespace std;
 %}
 
 %code requires {
+  #include  "../src/abstract_syntax_tree/Node.h"
   #include  "../src/symbol_table/SymbolTable.h"
   #define YYSTYPE std::list<SymbolInfo>
 }
