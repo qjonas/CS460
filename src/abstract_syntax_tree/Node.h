@@ -22,7 +22,7 @@ public:
   void Generate3AC(std::ostream& os) const;
 
   // Generate Graphviz Code:
-  void GenerateGraphviz() const;
+  void GenerateGraphviz(const std::string& file_name) const;
   void GenerateGraphvizHelper(std::ofstream& fout) const;
 
 private:
@@ -34,8 +34,16 @@ private:
 
 class AssignmentNode : public Node {
 public:
+   enum AssignmentType {
+    EQUALS, MUL, DIV, MOD, ADD, SUB, LEFT, RIGHT, AND, XOR, OR
+  };
+
   // Constructors 
-  AssignmentNode();
+  AssignmentNode(AssignmentType type);
+
+private:
+  AssignmentType type;
+
 };
 
 class DeclarationNode : public Node {
@@ -47,15 +55,32 @@ public:
 class ExpressNode: public Node{
 public:
   ExpressNode();
+  ExpressNode(Node * child);
 };
+}
 
+
+// Forward declare.
+struct SymbolInfo;
+
+#include "../symbol_table/SymbolTable.h"
+
+namespace AST {
 class IdentifierNode: public Node{
 public:
   // constructor
-  IdentifierNode();
+  IdentifierNode(SymbolInfo * id);
 
 private:
-  // SymbolInfo* Id_info;
+  SymbolInfo* Id_info;
+};
+
+class IntegerConstantNode : public Node {
+public:
+  IntegerConstantNode(long long int val);
+
+private:
+  long long int value;
 };
 
 class IterationNode : public Node {

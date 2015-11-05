@@ -33,9 +33,11 @@ void Node::AddChild(Node * node) {
 }
 
 
-void Node::GenerateGraphviz() const {
+void Node::GenerateGraphviz(const string& file_name) const {
   // Create file stream.
-  ofstream fout("AST.dot");
+  string dot_name(file_name);
+  dot_name.append(".dot");
+  ofstream fout(dot_name);
 
   // Create a digraph.
   fout << "digraph AST {" << endl;
@@ -50,7 +52,12 @@ void Node::GenerateGraphviz() const {
   fout.close();
 
   // Create the png of the AST.
-  system("dot -Tpng AST.dot -o AST.png");
+  string sys_call("dot -Tpng ");
+  sys_call.append(dot_name);
+  sys_call.append(" -o ");
+  sys_call.append(file_name);
+  sys_call.append(".png");
+  system(sys_call.c_str());
   // system("rm AST.dot");
 }
 
@@ -68,13 +75,24 @@ void Node::GenerateGraphvizHelper(ofstream& fout) const {
   }
 }
 
-AssignmentNode::AssignmentNode():Node("Assignment") {}
+AssignmentNode::AssignmentNode(AssignmentType type) : Node("Assignment") {
+  this->type = type;
+}
 
 DeclarationNode::DeclarationNode():Node("Declaration") {}
 
 ExpressNode::ExpressNode() : Node("Expression") {}
+ExpressNode::ExpressNode(Node * child) : Node("Expression", child) {}
 
-IdentifierNode::IdentifierNode() : Node("Identifier") {}
+IdentifierNode::IdentifierNode(SymbolInfo* id) : Node("Identifier") {
+  Id_info = id;
+}
+
+IntegerConstantNode::IntegerConstantNode(long long int val) 
+  : Node("Integer_Constant") {
+  value = val;
+}
+
 
 IterationNode::IterationNode(bool post_check) : Node("Iteration"),
 is_post_check(post_check) {}

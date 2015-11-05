@@ -17,6 +17,7 @@
 #include  "../src/symbol_table/SymbolTable.h"
 #include  "../src/symbol_table/SymbolInfoUtil.h"
 
+using namespace AST;
 using namespace std;
 
 /* Globals between flex and bison. These are declared in Globals.cpp. */
@@ -383,6 +384,8 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
     S_TABLE.InsertSymbol(yytext, insert_info);
     yylval = *(new list<SymbolInfo>);
     yylval.push_front(insert_info);
+    yylval.front().node = 
+        new IdentifierNode(S_TABLE.GetMostRecentSymbolInfo(yytext));
 
     // Log and return
     TR_LOGGER.PushToken("IDENTIFIER");
@@ -395,6 +398,8 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
     if(S_TABLE.Has(yytext)) { // The info can be accessed
       yylval = *(new list<SymbolInfo>);
       yylval.push_front(*(S_TABLE.GetMostRecentSymbolInfo(yytext)));
+      yylval.front().node = 
+          new IdentifierNode(S_TABLE.GetMostRecentSymbolInfo(yytext));
       TR_LOGGER.PushToken("IDENTIFIER");
       return IDENTIFIER;
     } else {
@@ -431,6 +436,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
     yylval.front().type_specifier_list.push_back(SymbolTypes::LONG);
     yylval.front().type_specifier_list.push_back(SymbolTypes::INT);
     yylval.front().data_value.unsigned_long_long_val = input;
+    yylval.front().node = new IntegerConstantNode(input);
   }
 
   // Increment COLUMN counter and return
@@ -460,6 +466,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
     yylval.front().type_specifier_list.push_back(SymbolTypes::LONG);
     yylval.front().type_specifier_list.push_back(SymbolTypes::LONG);
     yylval.front().type_specifier_list.push_back(SymbolTypes::INT);
+    yylval.front().node = new IntegerConstantNode(input);
   }
 
   // Increment COLUMN counter and return
@@ -490,7 +497,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
     yylval.front().type_specifier_list.push_back(SymbolTypes::LONG);
     yylval.front().type_specifier_list.push_back(SymbolTypes::LONG);
     yylval.front().type_specifier_list.push_back(SymbolTypes::INT);
-
+    yylval.front().node = new IntegerConstantNode(input);
   }
 
   // Increment COLUMN counter and return

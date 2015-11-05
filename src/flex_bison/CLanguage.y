@@ -158,11 +158,18 @@ translation_unit
   : external_declaration {
     TR_LOGGER.PushReduction("external_declaration -> translation_unit");
     // pass through
-    $$.front().node = new Node("External_Declaration", $$.front().node);
+    Node * temp = new Node("Translation_Unit", $$.front().node);
+    $$ = $1;
+    $$.front().node = temp;
+    $$.front().node->GenerateGraphviz("Translation_Unit");
+
   }
   | translation_unit external_declaration {
     TR_LOGGER.PushReduction(
       "translation_unit external_declaration -> translation_unit");
+    $$ = $1;
+    $$.front().node->AddChild($2.front().node);
+    $$.front().node->GenerateGraphviz("Translation_Unit");
   }
   ;
 
@@ -173,7 +180,7 @@ external_declaration
     SymbolInfo* temp = S_TABLE.GetMostRecentSymbolInfo($1.front().identifier_name);
     temp->function_defined = true;
 
-    $$.front().node = new Node("Function_Declaration", $$.front().node);
+    $$.front().node = new Node("External_Declaration", $$.front().node);
   }
   | declaration {
     TR_LOGGER.PushReduction("declaration -> external_declaration");
@@ -254,6 +261,11 @@ function_definition
     }
 
     $$ = $2;
+    Node * temp_node = new Node("Function_Definition");
+    temp_node->AddChild(new Node("Declaration_Specifiers"));
+    temp_node->AddChild(new Node("Declarator"));
+    temp_node->AddChild($3.front().node);
+    $$.front().node = temp_node;
   }
   | declaration_specifiers declarator declaration_list compound_statement {
     // Log reduction.
@@ -1204,10 +1216,15 @@ statement
     TR_LOGGER.PushReduction("labeled_statement -> statement");
   }
   | compound_statement {
+    // Log reduction
     TR_LOGGER.PushReduction("compound_statement -> statement");
   }
   | expression_statement {
+    // Log reduction
     TR_LOGGER.PushReduction("expression_statement -> statement");
+
+    // Pass through
+    $$ = $1;
   }
   | selection_statement {
     // Log reduction
@@ -1215,7 +1232,6 @@ statement
 
     //Pass through
     $$ = $1;
-    $$.front().node = new Node("Statement", $$.front().node);
   }
   | iteration_statement {
     // Log reduction.
@@ -1251,14 +1267,19 @@ expression_statement
     TR_LOGGER.PushReduction("SEMI -> expression_statement");
   }
   | expression SEMI {
+    // Log reduction
     TR_LOGGER.PushReduction("expression SEMI -> expression_statement");
+
+    // Pass through
+    $$ = $1;
+    $$.front().node = new Node("Expression_Statement", $$.front().node);
   }
   ;
 
 compound_statement
   : open_curly close_curly {
     // Log Reduction
-    TR_LOGGER.PushReduction("open_curly close_curly -> expression_statement");
+    TR_LOGGER.PushReduction("open_curly close_curly -> compound_statement");
 
     // Check if it is in a function.
     if(IN_FUNCTION > 0) {
@@ -1272,7 +1293,7 @@ compound_statement
   }
   | open_curly statement_list close_curly {
     TR_LOGGER.PushReduction(
-      "open_curly statement_list close_curly -> expression_statement");
+      "open_curly statement_list close_curly -> compound_statement");
 
     if(IN_FUNCTION > 0) {
       IN_FUNCTION--;
@@ -1285,7 +1306,7 @@ compound_statement
   }
   | open_curly declaration_list close_curly {
     TR_LOGGER.PushReduction(
-      "open_curly declaration_list close_curly -> expression_statement");
+      "open_curly declaration_list close_curly -> compound_statement");
 
     if(IN_FUNCTION > 0) {
       IN_FUNCTION--;
@@ -1296,7 +1317,7 @@ compound_statement
     close_curly {
     TR_LOGGER.PushReduction(
       "open_curly declaration_list statement_list close_curly "
-      "-> expression_statement");
+      "-> compound_statement");
 
     if(IN_FUNCTION > 0) {
       IN_FUNCTION--;
@@ -1313,8 +1334,6 @@ statement_list
     // Pass through
     $$ = $1;
     $$.front().node = new Node("Statement_List", $$.front().node);
-    $$.front().node->GenerateGraphviz();
-
   }
   | statement_list statement {
     // Log Reduction
@@ -1323,7 +1342,6 @@ statement_list
     // Pass through
     $$ = $1;
     $$.front().node->AddChild($2.front().node);
-    $$.front().node->GenerateGraphviz();
   }
   ;
 
@@ -1336,7 +1354,7 @@ selection_statement
 
     $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
     $$.front().node = new SelectionNode();
-    $$.front().node->AddChild(new Node("Expression"));
+    $$.front().node->AddChild($3.front().node);
     if($5.size() > 0 && $5.front().node != NULL) {
       $$.front().node->AddChild($5.front().node);
     }
@@ -1349,7 +1367,7 @@ selection_statement
     // Pass through
     $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
     $$.front().node = new SelectionNode();
-    $$.front().node->AddChild(new Node("Expression"));
+    $$.front().node->AddChild($3.front().node);
     if($5.size() > 0 && $5.front().node != NULL) {
       $$.front().node->AddChild($5.front().node);
     }
@@ -1584,10 +1602,15 @@ expression
     TR_LOGGER.PushReduction("assignment_expression -> expression");
     // Pass through 
     $$ = $1;
+    $$.front().node = new ExpressNode($$.front().node);
+    $$.front().node->GenerateGraphviz("Expression");
   }
   | expression COMMA assignment_expression {
     TR_LOGGER.PushReduction(
       "expression COMMA assignment_expression -> expression");
+    $$ = $1;
+    $$.push_front($3.front());
+    $$.front().node->AddChild($3.front().node);
   }
   ;
 
@@ -1616,42 +1639,111 @@ assignment_expression
 
     // Pass through
     $$ = $1;
+    $2.front().node->AddChild($1.front().node);
+    $2.front().node->AddChild($3.front().node);
+    $$.front().node = $2.front().node;
   }
   ;
 
 assignment_operator
   : EQUALS_SIGN {
+    // Log reduction
     TR_LOGGER.PushReduction("EQUALS_SIGN -> assignment_operator");
+
+    // Pass through assignment node.
+    $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
+    $$.front().node = new 
+        AssignmentNode(AssignmentNode::AssignmentType::EQUALS);
   }
   | MUL_ASSIGN {
+    // Log reduction
     TR_LOGGER.PushReduction("MUL_ASSIGN -> assignment_operator");
+
+    // Pass through assignment node.
+    $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
+    $$.front().node = new 
+        AssignmentNode(AssignmentNode::AssignmentType::MUL);
   }
   | DIV_ASSIGN {
+    // Log reduction
     TR_LOGGER.PushReduction("DIV_ASSIGN -> assignment_operator");
+
+    // Pass through assignment node.
+    $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
+    $$.front().node = new 
+        AssignmentNode(AssignmentNode::AssignmentType::DIV);
   }
   | MOD_ASSIGN {
+    // Log reduction
     TR_LOGGER.PushReduction("MOD_ASSIGN -> assignment_operator");
+
+    // Pass through assignment node.
+    $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
+    $$.front().node = new 
+        AssignmentNode(AssignmentNode::AssignmentType::MOD);
   }
   | ADD_ASSIGN {
+    // Log reduction
     TR_LOGGER.PushReduction("ADD_ASSIGN -> assignment_operator");
+
+    // Pass through assignment node.
+    $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
+    $$.front().node = new 
+        AssignmentNode(AssignmentNode::AssignmentType::EQUALS);
   }
   | SUB_ASSIGN {
+    // Log reduction
     TR_LOGGER.PushReduction("SUB_ASSIGN -> assignment_operator");
+
+    // Pass through assignment node.
+    $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
+    $$.front().node = new 
+        AssignmentNode(AssignmentNode::AssignmentType::SUB);
   }
   | LEFT_ASSIGN {
+    // Log reduction
     TR_LOGGER.PushReduction("LEFT_ASSIGN -> assignment_operator");
+
+    // Pass through assignment node.
+    $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
+    $$.front().node = new 
+        AssignmentNode(AssignmentNode::AssignmentType::LEFT);
   }
   | RIGHT_ASSIGN {
+    // Log reduction
     TR_LOGGER.PushReduction("RIGHT_ASSIGN -> assignment_operator");
+
+    // Pass through assignment node.
+    $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
+    $$.front().node = new 
+        AssignmentNode(AssignmentNode::AssignmentType::RIGHT);
   }
   | AND_ASSIGN {
+    // Log reduction
     TR_LOGGER.PushReduction("AND_ASSIGN -> assignment_operator");
+
+    // Pass through assignment node.
+    $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
+    $$.front().node = new 
+        AssignmentNode(AssignmentNode::AssignmentType::AND);
   }
   | XOR_ASSIGN {
+    // Log reduction
     TR_LOGGER.PushReduction("XOR_ASSIGN -> assignment_operator");
+
+    // Pass through assignment node.
+    $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
+    $$.front().node = new 
+        AssignmentNode(AssignmentNode::AssignmentType::XOR);
   }
   | OR_ASSIGN {
+    // Log reduction
     TR_LOGGER.PushReduction("OR_ASSIGN -> assignment_operator");
+
+    // Pass through assignment node.
+    $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
+    $$.front().node = new 
+        AssignmentNode(AssignmentNode::AssignmentType::OR);
   }
   ;
 
@@ -3179,7 +3271,7 @@ primary_expression
     TR_LOGGER.PushReduction("identifier -> primary_expression");
     // Pass through
     $$ = $1;
-
+    $$.front().node->GenerateGraphviz("identifier");
   }
   | constant {
     // Log reduction
@@ -3251,8 +3343,6 @@ string
 identifier
   : IDENTIFIER {
     $$ = $1;
-
-    $$.front().node = new Node("Identifier", $$.front().node);
     TR_LOGGER.PushReduction("IDENTIFIER -> identifier");
   }
   ;

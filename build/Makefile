@@ -28,9 +28,9 @@ MAINOBJS += ../bin/SymbolInfoUtil.o ../bin/Node.o
 
 # Cleanup
 CLEAN = ../bin/CLanguage.tab.cc ../bin/CLanguage.tab.hh ../bin/lex.yy.cc
-CLEAN += ../bin/Node.o ../bin/AST*
+CLEAN += ../bin/*.dot ../bin/*.png
 
-all: $(TARGET) ../bin/Node.o
+all: $(TARGET)
 
 ../bin/CLanguage.out: $(MAINOBJS)
 	$(CC) $(C11) $(HEADERS) -o ../bin/CLanguage.out $(MAINOBJS) $(LIBS)
