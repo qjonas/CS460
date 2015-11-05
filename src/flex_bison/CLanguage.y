@@ -846,6 +846,7 @@ direct_declarator
 
     // Pass through
     $$ = $1;
+    $$.front().node = new Node("Direct_Declarator", $$.front().node);
   }
   | direct_declarator open_paren_scope parameter_type_list close_paren_scope  {
     // Log reduction
