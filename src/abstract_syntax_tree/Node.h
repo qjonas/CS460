@@ -55,7 +55,7 @@ public:
   IdentifierNode();
 
 private:
-  SymbolInfo* Id_info;
+  //SymbolInfo* Id_info;
 };
 
 class IterationNode : public Node {
