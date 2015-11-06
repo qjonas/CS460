@@ -79,6 +79,11 @@ AssignmentNode::AssignmentNode(AssignmentType type) : Node("Assignment") {
   this->type = type;
 }
 
+ArrayAccessNode::ArrayAccessNode(SymbolInfo* symbol_info) 
+  : Node("Array_Access"), info(symbol_info) {}
+
+
+
 DeclarationNode::DeclarationNode(const list<SymbolInfo*>& infos) 
   : Node("Declaration"), Id_infos(infos) {}
 
@@ -86,10 +91,13 @@ ExpressNode::ExpressNode() : Node("Expression") {}
 ExpressNode::ExpressNode(Node * child) : Node("Expression", child) {}
 
 IdentifierNode::IdentifierNode(SymbolInfo* id) 
-  : Node("Identifier"), Id_info(id) {}
+  : Node("Identifier"), Id_info(id) {
+    AddChild(new Node(id->identifier_name));
+  }
 
 IntegerConstantNode::IntegerConstantNode(long long int val) 
-  : Node("Integer_Constant"), value(val) {}
+  : Node("Integer_Constant"), value(val) {
+  }
 
 IterationNode::IterationNode(bool post_check) : Node("Iteration"),
 is_post_check(post_check) {}

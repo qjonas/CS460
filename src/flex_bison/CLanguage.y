@@ -262,8 +262,8 @@ function_definition
 
     $$ = $2;
     Node * temp_node = new Node("Function_Definition");
-    temp_node->AddChild(new Node("Declaration_Specifiers"));
-    temp_node->AddChild(new Node("Declarator"));
+    temp_node->AddChild($1.front().node);
+    temp_node->AddChild($2.front().node);
     temp_node->AddChild($3.front().node);
     $$.front().node = temp_node;
   }
@@ -353,8 +353,6 @@ declaration_list
     $$ = $1;
     $$.front().node->AddChild($3.front().node);
     $$.push_back($3.front());
-    $$.front().node->GenerateGraphviz("decl_list");
-
   }
   ;
 
@@ -827,7 +825,6 @@ direct_declarator
     // Pass through
     $$ = $1;
     $$.front().node = new Node("Direct_Declarator", $$.front().node);
-
   }
   | OPEN_PAREN declarator CLOSE_PAREN {
     TR_LOGGER.PushReduction(
@@ -1182,7 +1179,6 @@ initializer
     TR_LOGGER.PushReduction(
       "open_curly initializer_list COMMA close_curly -> initializer");
     TR_LOGGER.Warning("initializer_list is unsupported.", LINE, COLUMN);
-
   }
   ;
 
@@ -3196,6 +3192,13 @@ postfix_expression
     if($1.front().array_sizes.size() > 0) {
       $$.front().array_sizes.pop_back();
     }
+
+    Node * temp = new ArrayAccessNode(&($$.front()));
+    temp->AddChild($1.front().node);
+    temp->AddChild($3.front().node);
+
+    $$.front().node = temp;
+
   }
   | postfix_expression OPEN_PAREN CLOSE_PAREN {
     // Log Reduction
@@ -3335,10 +3338,9 @@ primary_expression
     TR_LOGGER.PushReduction("identifier -> primary_expression");
     // Pass through
     $$ = $1;
-    $$.front().node->GenerateGraphviz("identifier");
   }
   | constant {
-    // Log reduction
+    // Log reduction;
     TR_LOGGER.PushReduction("constant -> primary_expression");
     // Pass through
     $$ = $1;
@@ -3381,6 +3383,9 @@ argument_expression_list
 constant
   : INTEGER_CONSTANT {
     $$ = $1;
+    $$.front().node 
+        = new IntegerConstantNode($$.front().data_value.long_long_val);
+
     TR_LOGGER.PushReduction("INTEGER_CONSTANT -> constant");
   }
   | CHARACTER_CONSTANT {
@@ -3407,6 +3412,9 @@ string
 identifier
   : IDENTIFIER {
     $$ = $1;
+    $$.front().node = 
+        new IdentifierNode(S_TABLE.GetMostRecentSymbolInfo(
+          $$.front().identifier_name));
     TR_LOGGER.PushReduction("IDENTIFIER -> identifier");
   }
   ;

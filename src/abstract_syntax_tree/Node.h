@@ -54,6 +54,14 @@ private:
 
 };
 
+class ArrayAccessNode : public Node {
+public:
+  ArrayAccessNode(SymbolInfo* symbol_info);
+private:
+  // this will hold information about the symbol so we can calculate offset.
+  SymbolInfo* info;
+};
+
 class DeclarationNode : public Node {
 public:
   // Constructors 

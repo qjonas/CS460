@@ -377,16 +377,14 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
     }
 
     // Create info to be inserted into the symbol table
-    SymbolInfo insert_info;
-    insert_info.identifier_name = string(yytext);
+    SymbolInfo* insert_info = new SymbolInfo();
+    insert_info->identifier_name = string(yytext);
 
     // Insert into table
-    S_TABLE.InsertSymbol(yytext, insert_info);
+    S_TABLE.InsertSymbol(yytext, *insert_info);
     yylval = *(new list<SymbolInfo>);
-    yylval.push_front(insert_info);
-    yylval.front().node = 
-        new IdentifierNode(S_TABLE.GetMostRecentSymbolInfo(yytext));
-
+    yylval.push_front(*insert_info);
+    
     // Log and return
     TR_LOGGER.PushToken("IDENTIFIER");
     return IDENTIFIER;
@@ -398,8 +396,6 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
     if(S_TABLE.Has(yytext)) { // The info can be accessed
       yylval = *(new list<SymbolInfo>);
       yylval.push_front(*(S_TABLE.GetMostRecentSymbolInfo(yytext)));
-      yylval.front().node = 
-          new IdentifierNode(S_TABLE.GetMostRecentSymbolInfo(yytext));
       TR_LOGGER.PushToken("IDENTIFIER");
       return IDENTIFIER;
     } else {
@@ -436,7 +432,6 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
     yylval.front().type_specifier_list.push_back(SymbolTypes::LONG);
     yylval.front().type_specifier_list.push_back(SymbolTypes::INT);
     yylval.front().data_value.unsigned_long_long_val = input;
-    yylval.front().node = new IntegerConstantNode(input);
   }
 
   // Increment COLUMN counter and return
@@ -466,7 +461,6 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
     yylval.front().type_specifier_list.push_back(SymbolTypes::LONG);
     yylval.front().type_specifier_list.push_back(SymbolTypes::LONG);
     yylval.front().type_specifier_list.push_back(SymbolTypes::INT);
-    yylval.front().node = new IntegerConstantNode(input);
   }
 
   // Increment COLUMN counter and return
@@ -497,7 +491,6 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
     yylval.front().type_specifier_list.push_back(SymbolTypes::LONG);
     yylval.front().type_specifier_list.push_back(SymbolTypes::LONG);
     yylval.front().type_specifier_list.push_back(SymbolTypes::INT);
-    yylval.front().node = new IntegerConstantNode(input);
   }
 
   // Increment COLUMN counter and return
