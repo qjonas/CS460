@@ -1453,8 +1453,8 @@ iteration_statement
     // Pass through AST Node
     $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
     $$.front().node = new IterationNode();
-    $$.front().node->AddChild(new Node("Expression"));
     $$.front().node->AddChild(NULL);
+    $$.front().node->AddChild($3.front().node);
     $$.front().node->AddChild(NULL);
     $$.front().node->AddChild(NULL);
     if($5.size() > 0 && $5.front().node != NULL) {
@@ -1471,7 +1471,7 @@ iteration_statement
     $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
     bool is_post_check(true);
     $$.front().node = new IterationNode(is_post_check);
-    $$.front().node->AddChild(new Node("Expression"));
+    $$.front().node->AddChild($5.front().node);
     $$.front().node->AddChild(NULL);
     $$.front().node->AddChild(NULL);
     $$.front().node->AddChild(NULL);
@@ -1487,7 +1487,6 @@ iteration_statement
     // Pass through AST Node
     $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
     $$.front().node = new IterationNode();
-    $$.front().node->AddChild(new Node("Expression"));
     $$.front().node->AddChild(NULL);
     $$.front().node->AddChild(NULL);
     $$.front().node->AddChild(NULL);
@@ -1504,7 +1503,6 @@ iteration_statement
     // Pass through AST Node
     $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
     $$.front().node = new IterationNode();
-    $$.front().node->AddChild(new Node("Expression"));
     $$.front().node->AddChild(NULL);
     $$.front().node->AddChild(NULL);
     if($5.size() > 0 && $5.front().node != NULL) {
@@ -1562,7 +1560,6 @@ iteration_statement
     // Pass through AST Node
     $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
     $$.front().node = new IterationNode();
-    $$.front().node->AddChild(new Node("Expression"));
     if($3.size() > 0 && $3.front().node != NULL) {
       $$.front().node->AddChild($3.front().node);
     }
@@ -1581,7 +1578,6 @@ iteration_statement
     // Pass through AST Node
     $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
     $$.front().node = new IterationNode();
-    $$.front().node->AddChild(new Node("Expression"));
     if($3.size() > 0 && $3.front().node != NULL) {
       $$.front().node->AddChild($3.front().node);
     }
@@ -1602,7 +1598,6 @@ iteration_statement
     // Pass through AST Node
     $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
     $$.front().node = new IterationNode();
-    $$.front().node->AddChild(new Node("Expression"));
     if($3.size() > 0 && $3.front().node != NULL) {
       $$.front().node->AddChild($3.front().node);
     }
