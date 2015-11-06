@@ -99,6 +99,10 @@ IntegerConstantNode::IntegerConstantNode(long long int val)
   : Node("Integer_Constant"), value(val) {
   }
 
+CharConstantNode::CharConstantNode(char val) 
+  : Node("Char_Constant"), value(val) {
+  }
+
 IterationNode::IterationNode(bool post_check) : Node("Iteration"),
 is_post_check(post_check) {}
 

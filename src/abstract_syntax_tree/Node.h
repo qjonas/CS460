@@ -101,6 +101,15 @@ private:
   long long int value;
 };
 
+class CharConstantNode : public Node {
+public:
+  CharConstantNode(char val);
+
+private:
+  char value;
+};
+
+
 class IterationNode : public Node {
 public:
   IterationNode();
