@@ -101,6 +101,9 @@ IntegerConstantNode::IntegerConstantNode(long long int val)
 
 CharConstantNode::CharConstantNode(char val) 
   : Node("Char_Constant"), value(val) {
+}
+FloatingConstantNode::FloatingConstantNode(long double val) 
+  : Node("Floating_Constant"), value(val) {
   }
 
 IterationNode::IterationNode(bool post_check) : Node("Iteration"),
