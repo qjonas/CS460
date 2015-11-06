@@ -25,13 +25,21 @@ public:
   void GenerateGraphviz(const std::string& file_name) const;
   void GenerateGraphvizHelper(std::ofstream& fout) const;
 
-private:
+protected:
   static std::map<std::string, int> name_count_;
   std::string name_;
   std::string id_;
   std::list<Node*> children_;
 };
+}
 
+// Forward declare.
+struct SymbolInfo;
+
+#include "../symbol_table/SymbolTable.h"
+
+
+namespace AST {
 class AssignmentNode : public Node {
 public:
    enum AssignmentType {
@@ -49,7 +57,17 @@ private:
 class DeclarationNode : public Node {
 public:
   // Constructors 
-  DeclarationNode();
+  DeclarationNode(const std::list<SymbolInfo*>& infos);
+
+private:
+  // SymbolInfo of the declaration
+  std::list<SymbolInfo*> Id_infos;
+};
+
+class DeclarationSpecifierNode : public Node {
+public:
+  DeclarationSpecifierNode();
+
 };
 
 class ExpressNode: public Node{
@@ -57,15 +75,7 @@ public:
   ExpressNode();
   ExpressNode(Node * child);
 };
-}
 
-
-// Forward declare.
-struct SymbolInfo;
-
-#include "../symbol_table/SymbolTable.h"
-
-namespace AST {
 class IdentifierNode: public Node{
 public:
   // constructor

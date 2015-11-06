@@ -79,20 +79,17 @@ AssignmentNode::AssignmentNode(AssignmentType type) : Node("Assignment") {
   this->type = type;
 }
 
-DeclarationNode::DeclarationNode():Node("Declaration") {}
+DeclarationNode::DeclarationNode(const list<SymbolInfo*>& infos) 
+  : Node("Declaration"), Id_infos(infos) {}
 
 ExpressNode::ExpressNode() : Node("Expression") {}
 ExpressNode::ExpressNode(Node * child) : Node("Expression", child) {}
 
-IdentifierNode::IdentifierNode(SymbolInfo* id) : Node("Identifier") {
-  Id_info = id;
-}
+IdentifierNode::IdentifierNode(SymbolInfo* id) 
+  : Node("Identifier"), Id_info(id) {}
 
 IntegerConstantNode::IntegerConstantNode(long long int val) 
-  : Node("Integer_Constant") {
-  value = val;
-}
-
+  : Node("Integer_Constant"), value(val) {}
 
 IterationNode::IterationNode(bool post_check) : Node("Iteration"),
 is_post_check(post_check) {}

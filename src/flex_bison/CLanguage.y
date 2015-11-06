@@ -300,6 +300,8 @@ declaration
     // Log reduction.
     TR_LOGGER.PushReduction("declaration_specifiers SEMI -> declaration");
     // Do nothing
+    $$ = $1;
+    $$.front().node = new Node("Empty_Declaration", $1.front().node);
   }
   | declaration_specifiers init_declarator_list SEMI {
     // Log reduction.
@@ -309,6 +311,10 @@ declaration
     // declaration specifiers.
     //TODO still working
     //$$.front().node = new Node("Declaration", $$.front().node);
+    $$ = *(new list<SymbolInfo>());
+    $$.push_front(*(new SymbolInfo()));
+    list<SymbolInfo*>* symbols_list = new list<SymbolInfo*>();
+
     for(auto info : $2){
       SymbolInfo* temp = S_TABLE.GetMostRecentSymbolInfo(info.identifier_name);
       temp->type_specifier_list = $1.front().type_specifier_list;
@@ -320,17 +326,35 @@ declaration
       if(!(IsTypeQualifierValid(*temp))) {
         TR_LOGGER.Error("Qualifier not valid.", LINE, COLUMN);
       }
-      
+      symbols_list->push_back(temp);
     }
+    $$.front().node = new DeclarationNode(*symbols_list);
+    $$.front().node->AddChild($1.front().node);
+    $$.front().node->AddChild($2.front().node);
   }
   ;
 
 declaration_list
-  : {INSERT_MODE = true;} declaration {INSERT_MODE = false;} {
+  : {INSERT_MODE = true;} declaration {
+    // Switch Insert mode
+    INSERT_MODE = false;
+    // Log reduction
     TR_LOGGER.PushReduction("declaration -> declaration_list");
+    // Pass through
+    $$ = $1;
+    $$.front().node = new Node("Declaration_List", $2.front().node);
   }
-  | declaration_list {INSERT_MODE = true;} declaration {INSERT_MODE = false;} {
+  | declaration_list {INSERT_MODE = true;} declaration {
+    // Switch Insert mode
+    INSERT_MODE = false;
+    // Log reduction
     TR_LOGGER.PushReduction("delcaration_list declaration -> declaration_list");
+    // Pass through
+    $$ = $1;
+    $$.front().node->AddChild($3.front().node);
+    $$.push_back($3.front());
+    $$.front().node->GenerateGraphviz("decl_list");
+
   }
   ;
 
@@ -341,6 +365,7 @@ declaration_specifiers
       "storage_class_specifier -> declaration_specifiers");
     // Pass through symbol info
     $$ = $1;
+    $$.front().node = new Node("Declaration_Specifiers", $$.front().node);
   }
   | storage_class_specifier declaration_specifiers {
     // Log Reduction
@@ -359,6 +384,7 @@ declaration_specifiers
     }
     // Pass through $2
     $$ = $2;
+    $$.front().node->AddChild($1.front().node);
   }
   | type_specifier {
     // Log Reduction
@@ -374,6 +400,7 @@ declaration_specifiers
     // Add type specifier to declaration specifier
     $2.front().type_specifier_list.push_front($1.front().type_specifier_list.front());
     $$ = $2;
+    $$.front().node->AddChild($1.front().node);
 
     // Check if the data type is valid
     if(!(IsDataTypeValid($2.front()))) {
@@ -386,6 +413,7 @@ declaration_specifiers
       "type_qualifier -> declaration_specifiers");
     // Pass through SymbolInfo
     $$ = $1;
+    $$.front().node = new Node("Declaration_Specifiers", $$.front().node);
   }
   | type_qualifier declaration_specifiers {
     // Log reduction
@@ -397,6 +425,7 @@ declaration_specifiers
 
     // Assign $$ to $2
     $$ = $2;
+    $$.front().node->AddChild($1.front().node);
 
     // Check if the Type qualifier is valid if not Error.
     if(!(IsTypeQualifierValid($2.front()))) {
@@ -408,22 +437,27 @@ declaration_specifiers
 storage_class_specifier
   : AUTO {
     $$ = $1;
+    $$.front().node = new Node("AUTO");
     TR_LOGGER.PushReduction("AUTO -> storage_class_specifier");
   }
   | REGISTER {
     $$ = $1;
+    $$.front().node = new Node("REGISTER");
     TR_LOGGER.PushReduction("REGISTER -> storage_class_specifier");
   }
   | STATIC {
     $$ = $1;
+    $$.front().node = new Node("STATIC");
     TR_LOGGER.PushReduction("STATIC -> storage_class_specifier");
   }
   | EXTERN {
     $$ = $1;
+    $$.front().node = new Node("EXTERN");
     TR_LOGGER.PushReduction("EXTERN -> storage_class_specifier");
   }
   | TYPEDEF {
     $$ = $1;
+    $$.front().node = new Node("TYPEDEF");
     TR_LOGGER.PushReduction("TYPEDEF -> storage_class_specifier");
   }
   ;
@@ -431,38 +465,47 @@ storage_class_specifier
 type_specifier
   : VOID {
     $$ = $1;
+    $$.front().node = new Node("VOID");
     TR_LOGGER.PushReduction("VOID -> type_specifier");
   }
   | CHAR {
     $$ = $1;
+    $$.front().node = new Node("CHAR");
     TR_LOGGER.PushReduction("CHAR -> type_specifier");
   }
   | SHORT {
     $$ = $1;
+    $$.front().node = new Node("SHORT");
     TR_LOGGER.PushReduction("SHORT -> type_specifier");
   }
   | INT  {
     $$ = $1;
+    $$.front().node = new Node("INT");
     TR_LOGGER.PushReduction("INT -> type_specifier");
   }
   | LONG {
     $$ = $1;
+    $$.front().node = new Node("LONG");
     TR_LOGGER.PushReduction("LONG -> type_specifier");
   }
   | FLOAT {
     $$ = $1;
+    $$.front().node = new Node("FLOAT");
     TR_LOGGER.PushReduction("FLOAT -> type_specifier");
   }
   | DOUBLE  {
     $$ = $1;
+    $$.front().node = new Node("DOUBLE");
     TR_LOGGER.PushReduction("DOUBLE -> type_specifier");
   }
   | SIGNED  {
     $$ = $1;
+    $$.front().node = new Node("SIGNED");
     TR_LOGGER.PushReduction("SIGNED -> type_specifier");
   }
   | UNSIGNED {
     $$ = $1;
+    $$.front().node = new Node("UNSIGNED");
     TR_LOGGER.PushReduction("UNSIGNED -> type_specifier");
   }
   | struct_or_union_specifier {
@@ -482,10 +525,12 @@ type_specifier
 type_qualifier
   : CONST  {
     $$ = $1;
+    $$.front().node = new Node("CONST");
     TR_LOGGER.PushReduction("CONST -> type_qualifier");
   }
   | VOLATILE {
     $$ = $1;
+    $$.front().node = new Node("VOLATILE");
     TR_LOGGER.PushReduction("VOLATILE -> type_qualifier");
   }
   ;
@@ -497,7 +542,7 @@ struct_or_union_specifier
                             "struct_declaration_list close_curly "
                             "-> struct_or_union_specifier");
     // Copy the symbol table from the struct declaration list.
-
+    TR_LOGGER.Warning("Structs and unions are unsupported.", LINE, COLUMN);
 
 
   }
@@ -505,10 +550,14 @@ struct_or_union_specifier
     TR_LOGGER.PushReduction("struct_or_union open_curly "
                             "struct_declaration_list close_curly "
                             "-> struct_or_union_specifier");
+    TR_LOGGER.Warning("Structs and unions are unsupported.", LINE, COLUMN);
+
   }
   | struct_or_union identifier {
     TR_LOGGER.PushReduction(
       "struct_or_union identifier -> struct_or_union_specifier");
+    TR_LOGGER.Warning("Structs and unions are unsupported.", LINE, COLUMN);
+
   }
   ;
 
@@ -551,7 +600,7 @@ init_declarator_list
     // Add new declarator to the back and pass through
     $1.push_back($3.front());
     $$ = $1;
-    $$.front().node = new Node("Init_Declarator_List", $$.front().node);
+    $$.front().node->AddChild($3.front().node);
 
     // Set insert mode
     INSERT_MODE = true;
@@ -605,6 +654,8 @@ init_declarator
     if(temp != NULL) *temp = $1.front();
 
     $$ = *(new list<SymbolInfo>({*temp}));
+    $$.front().node = new Node("Init_declarator", $1.front().node);
+    $$.front().node->AddChild($3.front().node);
 
   }
   ;
@@ -800,6 +851,7 @@ direct_declarator
 
     // Pass through
     $$ = $1;
+    $$.front().node->AddChild(new Node("ArrayDeclaration"));
   }
   | direct_declarator OPEN_SQUARE constant_expression CLOSE_SQUARE {
     TR_LOGGER.PushReduction(
@@ -832,6 +884,8 @@ direct_declarator
 
     // Pass through
     $$ = $1;
+    $$.front().node->AddChild(new Node("ArrayDeclaration"));
+    $$.front().node->AddChild($3.front().node);
   }
   | direct_declarator open_paren_scope close_paren_scope {
     // Log Reduction
@@ -1114,15 +1168,21 @@ identifier_list
 
 initializer
   : assignment_expression {
+    // Log Reduction.
     TR_LOGGER.PushReduction("assignment_expression -> initializer");
+    $$ = $1;
   }
   | open_curly initializer_list close_curly  {
+    // Log Reduction.
     TR_LOGGER.PushReduction(
       "open_curly initializer_list close_curly -> initializer");
+    TR_LOGGER.Warning("initializer_list is unsupported.", LINE, COLUMN);
   }
   | open_curly initializer_list COMMA close_curly {
     TR_LOGGER.PushReduction(
       "open_curly initializer_list COMMA close_curly -> initializer");
+    TR_LOGGER.Warning("initializer_list is unsupported.", LINE, COLUMN);
+
   }
   ;
 
@@ -1218,6 +1278,7 @@ statement
   | compound_statement {
     // Log reduction
     TR_LOGGER.PushReduction("compound_statement -> statement");
+    $$ = $1;
   }
   | expression_statement {
     // Log reduction
@@ -1312,6 +1373,7 @@ compound_statement
       IN_FUNCTION--;
       S_TABLE.PopFrame();
     }
+    $$.front().node = new Node("Compound_Statement", $2.front().node);
   }
   | open_curly declaration_list statement_list 
     close_curly {
@@ -1323,6 +1385,9 @@ compound_statement
       IN_FUNCTION--;
       S_TABLE.PopFrame();
     }
+
+    $$.front().node = new Node("Compound_Statement", $2.front().node);
+    $$.front().node->AddChild($3.front().node);
   }
   ;
 
@@ -1603,7 +1668,6 @@ expression
     // Pass through 
     $$ = $1;
     $$.front().node = new ExpressNode($$.front().node);
-    $$.front().node->GenerateGraphviz("Expression");
   }
   | expression COMMA assignment_expression {
     TR_LOGGER.PushReduction(
