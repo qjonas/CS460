@@ -3389,6 +3389,7 @@ constant
   }
   | FLOATING_CONSTANT {
     $$ = $1;
+    $$.front().node = new FloatingConstantNode($$.front().data_value.double_val);
     TR_LOGGER.PushReduction("FLOATING_CONSTANT -> constant");
   }
   | ENUMERATION_CONSTANT {
