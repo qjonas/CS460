@@ -3394,12 +3394,14 @@ constant
   : INTEGER_CONSTANT {
     $$ = $1;
     $$.front().node 
-        = new IntegerConstantNode($$.front().data_value.long_long_val);
+        = new IntegerConstantNode($$.front().data_value.char_val);
 
     TR_LOGGER.PushReduction("INTEGER_CONSTANT -> constant");
   }
   | CHARACTER_CONSTANT {
     $$ = $1;
+    $$.front().node 
+      = new CharConstantNode($$.front().data_value.char_val);
     TR_LOGGER.PushReduction("CHARACTER_CONSTANT -> constant");
   }
   | FLOATING_CONSTANT {

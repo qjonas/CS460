@@ -103,6 +103,9 @@ IntegerConstantNode::IntegerConstantNode(long long int val)
   : Node("Integer_Constant"), value(val) {
   }
 
+CharConstantNode::CharConstantNode(char val) 
+  : Node("Char_Constant"), value(val) {
+}
 FloatingConstantNode::FloatingConstantNode(long double val) 
   : Node("Floating_Constant"), value(val) {
   }
