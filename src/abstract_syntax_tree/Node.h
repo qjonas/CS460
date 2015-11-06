@@ -38,8 +38,15 @@ struct SymbolInfo;
 
 #include "../symbol_table/SymbolTable.h"
 
-
 namespace AST {
+class AdditiveNode : public Node {
+public:
+  AdditiveNode(bool is_add);
+
+private:
+  bool is_addition;
+};
+
 class AssignmentNode : public Node {
 public:
    enum AssignmentType {

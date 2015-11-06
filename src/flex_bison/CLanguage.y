@@ -2648,6 +2648,14 @@ additive_expression
         }
         $$.front().type_specifier_list = $3.front().type_specifier_list;
       }
+
+      bool is_addition = true;
+      Node * temp = new AdditiveNode(is_addition);
+      temp->AddChild($1.front().node);
+      temp->AddChild(new Node("PLUS"));
+      temp->AddChild($3.front().node);
+
+      $$.front().node = temp;
   }
   | additive_expression MINUS multiplicative_expression {
     TR_LOGGER.PushReduction(
@@ -2753,6 +2761,13 @@ additive_expression
         }
         $$.front().type_specifier_list = $3.front().type_specifier_list;
       }
+      bool is_addition = false;
+      Node * temp = new AdditiveNode(is_addition);
+      temp->AddChild($1.front().node);
+      temp->AddChild(new Node("PLUS"));
+      temp->AddChild($3.front().node);
+
+      $$.front().node = temp;
   }
   ;
 

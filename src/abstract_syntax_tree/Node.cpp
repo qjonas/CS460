@@ -75,6 +75,10 @@ void Node::GenerateGraphvizHelper(ofstream& fout) const {
   }
 }
 
+AdditiveNode::AdditiveNode(bool is_add) 
+  : Node("Additive_Expression"), is_addition(is_add) {}
+
+
 AssignmentNode::AssignmentNode(AssignmentType type) : Node("Assignment") {
   this->type = type;
 }
