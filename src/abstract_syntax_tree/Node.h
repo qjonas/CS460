@@ -101,6 +101,14 @@ private:
   long long int value;
 };
 
+class FloatingConstantNode : public Node {
+public:
+  FloatingConstantNode(long double val);
+
+private:
+  long double value;
+};
+
 class IterationNode : public Node {
 public:
   IterationNode();
