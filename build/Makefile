@@ -18,13 +18,13 @@ LIBS	= -L/usr/local/lib -ll
 
 # Main target executable files
 TARGET = ../bin/CLanguage.out ../bin/SymbolTableDriver.out
-TARGET += ../bin/Node_test.out
+TARGET += ../bin/Node_test.out ../bin/TicketCoutner_test.out
 
 # CLanguage build objects
 MAINOBJS =  ../bin/CLanguage.tab.o ../bin/lex.yy.o 
 MAINOBJS += ../bin/SymbolTable.o ../bin/CommandLineFlags.o 
 MAINOBJS += ../bin/Globals.o ../bin/TokenReductionsLogger.o 
-MAINOBJS += ../bin/SymbolInfoUtil.o ../bin/Node.o
+MAINOBJS += ../bin/SymbolInfoUtil.o ../bin/Node.o ../bin/TicketCounter.o
 
 # Cleanup
 CLEAN = ../bin/CLanguage.tab.cc ../bin/CLanguage.tab.hh ../bin/lex.yy.cc
@@ -65,11 +65,18 @@ all: $(TARGET)
 ../bin/SymbolTableDriver.out: ../src/symbol_table/SymbolTableDriver.cpp
 	$(CC) $(C11) $< ../bin/SymbolTable.o -o $@
 
-../bin/Node.o: ../src/abstract_syntax_tree/Node.cpp
+../bin/Node.o: ../src/abstract_syntax_tree/Node.cpp ../bin/TicketCounter.o
 	$(CC) $(C11) -c $< -o $@
 
-../bin/Node_test.out: ../src/abstract_syntax_tree/Node_test.cpp ../bin/Node.o
-	$(CC) $(C11) $< ../bin/Node.o -o $@
+../bin/Node_test.out: ../src/abstract_syntax_tree/Node_test.cpp
+	$(CC) $(C11) $< ../bin/Node.o ../bin/TicketCounter.o -o $@
+
+../bin/TicketCounter.o: ../src/helpers/TicketCounter.cpp
+	$(CC) $(C11) -c $< -o $@
+
+../bin/TicketCoutner_test.out: ../src/helpers/TicketCounter_test.cpp
+	$(CC) $(C11) $< ../bin/TicketCounter.o -o $@
+
 
 clean:
 	rm $(MAINOBJS) $(CLEAN) $(TARGET)
