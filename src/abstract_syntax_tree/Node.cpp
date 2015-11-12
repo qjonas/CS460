@@ -3,10 +3,14 @@
 #include <list>
 #include <string>
 
+#include "../helpers/TicketCounter.h"
+
 using namespace AST;
 using namespace std;
 
 map<string, int> Node::name_count_;
+map<string, string> Node::identifier_to_temporary_;
+TicketCounter Node::temp_int_counter_("TI");
 
 Node::Node(const string& name) : name_(name) {
   // Add name to name count.

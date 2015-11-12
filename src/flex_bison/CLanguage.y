@@ -311,8 +311,8 @@ declaration
     // declaration specifiers.
     //TODO still working
     //$$.front().node = new Node("Declaration", $$.front().node);
-    $$ = *(new list<SymbolInfo>());
-    $$.push_front(*(new SymbolInfo()));
+    $$ = list<SymbolInfo>();
+    $$.push_front(SymbolInfo());
     list<SymbolInfo*>* symbols_list = new list<SymbolInfo*>();
 
     for(auto info : $2){
@@ -651,7 +651,7 @@ init_declarator
     SymbolInfo* temp = S_TABLE.GetMostRecentSymbolInfo($1.front().identifier_name);
     if(temp != NULL) *temp = $1.front();
 
-    $$ = *(new list<SymbolInfo>({*temp}));
+    $$ = list<SymbolInfo>({*temp});
     $$.front().node = new Node("Init_declarator", $1.front().node);
     $$.front().node->AddChild($3.front().node);
 
@@ -990,8 +990,8 @@ pointer
     // Log reduction.
     TR_LOGGER.PushReduction("ASTERISK -> pointer");
 
-    $$ = *(new list<SymbolInfo>());
-    $$.push_back(*(new SymbolInfo()));
+    $$ = list<SymbolInfo>();
+    $$.push_back(SymbolInfo());
     $$.front().array_sizes.push_back(SymbolTypes::NO_ARRAY_SIZE);
   }
   | ASTERISK type_qualifier_list {
@@ -1356,7 +1356,7 @@ compound_statement
     }
 
     // Pass through
-    $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
+    $$ = list<SymbolInfo>({SymbolInfo()});
     $$.front().node = new Node("Compound_Statement");
   }
   | open_curly statement_list close_curly {
@@ -1369,7 +1369,7 @@ compound_statement
     }
 
     // Pass through
-    $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
+    $$ = list<SymbolInfo>({SymbolInfo()});
     $$.front().node = new Node("Compound_Statement", $2.front().node);
   }
   | open_curly declaration_list close_curly {
@@ -1424,7 +1424,7 @@ selection_statement
       "IF OPEN_PAREN expression CLOSE_PAREN statement "
       "-> selection_statement");
 
-    $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
+    $$ = list<SymbolInfo>({SymbolInfo()});
     $$.front().node = new SelectionNode();
     $$.front().node->AddChild($3.front().node);
     if($5.size() > 0 && $5.front().node != NULL) {
@@ -1437,7 +1437,7 @@ selection_statement
       "-> selection_statement");
 
     // Pass through
-    $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
+    $$ = list<SymbolInfo>({SymbolInfo()});
     $$.front().node = new SelectionNode();
     $$.front().node->AddChild($3.front().node);
     if($5.size() > 0 && $5.front().node != NULL) {
@@ -1462,7 +1462,7 @@ iteration_statement
       "-> iteration_statement");
 
     // Pass through AST Node
-    $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
+    $$ = list<SymbolInfo>({SymbolInfo()});
     $$.front().node = new IterationNode();
     $$.front().node->AddChild(NULL);
     $$.front().node->AddChild($3.front().node);
@@ -1479,7 +1479,7 @@ iteration_statement
       "-> iteration_statement");
 
     // Pass through AST Node
-    $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
+    $$ = list<SymbolInfo>({SymbolInfo()});
     bool is_post_check(true);
     $$.front().node = new IterationNode(is_post_check);
     $$.front().node->AddChild($5.front().node);
@@ -1496,7 +1496,7 @@ iteration_statement
       "FOR OPEN_PAREN SEMI SEMI CLOSE_PAREN statement -> iteration_statement");
 
     // Pass through AST Node
-    $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
+    $$ = list<SymbolInfo>({SymbolInfo()});
     $$.front().node = new IterationNode();
     $$.front().node->AddChild(NULL);
     $$.front().node->AddChild(NULL);
@@ -1512,7 +1512,7 @@ iteration_statement
       "-> iteration_statement");
 
     // Pass through AST Node
-    $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
+    $$ = list<SymbolInfo>({SymbolInfo()});
     $$.front().node = new IterationNode();
     $$.front().node->AddChild(NULL);
     $$.front().node->AddChild(NULL);
@@ -1530,7 +1530,7 @@ iteration_statement
       "-> iteration_statement");
 
     // Pass through AST Node
-    $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
+    $$ = list<SymbolInfo>({SymbolInfo()});
     $$.front().node = new IterationNode();
     $$.front().node->AddChild(new Node("Expression"));
     $$.front().node->AddChild(NULL);
@@ -1548,7 +1548,7 @@ iteration_statement
       "FOR OPEN_PAREN SEMI expression SEMI expression CLOSE_PAREN statement "
       "-> iteration_statement");
     // Pass through AST Node
-    $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
+    $$ = list<SymbolInfo>({SymbolInfo()});
     $$.front().node = new IterationNode();
     $$.front().node->AddChild(new Node("Expression"));
     $$.front().node->AddChild(NULL);
@@ -1569,7 +1569,7 @@ iteration_statement
       "-> iteration_statement");
 
     // Pass through AST Node
-    $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
+    $$ = list<SymbolInfo>({SymbolInfo()});
     $$.front().node = new IterationNode();
     if($3.size() > 0 && $3.front().node != NULL) {
       $$.front().node->AddChild($3.front().node);
@@ -1587,7 +1587,7 @@ iteration_statement
       "-> iteration_statement");
 
     // Pass through AST Node
-    $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
+    $$ = list<SymbolInfo>({SymbolInfo()});
     $$.front().node = new IterationNode();
     if($3.size() > 0 && $3.front().node != NULL) {
       $$.front().node->AddChild($3.front().node);
@@ -1607,7 +1607,7 @@ iteration_statement
       "-> iteration_statement");
     
     // Pass through AST Node
-    $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
+    $$ = list<SymbolInfo>({SymbolInfo()});
     $$.front().node = new IterationNode();
     if($3.size() > 0 && $3.front().node != NULL) {
       $$.front().node->AddChild($3.front().node);
@@ -1627,7 +1627,7 @@ iteration_statement
       "-> iteration_statement");
     
     // Pass through AST Node
-    $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
+    $$ = list<SymbolInfo>({SymbolInfo()});
     $$.front().node = new IterationNode();
     if($3.size() > 0 && $3.front().node != NULL) {
       $$.front().node->AddChild($3.front().node);
@@ -1716,7 +1716,7 @@ assignment_operator
     TR_LOGGER.PushReduction("EQUALS_SIGN -> assignment_operator");
 
     // Pass through assignment node.
-    $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
+    $$ = list<SymbolInfo>({SymbolInfo()});
     $$.front().node = new 
         AssignmentNode(AssignmentNode::AssignmentType::EQUALS);
   }
@@ -1725,7 +1725,7 @@ assignment_operator
     TR_LOGGER.PushReduction("MUL_ASSIGN -> assignment_operator");
 
     // Pass through assignment node.
-    $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
+    $$ = list<SymbolInfo>({SymbolInfo()});
     $$.front().node = new 
         AssignmentNode(AssignmentNode::AssignmentType::MUL);
   }
@@ -1734,7 +1734,7 @@ assignment_operator
     TR_LOGGER.PushReduction("DIV_ASSIGN -> assignment_operator");
 
     // Pass through assignment node.
-    $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
+    $$ = list<SymbolInfo>({SymbolInfo()});
     $$.front().node = new 
         AssignmentNode(AssignmentNode::AssignmentType::DIV);
   }
@@ -1743,7 +1743,7 @@ assignment_operator
     TR_LOGGER.PushReduction("MOD_ASSIGN -> assignment_operator");
 
     // Pass through assignment node.
-    $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
+    $$ = list<SymbolInfo>({SymbolInfo()});
     $$.front().node = new 
         AssignmentNode(AssignmentNode::AssignmentType::MOD);
   }
@@ -1752,7 +1752,7 @@ assignment_operator
     TR_LOGGER.PushReduction("ADD_ASSIGN -> assignment_operator");
 
     // Pass through assignment node.
-    $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
+    $$ = list<SymbolInfo>({SymbolInfo()});
     $$.front().node = new 
         AssignmentNode(AssignmentNode::AssignmentType::EQUALS);
   }
@@ -1761,7 +1761,7 @@ assignment_operator
     TR_LOGGER.PushReduction("SUB_ASSIGN -> assignment_operator");
 
     // Pass through assignment node.
-    $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
+    $$ = list<SymbolInfo>({SymbolInfo()});
     $$.front().node = new 
         AssignmentNode(AssignmentNode::AssignmentType::SUB);
   }
@@ -1770,7 +1770,7 @@ assignment_operator
     TR_LOGGER.PushReduction("LEFT_ASSIGN -> assignment_operator");
 
     // Pass through assignment node.
-    $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
+    $$ = list<SymbolInfo>({SymbolInfo()});
     $$.front().node = new 
         AssignmentNode(AssignmentNode::AssignmentType::LEFT);
   }
@@ -1779,7 +1779,7 @@ assignment_operator
     TR_LOGGER.PushReduction("RIGHT_ASSIGN -> assignment_operator");
 
     // Pass through assignment node.
-    $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
+    $$ = list<SymbolInfo>({SymbolInfo()});
     $$.front().node = new 
         AssignmentNode(AssignmentNode::AssignmentType::RIGHT);
   }
@@ -1788,7 +1788,7 @@ assignment_operator
     TR_LOGGER.PushReduction("AND_ASSIGN -> assignment_operator");
 
     // Pass through assignment node.
-    $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
+    $$ = list<SymbolInfo>({SymbolInfo()});
     $$.front().node = new 
         AssignmentNode(AssignmentNode::AssignmentType::AND);
   }
@@ -1797,7 +1797,7 @@ assignment_operator
     TR_LOGGER.PushReduction("XOR_ASSIGN -> assignment_operator");
 
     // Pass through assignment node.
-    $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
+    $$ = list<SymbolInfo>({SymbolInfo()});
     $$.front().node = new 
         AssignmentNode(AssignmentNode::AssignmentType::XOR);
   }
@@ -1806,7 +1806,7 @@ assignment_operator
     TR_LOGGER.PushReduction("OR_ASSIGN -> assignment_operator");
 
     // Pass through assignment node.
-    $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
+    $$ = list<SymbolInfo>({SymbolInfo()});
     $$.front().node = new 
         AssignmentNode(AssignmentNode::AssignmentType::OR);
   }
@@ -1872,7 +1872,7 @@ logical_or_expression
     }
 
     $1.front().type_specifier_list 
-      = *(new list<SymbolTypes::SymbolType>({SymbolTypes::INT}));
+      = list<SymbolTypes::SymbolType>({SymbolTypes::INT});
 
     // Pass through.
     $$ = $1;
@@ -1921,7 +1921,7 @@ logical_and_expression
     }
 
     $1.front().type_specifier_list 
-      = *(new list<SymbolTypes::SymbolType>({SymbolTypes::INT}));
+      = list<SymbolTypes::SymbolType>({SymbolTypes::INT});
 
     // Pass through.
     $$ = $1;
@@ -2125,7 +2125,7 @@ equality_expression
     }
 
     $1.front().type_specifier_list 
-      = *(new list<SymbolTypes::SymbolType>({SymbolTypes::INT}));
+      = list<SymbolTypes::SymbolType>({SymbolTypes::INT});
 
     $$ = $1;
 
@@ -2198,7 +2198,7 @@ equality_expression
     }
 
     $1.front().type_specifier_list 
-      = *(new list<SymbolTypes::SymbolType>({SymbolTypes::INT}));
+      = list<SymbolTypes::SymbolType>({SymbolTypes::INT});
 
     $$ = $1;
 
@@ -2280,7 +2280,7 @@ relational_expression
     }
 
     $1.front().type_specifier_list 
-      = *(new list<SymbolTypes::SymbolType>({SymbolTypes::INT}));
+      = list<SymbolTypes::SymbolType>({SymbolTypes::INT});
 
     $$ = $1;
 
@@ -2355,7 +2355,7 @@ relational_expression
     }
 
     $1.front().type_specifier_list 
-      = *(new list<SymbolTypes::SymbolType>({SymbolTypes::INT}));
+      = list<SymbolTypes::SymbolType>({SymbolTypes::INT});
 
     $$ = $1;
 
@@ -2428,7 +2428,7 @@ relational_expression
     }
 
     $1.front().type_specifier_list 
-      = *(new list<SymbolTypes::SymbolType>({SymbolTypes::INT}));
+      = list<SymbolTypes::SymbolType>({SymbolTypes::INT});
 
     $$ = $1;
 
@@ -2500,7 +2500,7 @@ relational_expression
     }
 
     $1.front().type_specifier_list 
-      = *(new list<SymbolTypes::SymbolType>({SymbolTypes::INT}));
+      = list<SymbolTypes::SymbolType>({SymbolTypes::INT});
 
     $$ = $1;
 
@@ -3056,7 +3056,7 @@ unary_expression
     
     
     IncrementSymbolInfoBy(temp, 1);
-    $$ = *(new list<SymbolInfo>({*(new SymbolInfo(*temp))}));
+    $$ = list<SymbolInfo>({SymbolInfo(*temp)});
 
     SymbolInfo dummy;
     dummy.data_value.long_long_val = 1;
@@ -3087,7 +3087,7 @@ unary_expression
         S_TABLE.GetMostRecentSymbolInfo($2.front().identifier_name);
 
     IncrementSymbolInfoBy(temp, -1);
-    $$ = *(new list<SymbolInfo>({*(new SymbolInfo(*temp))}));
+    $$ = list<SymbolInfo>({SymbolInfo(*temp)});
 
     SymbolInfo dummy;
     dummy.data_value.long_long_val = 1;
@@ -3240,8 +3240,8 @@ postfix_expression
                       LINE, COLUMN);
     }
     // Create new symbol info to be placed in $$
-    $$ = *(new list<SymbolInfo>());
-    $$.push_front(*(new SymbolInfo($1.front())));
+    $$ = list<SymbolInfo>();
+    $$.push_front(SymbolInfo($1.front()));
     $$.front().identifier_name = "";
     $$.front().data_is_valid = false;
 
@@ -3270,8 +3270,8 @@ postfix_expression
     } 
 
     // Create new symbol info to be placed in $$
-    $$ = *(new list<SymbolInfo>());
-    $$.push_front(*(new SymbolInfo($1.front())));
+    $$ = list<SymbolInfo>();
+    $$.push_front(SymbolInfo($1.front()));
 
     // Change symbol info to act like it has been called.
     $$.front().data_is_valid = false;
@@ -3314,8 +3314,8 @@ postfix_expression
     }
 
     // Create new symbol info to be placed in $$
-    $$ = *(new list<SymbolInfo>());
-    $$.push_front(*(new SymbolInfo($1.front())));
+    $$ = list<SymbolInfo>();
+    $$.push_front(SymbolInfo($1.front()));
 
     // Change function
     $$.front().data_is_valid = false;
@@ -3355,7 +3355,7 @@ postfix_expression
         S_TABLE.GetMostRecentSymbolInfo($1.front().identifier_name);
 
     temp->postfix_increment++;
-    $$ = *(new list<SymbolInfo>({*(new SymbolInfo(*temp))}));
+    $$ = list<SymbolInfo>({SymbolInfo(*temp)});
 
     //overflow check
     SymbolInfo dummy;
@@ -3385,7 +3385,7 @@ postfix_expression
         S_TABLE.GetMostRecentSymbolInfo($1.front().identifier_name);
 
     temp->postfix_increment++;
-    $$ = *(new list<SymbolInfo>({*(new SymbolInfo(*temp))}));
+    $$ = list<SymbolInfo>({SymbolInfo(*temp)});
     SymbolInfo dummy;
     dummy.data_value.long_long_val = 1;
     dummy.type_specifier_list = $$.front().type_specifier_list;
@@ -3439,7 +3439,7 @@ argument_expression_list
       "-> argument_expression_list");
 
     // Pass through
-    $1.push_back(*(new SymbolInfo($3.front())));
+    $1.push_back(SymbolInfo($3.front()));
     $$ = $1;
   }
   ;
@@ -3518,7 +3518,7 @@ int main(int argc, char** argv) {
 
 void yyerror(const char * err) {
   string new_err(err);
-  new_err[0] = toupper(new_err[0], *(new locale));
+  new_err[0] = toupper(new_err[0], locale());
   TR_LOGGER.Error(new_err, LINE, COLUMN - 1);
 }
 

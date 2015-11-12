@@ -7,6 +7,8 @@
 #include <ostream>
 #include <string>
 
+#include "../helpers/TicketCounter.h"
+
 namespace AST {
 class Node {
 public:
@@ -18,8 +20,8 @@ public:
   // Add a child to node
   void AddChild(Node * node);
 
-  // Generate 3AC;
-  void Generate3AC(std::ostream& os) const;
+  // Generate 3AC; The string returned is the temporary that it should return.
+  std::string Generate3AC(std::ostream& os) const;
 
   // Generate Graphviz Code:
   void GenerateGraphviz(const std::string& file_name) const;
@@ -27,9 +29,12 @@ public:
 
 protected:
   static std::map<std::string, int> name_count_;
+  static std::map<std::string, std::string> identifier_to_temporary_;
+  static TicketCounter temp_int_counter_;
   std::string name_;
   std::string id_;
   std::list<Node*> children_;
+
 };
 }
 
