@@ -91,6 +91,9 @@ ArrayAccessNode::ArrayAccessNode(SymbolInfo* symbol_info)
 DeclarationNode::DeclarationNode(const list<SymbolInfo*>& infos) 
   : Node("Declaration"), Id_infos(infos) {}
 
+EqualityNode::EqualityNode(RelationalType t) : Node("EqualityNode"), type(t) {}
+
+
 ExpressNode::ExpressNode() : Node("Expression") {}
 ExpressNode::ExpressNode(Node * child) : Node("Expression", child) {}
 

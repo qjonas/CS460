@@ -90,11 +90,16 @@ struct FunctionParameter {
 	// This will store a list of type qualifiers
 	std::list<SymbolTypes::TypeQualifier> type_qualifier_list;
 
+	// 
+	std::string identifier_name;
+
 	// Contains the sizes of the arrays declared with square brackets. Empty
 	// brackets will have an ambiguous size and the value in the list will be
 	// SymbolTypes::AMBIGUOUS_ARRAY_SIZE
 	// The size of the array_sizes list will be the number of square brackets.
 	std::list<int> array_sizes;
+
+	std::string toString() const;
 };
 
 // SymbolValue will union the values of the identifiers.

@@ -605,6 +605,11 @@ bool multOverflow(const SymbolInfo& symbol_info_LH, const SymbolInfo& symbol_inf
 return true;
 }
 bool addOverflow(const SymbolInfo& symbol_info_LH, const SymbolInfo& symbol_info_RH){
+
+  if(!symbol_info_LH.data_is_valid || !symbol_info_RH.data_is_valid) {
+    return false;
+  }
+
 //check if int
 if(IsInteger(symbol_info_LH)){
 	//check if unsigned
@@ -639,6 +644,10 @@ return true;
 }
 
 bool subOverflow(const SymbolInfo& symbol_info_LH, const SymbolInfo& symbol_info_RH){
+  if(!symbol_info_LH.data_is_valid || !symbol_info_RH.data_is_valid) {
+    return false;
+  }
+
 //check if int
 if(IsInteger(symbol_info_LH)){
 	//check if unsigned

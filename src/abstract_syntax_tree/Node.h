@@ -85,6 +85,17 @@ public:
 
 };
 
+class EqualityNode : public Node {
+public:
+  enum RelationalType {
+    EQ, NE, LESS, GREATER, LE, GE
+  };
+  EqualityNode(RelationalType t);
+
+private:
+  RelationalType type;
+};
+
 class ExpressNode: public Node{
 public:
   ExpressNode();

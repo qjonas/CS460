@@ -881,8 +881,9 @@ direct_declarator
 
     // Pass through
     $$ = $1;
-    $$.front().node->AddChild(new Node("ArrayDeclaration"));
-    $$.front().node->AddChild($3.front().node);
+    Node * temp_node = new Node("ArrayDeclaration");
+    temp_node->AddChild($3.front().node);
+    $$.front().node->AddChild(temp_node);
   }
   | direct_declarator open_paren_scope close_paren_scope {
     // Log Reduction
@@ -927,6 +928,13 @@ direct_declarator
     *temp = $1.front();
 
     $$ = $1;
+
+    $$.front().node = new Node("Direct_Declarator", $$.front().node);
+    Node * temp_node = new Node("Parameters");
+    for(FunctionParameter param : $$.front().parameters_types) {
+      temp_node->AddChild(new Node(param.identifier_name));
+    }
+    $$.front().node->AddChild(temp_node);
   }
   | direct_declarator open_paren_scope identifier_list close_paren_scope {
     // Log Reduction
@@ -1109,6 +1117,7 @@ parameter_declaration
     }
 
     temp->array_sizes = $2.front().array_sizes;
+    temp->identifier_name = $2.front().identifier_name;
 
     $2.front().parameters_types.push_front(*temp);
 
@@ -1123,6 +1132,8 @@ parameter_declaration
     temp->type_specifier_list = $1.front().type_specifier_list;
     temp->type_qualifier_list = $1.front().type_qualifier_list;
     temp->storage_class_specifier = $1.front().storage_class_specifier;
+    temp->identifier_name = "NO_IDENTIFIER_NAME";
+
 
     $1.front().parameters_types.push_front(*temp);
 
@@ -1618,7 +1629,6 @@ iteration_statement
     // Pass through AST Node
     $$ = *(new list<SymbolInfo>({*(new SymbolInfo())}));
     $$.front().node = new IterationNode();
-    $$.front().node->AddChild(new Node("Expression"));
     if($3.size() > 0 && $3.front().node != NULL) {
       $$.front().node->AddChild($3.front().node);
     }
@@ -2118,6 +2128,12 @@ equality_expression
       = *(new list<SymbolTypes::SymbolType>({SymbolTypes::INT}));
 
     $$ = $1;
+
+    Node * temp = new EqualityNode(EqualityNode::RelationalType::EQ);
+    temp->AddChild($1.front().node);
+    temp->AddChild(new Node("EQUALS"));
+    temp->AddChild($3.front().node);
+    $$.front().node = temp;
   }
   | equality_expression NE_OP relational_expression {
     // Log reduction
@@ -2185,6 +2201,12 @@ equality_expression
       = *(new list<SymbolTypes::SymbolType>({SymbolTypes::INT}));
 
     $$ = $1;
+
+    Node * temp = new EqualityNode(EqualityNode::RelationalType::NE);
+    temp->AddChild($1.front().node);
+    temp->AddChild(new Node("NOT_EQ"));
+    temp->AddChild($3.front().node);
+    $$.front().node = temp;
   }
   ;
 
@@ -2261,6 +2283,12 @@ relational_expression
       = *(new list<SymbolTypes::SymbolType>({SymbolTypes::INT}));
 
     $$ = $1;
+
+    Node * temp = new EqualityNode(EqualityNode::RelationalType::LESS);
+    temp->AddChild($1.front().node);
+    temp->AddChild(new Node("LESS"));
+    temp->AddChild($3.front().node);
+    $$.front().node = temp;
   }
   | relational_expression GREATER shift_expression {
     // Log reduction
@@ -2330,6 +2358,12 @@ relational_expression
       = *(new list<SymbolTypes::SymbolType>({SymbolTypes::INT}));
 
     $$ = $1;
+
+    Node * temp = new EqualityNode(EqualityNode::RelationalType::GREATER);
+    temp->AddChild($1.front().node);
+    temp->AddChild(new Node("GREATER"));
+    temp->AddChild($3.front().node);
+    $$.front().node = temp;
   }
   | relational_expression LE_OP shift_expression {
     // Log reduction.
@@ -2397,6 +2431,12 @@ relational_expression
       = *(new list<SymbolTypes::SymbolType>({SymbolTypes::INT}));
 
     $$ = $1;
+
+    Node * temp = new EqualityNode(EqualityNode::RelationalType::LE);
+    temp->AddChild($1.front().node);
+    temp->AddChild(new Node("LEES_EQUAL"));
+    temp->AddChild($3.front().node);
+    $$.front().node = temp;
   }
   | relational_expression GE_OP shift_expression {
     TR_LOGGER.PushReduction(
@@ -2463,6 +2503,12 @@ relational_expression
       = *(new list<SymbolTypes::SymbolType>({SymbolTypes::INT}));
 
     $$ = $1;
+
+    Node * temp = new EqualityNode(EqualityNode::RelationalType::GE);
+    temp->AddChild($1.front().node);
+    temp->AddChild(new Node("GREATER_EQUAL"));
+    temp->AddChild($3.front().node);
+    $$.front().node = temp;
   }
   ;
 
@@ -3197,6 +3243,7 @@ postfix_expression
     $$ = *(new list<SymbolInfo>());
     $$.push_front(*(new SymbolInfo($1.front())));
     $$.front().identifier_name = "";
+    $$.front().data_is_valid = false;
 
     // Update value such that $$ has one less pointer or array.
     if($1.front().array_sizes.size() > 0) {
@@ -3230,6 +3277,8 @@ postfix_expression
     $$.front().data_is_valid = false;
     $$.front().is_function = false;
     $$.front().identifier_name = string("");
+
+    $$.front().node = new Node("FunctionCall", $$.front().node);
   }
   | postfix_expression OPEN_PAREN argument_expression_list CLOSE_PAREN {
     // Log reduction
@@ -3251,6 +3300,8 @@ postfix_expression
     list<SymbolInfo>::iterator argument_iter
         = $3.begin();
 
+    Node* temp_node = new Node("FunctionCall", $$.front().node);
+
     while(param_iter != $1.front().parameters_types.end() &&
           argument_iter != $3.end()) {
       if( !CompareParamToArgument(*param_iter, *argument_iter)) {
@@ -3258,6 +3309,8 @@ postfix_expression
       }
       param_iter++;
       argument_iter++;
+
+      temp_node->AddChild(new Node("argument"));
     }
 
     // Create new symbol info to be placed in $$
@@ -3268,6 +3321,7 @@ postfix_expression
     $$.front().data_is_valid = false;
     $$.front().is_function = false;
     $$.front().identifier_name = string("");
+    $$.front().node = temp_node;
   }
   | postfix_expression DOT identifier {
     // Struct operation hold off on this.
