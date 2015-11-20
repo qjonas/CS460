@@ -83,52 +83,107 @@ void Node::GenerateGraphvizHelper(ofstream& fout) const {
 
 AdditiveNode::AdditiveNode(bool is_add) 
   : Node("Additive_Expression"), is_addition(is_add) {}
- //void AdditiveNode::Generate3AC(std::vector<std::string>& vector){
+void AdditiveNode::Generate3AC(std::vector<std::string>& vector){
 
 
 
-
+}
 AssignmentNode::AssignmentNode(AssignmentType type) : Node("Assignment") {
   this->type = type;
 }
+void AssignmentNode::Generate3AC(std::vector<std::string>& vector){
 
+
+
+}
 
 
 ArrayAccessNode::ArrayAccessNode(SymbolInfo* symbol_info) 
   : Node("Array_Access"), info(symbol_info) {}
 
+void ArrayAccessNode::Generate3AC(std::vector<std::string>& vector){
 
+
+
+}
 
 DeclarationNode::DeclarationNode(const list<SymbolInfo*>& infos) 
   : Node("Declaration"), Id_infos(infos) {}
 
+void DeclarationNode::Generate3AC(std::vector<std::string>& vector){
+
+
+
+}
+
 EqualityNode::EqualityNode(RelationalType t) : Node("EqualityNode"), type(t) {}
+
+void EqualityNode::Generate3AC(std::vector<std::string>& vector){
+
+
+
+}
 
 
 ExpressNode::ExpressNode() : Node("Expression") {}
 ExpressNode::ExpressNode(Node * child) : Node("Expression", child) {}
+void ExpressNode::Generate3AC(std::vector<std::string>& vector){
+
+
+
+}
 
 IdentifierNode::IdentifierNode(SymbolInfo* id) 
   : Node("Identifier"), Id_info(id) {
     AddChild(new Node(id->identifier_name));
   }
+void IdentifierNode::Generate3AC(std::vector<std::string>& vector){
+
+
+
+}
 
 IntegerConstantNode::IntegerConstantNode(long long int val) 
   : Node("Integer_Constant"), value(val) {
   }
+void IntegerConstantNode::Generate3AC(std::vector<std::string>& vector){
+
+
+
+}
 
 CharConstantNode::CharConstantNode(char val) 
   : Node("Char_Constant"), value(val) {
 }
+void CharConstantNode::Generate3AC(std::vector<std::string>& vector){
+
+
+
+}
 FloatingConstantNode::FloatingConstantNode(long double val) 
   : Node("Floating_Constant"), value(val) {
   }
+void FloatingConstantNode::Generate3AC(std::vector<std::string>& vector){
+
+
+
+}
 
 IterationNode::IterationNode(bool post_check) : Node("Iteration"),
 is_post_check(post_check) {}
 
 IterationNode::IterationNode() : IterationNode(false) {}
+void IterationNode::Generate3AC(std::vector<std::string>& vector){
+
+
+
+}
 
 SelectionNode::SelectionNode() : Node("Selection") {}
+void SelectionNode::Generate3AC(std::vector<std::string>& vector){
+
+
+
+}
 
 

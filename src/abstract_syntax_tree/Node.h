@@ -4,6 +4,7 @@
 #include <fstream>
 #include <list>
 #include <map>
+#include <iostream>
 #include <ostream>
 #include <string>
 #include <vector>
@@ -22,7 +23,7 @@ public:
   void AddChild(Node * node);
 
   // Generate 3AC; The string returned is the temporary that it should return.
- void Generate3AC(std::vector<std::string>& vector );
+  virtual void Generate3AC(std::vector<std::string>& vector ){std::cout << "base";};
 
   // Generate Graphviz Code:
   void GenerateGraphviz(const std::string& file_name) const;
@@ -48,6 +49,7 @@ namespace AST {
 class AdditiveNode : public Node {
 public:
   AdditiveNode(bool is_add);
+  void Generate3AC(std::vector<std::string>& vector );
   
 private:
   bool is_addition;
@@ -61,7 +63,7 @@ public:
 
   // Constructors 
   AssignmentNode(AssignmentType type);
-
+void Generate3AC(std::vector<std::string>& vector );
 private:
   AssignmentType type;
 
@@ -70,6 +72,8 @@ private:
 class ArrayAccessNode : public Node {
 public:
   ArrayAccessNode(SymbolInfo* symbol_info);
+  void Generate3AC(std::vector<std::string>& vector );
+
 private:
   // this will hold information about the symbol so we can calculate offset.
   SymbolInfo* info;
@@ -79,6 +83,7 @@ class DeclarationNode : public Node {
 public:
   // Constructors 
   DeclarationNode(const std::list<SymbolInfo*>& infos);
+  void Generate3AC(std::vector<std::string>& vector );
 
 private:
   // SymbolInfo of the declaration
@@ -88,6 +93,7 @@ private:
 class DeclarationSpecifierNode : public Node {
 public:
   DeclarationSpecifierNode();
+  void Generate3AC(std::vector<std::string>& vector );
 
 };
 
@@ -97,6 +103,7 @@ public:
     EQ, NE, LESS, GREATER, LE, GE
   };
   EqualityNode(RelationalType t);
+  void Generate3AC(std::vector<std::string>& vector );
 
 private:
   RelationalType type;
@@ -106,12 +113,14 @@ class ExpressNode: public Node{
 public:
   ExpressNode();
   ExpressNode(Node * child);
+  void Generate3AC(std::vector<std::string>& vector );
 };
 
 class IdentifierNode: public Node{
 public:
   // constructor
   IdentifierNode(SymbolInfo * id);
+  void Generate3AC(std::vector<std::string>& vector );
 
 private:
   SymbolInfo* Id_info;
@@ -120,6 +129,7 @@ private:
 class IntegerConstantNode : public Node {
 public:
   IntegerConstantNode(long long int val);
+  void Generate3AC(std::vector<std::string>& vector );
 
 private:
   long long int value;
@@ -129,6 +139,7 @@ private:
 class CharConstantNode : public Node {
 public:
   CharConstantNode(char val);
+  void Generate3AC(std::vector<std::string>& vector );
 
 private:
   char value;
@@ -138,6 +149,7 @@ private:
 class FloatingConstantNode : public Node {
 public:
   FloatingConstantNode(long double val);
+  void Generate3AC(std::vector<std::string>& vector );
 
 private:
   long double value;
@@ -148,6 +160,7 @@ class IterationNode : public Node {
 public:
   IterationNode();
   IterationNode(bool post_check);
+  void Generate3AC(std::vector<std::string>& vector );
 
 private:
   bool is_post_check;
@@ -156,6 +169,7 @@ private:
 class SelectionNode : public Node {
 public:
   SelectionNode();
+  void Generate3AC(std::vector<std::string>& vector );
 };
 
 }
