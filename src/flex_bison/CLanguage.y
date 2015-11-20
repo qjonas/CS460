@@ -40,6 +40,7 @@ extern bool IN_SWITCH;
 extern int LINE;
 extern int COLUMN;
 extern int IN_FUNCTION;
+extern vector<string> ThreeACvector;
 
 /* Functions from Flex */
 extern int yylex();

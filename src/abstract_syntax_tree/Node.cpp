@@ -1,7 +1,9 @@
+#include <string>
+#include <vector>
 #include "Node.h"
 
 #include <list>
-#include <string>
+
 
 #include "../helpers/TicketCounter.h"
 
@@ -81,11 +83,16 @@ void Node::GenerateGraphvizHelper(ofstream& fout) const {
 
 AdditiveNode::AdditiveNode(bool is_add) 
   : Node("Additive_Expression"), is_addition(is_add) {}
+ //void AdditiveNode::Generate3AC(std::vector<std::string>& vector){
+
+
 
 
 AssignmentNode::AssignmentNode(AssignmentType type) : Node("Assignment") {
   this->type = type;
 }
+
+
 
 ArrayAccessNode::ArrayAccessNode(SymbolInfo* symbol_info) 
   : Node("Array_Access"), info(symbol_info) {}

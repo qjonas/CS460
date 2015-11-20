@@ -6,6 +6,7 @@
 #include <map>
 #include <ostream>
 #include <string>
+#include <vector>
 
 #include "../helpers/TicketCounter.h"
 
@@ -21,7 +22,7 @@ public:
   void AddChild(Node * node);
 
   // Generate 3AC; The string returned is the temporary that it should return.
-  std::string Generate3AC(std::ostream& os) const;
+ void Generate3AC(std::vector<std::string>& vector );
 
   // Generate Graphviz Code:
   void GenerateGraphviz(const std::string& file_name) const;
@@ -47,7 +48,7 @@ namespace AST {
 class AdditiveNode : public Node {
 public:
   AdditiveNode(bool is_add);
-
+  
 private:
   bool is_addition;
 };
