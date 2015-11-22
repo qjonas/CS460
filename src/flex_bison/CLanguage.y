@@ -2698,11 +2698,13 @@ additive_expression
 
       bool is_addition = true;
       Node * temp = new AdditiveNode(is_addition);
+      temp->Generate3AC(ThreeACvector);
       temp->AddChild($1.front().node);
       temp->AddChild(new Node("PLUS"));
       temp->AddChild($3.front().node);
 
       $$.front().node = temp;
+      //$$.front().node->Generate3AC(ThreeACvector);
   }
   | additive_expression MINUS multiplicative_expression {
     TR_LOGGER.PushReduction(

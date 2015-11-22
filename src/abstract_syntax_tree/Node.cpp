@@ -1,5 +1,6 @@
 #include <string>
 #include <vector>
+#include <iostream>
 #include "Node.h"
 
 #include <list>
@@ -67,6 +68,14 @@ void Node::GenerateGraphviz(const string& file_name) const {
   // system("rm AST.dot");
 }
 
+std::string Node::Generate3AC(std::vector<std::string>& vector ){
+  for(auto node : children_){
+    if (node != NULL ){
+      Generate3AC(vector);
+    }
+    return "";
+  }
+}
 void Node::GenerateGraphvizHelper(ofstream& fout) const {
   // Generate a label for each node
   fout << name_ << "_" << id_ << "[label = \"" << name_ << "\"";
@@ -83,15 +92,34 @@ void Node::GenerateGraphvizHelper(ofstream& fout) const {
 
 AdditiveNode::AdditiveNode(bool is_add) 
   : Node("Additive_Expression"), is_addition(is_add) {}
-void AdditiveNode::Generate3AC(std::vector<std::string>& vector){
 
+std::string AdditiveNode::Generate3AC(std::vector<std::string>& vector){
+  std::list<Node*>::iterator tempIter;
+  tempIter = children_.begin();
+  std:string temp, sourceOne, sourceTwo, tempReg;;
+  sourceOne = (children_.front())->Generate3AC(vector); // segfault this ine
+  tempIter++;
+  sourceTwo = (*tempIter)->Generate3AC(vector);
+  temp += sourceOne;
+  temp += ", ";
+  temp += sourceTwo;
+  temp += ", ";
+  tempReg = temp_int_counter_.GenerateTicket();
+  temp += tempReg;
+  vector.push_back(temp);
+  cout << temp << endl;
+  return tempReg;
 
 
 }
 AssignmentNode::AssignmentNode(AssignmentType type) : Node("Assignment") {
   this->type = type;
 }
-void AssignmentNode::Generate3AC(std::vector<std::string>& vector){
+std::string  AssignmentNode::Generate3AC(std::vector<std::string>& vector){
+string temp = "ASSIGN, ";
+
+  temp += temp_int_counter_.GenerateTicket();
+  temp += ", ";
 
 
 
@@ -101,7 +129,7 @@ void AssignmentNode::Generate3AC(std::vector<std::string>& vector){
 ArrayAccessNode::ArrayAccessNode(SymbolInfo* symbol_info) 
   : Node("Array_Access"), info(symbol_info) {}
 
-void ArrayAccessNode::Generate3AC(std::vector<std::string>& vector){
+std::string  ArrayAccessNode::Generate3AC(std::vector<std::string>& vector){
 
 
 
@@ -110,7 +138,7 @@ void ArrayAccessNode::Generate3AC(std::vector<std::string>& vector){
 DeclarationNode::DeclarationNode(const list<SymbolInfo*>& infos) 
   : Node("Declaration"), Id_infos(infos) {}
 
-void DeclarationNode::Generate3AC(std::vector<std::string>& vector){
+std::string DeclarationNode::Generate3AC(std::vector<std::string>& vector){
 
 
 
@@ -118,7 +146,7 @@ void DeclarationNode::Generate3AC(std::vector<std::string>& vector){
 
 EqualityNode::EqualityNode(RelationalType t) : Node("EqualityNode"), type(t) {}
 
-void EqualityNode::Generate3AC(std::vector<std::string>& vector){
+std::string  EqualityNode::Generate3AC(std::vector<std::string>& vector){
 
 
 
@@ -127,7 +155,7 @@ void EqualityNode::Generate3AC(std::vector<std::string>& vector){
 
 ExpressNode::ExpressNode() : Node("Expression") {}
 ExpressNode::ExpressNode(Node * child) : Node("Expression", child) {}
-void ExpressNode::Generate3AC(std::vector<std::string>& vector){
+std::string  ExpressNode::Generate3AC(std::vector<std::string>& vector){
 
 
 
@@ -137,7 +165,7 @@ IdentifierNode::IdentifierNode(SymbolInfo* id)
   : Node("Identifier"), Id_info(id) {
     AddChild(new Node(id->identifier_name));
   }
-void IdentifierNode::Generate3AC(std::vector<std::string>& vector){
+std::string  IdentifierNode::Generate3AC(std::vector<std::string>& vector){
 
 
 
@@ -146,7 +174,7 @@ void IdentifierNode::Generate3AC(std::vector<std::string>& vector){
 IntegerConstantNode::IntegerConstantNode(long long int val) 
   : Node("Integer_Constant"), value(val) {
   }
-void IntegerConstantNode::Generate3AC(std::vector<std::string>& vector){
+std::string  IntegerConstantNode::Generate3AC(std::vector<std::string>& vector){
 
 
 
@@ -155,7 +183,7 @@ void IntegerConstantNode::Generate3AC(std::vector<std::string>& vector){
 CharConstantNode::CharConstantNode(char val) 
   : Node("Char_Constant"), value(val) {
 }
-void CharConstantNode::Generate3AC(std::vector<std::string>& vector){
+std::string  CharConstantNode::Generate3AC(std::vector<std::string>& vector){
 
 
 
@@ -163,7 +191,7 @@ void CharConstantNode::Generate3AC(std::vector<std::string>& vector){
 FloatingConstantNode::FloatingConstantNode(long double val) 
   : Node("Floating_Constant"), value(val) {
   }
-void FloatingConstantNode::Generate3AC(std::vector<std::string>& vector){
+std::string FloatingConstantNode::Generate3AC(std::vector<std::string>& vector){
 
 
 
@@ -173,14 +201,14 @@ IterationNode::IterationNode(bool post_check) : Node("Iteration"),
 is_post_check(post_check) {}
 
 IterationNode::IterationNode() : IterationNode(false) {}
-void IterationNode::Generate3AC(std::vector<std::string>& vector){
+std::string  IterationNode::Generate3AC(std::vector<std::string>& vector){
 
 
 
 }
 
 SelectionNode::SelectionNode() : Node("Selection") {}
-void SelectionNode::Generate3AC(std::vector<std::string>& vector){
+std::string  SelectionNode::Generate3AC(std::vector<std::string>& vector){
 
 
 
