@@ -13,6 +13,7 @@
 #include  "../bin/CLanguage.tab.hh"
 #include  "../src/abstract_syntax_tree/Node.h"
 #include  "../src/helpers/CommandLineFlags.h"
+#include  "../src/helpers/LineStore.h"
 #include  "../src/helpers/TokenReductionsLogger.h"
 #include  "../src/symbol_table/SymbolTable.h"
 #include  "../src/symbol_table/SymbolInfoUtil.h"
@@ -56,6 +57,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "auto"  {
   TR_LOGGER.PushToken("AUTO");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   yylval = list<SymbolInfo>();
   yylval.push_back(SymbolInfo());
   yylval.front().storage_class_specifier = SymbolTypes::AUTO;
@@ -66,6 +68,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "break" {
   TR_LOGGER.PushToken("BREAK");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   return BREAK;
 }
@@ -73,6 +76,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "case"  {
   TR_LOGGER.PushToken("CASE");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   return CASE;
 }
@@ -80,6 +84,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "char"  {
   TR_LOGGER.PushToken("CHAR");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   yylval = list<SymbolInfo>();
   yylval.push_back(SymbolInfo());
   yylval.front().type_specifier_list.push_back(SymbolTypes::CHAR);
@@ -90,6 +95,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "const" {
   TR_LOGGER.PushToken("CONST");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   yylval = list<SymbolInfo>();
   yylval.push_back(SymbolInfo());
   yylval.front().type_qualifier_list.push_back(SymbolTypes::CONST);
@@ -100,6 +106,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "continue"  {
   TR_LOGGER.PushToken("CONTINUE");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   return CONTINUE;
 }
@@ -107,6 +114,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "default" {
   TR_LOGGER.PushToken("DEFAULT");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   return DEFAULT;
 }
@@ -114,6 +122,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "do"  {
   TR_LOGGER.PushToken("DO");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   return DO;
 }
@@ -121,6 +130,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "double"  {
   TR_LOGGER.PushToken("DOUBLE");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   yylval = list<SymbolInfo>();
   yylval.push_back(SymbolInfo());
   yylval.front().type_specifier_list.push_back(SymbolTypes::DOUBLE);
@@ -131,6 +141,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "else"  {
   TR_LOGGER.PushToken("ELSE");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   return ELSE;
 }
@@ -138,6 +149,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "enum"  {
   TR_LOGGER.PushToken("ENUM");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   yylval = list<SymbolInfo>();
   yylval.push_back(SymbolInfo());
   yylval.front().type_specifier_list.push_back(SymbolTypes::ENUM);
@@ -148,6 +160,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "extern"  {
   TR_LOGGER.PushToken("EXTERN");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   yylval = list<SymbolInfo>();
   yylval.push_back(SymbolInfo());
   yylval.front().storage_class_specifier = SymbolTypes::EXTERN;
@@ -158,6 +171,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "float" {
   TR_LOGGER.PushToken("FLOAT");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   yylval = list<SymbolInfo>();
   yylval.push_back(SymbolInfo());
   yylval.front().type_specifier_list.push_back(SymbolTypes::FLOAT);
@@ -168,6 +182,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "for" {
   TR_LOGGER.PushToken("FOR");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   return FOR;
 }
@@ -175,6 +190,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "goto"  {
   TR_LOGGER.PushToken("GOTO");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   return GOTO;
 }
@@ -182,6 +198,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "if"  {
   TR_LOGGER.PushToken("IF");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   return IF;
 }
@@ -189,6 +206,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "int" {
   TR_LOGGER.PushToken("INT");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   yylval = list<SymbolInfo>();
   yylval.push_back(SymbolInfo());
   yylval.front().type_specifier_list.push_back(SymbolTypes::INT);
@@ -199,6 +217,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "long"  {
   TR_LOGGER.PushToken("LONG");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   yylval = list<SymbolInfo>();
   yylval.push_back(SymbolInfo());
   yylval.front().type_specifier_list.push_back(SymbolTypes::LONG);
@@ -209,6 +228,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "register"  {
   TR_LOGGER.PushToken("REGISTER");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   yylval = list<SymbolInfo>();
   yylval.push_back(SymbolInfo());
   yylval.front().storage_class_specifier = SymbolTypes::REGISTER;
@@ -219,6 +239,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "return"  {
   TR_LOGGER.PushToken("RETURN");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   return RETURN;
 }
@@ -226,6 +247,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "short" {
   TR_LOGGER.PushToken("SHORT");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   yylval = list<SymbolInfo>();
   yylval.push_back(SymbolInfo());
   yylval.front().type_specifier_list.push_back(SymbolTypes::SHORT);
@@ -236,6 +258,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "signed"  {
   TR_LOGGER.PushToken("SIGNED");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   yylval = list<SymbolInfo>();
   yylval.push_back(SymbolInfo());
   yylval.front().type_specifier_list.push_back(SymbolTypes::SIGNED);
@@ -246,6 +269,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "sizeof"  {
   TR_LOGGER.PushToken("SIZEOF");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   return SIZEOF;
 }
@@ -253,6 +277,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "static"  {
   TR_LOGGER.PushToken("STATIC");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   yylval = list<SymbolInfo>();
   yylval.push_back(SymbolInfo());
   yylval.front().storage_class_specifier = SymbolTypes::STATIC;
@@ -263,6 +288,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "struct"  {
   TR_LOGGER.PushToken("STRUCT");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   yylval = list<SymbolInfo>();
   yylval.push_back(SymbolInfo());
   yylval.front().type_specifier_list.push_back(SymbolTypes::STRUCT);
@@ -274,6 +300,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
   TR_LOGGER.PushToken("SWITCH");
   IN_SWITCH = true;
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   return SWITCH;
 }
@@ -281,6 +308,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "typedef" {
   TR_LOGGER.PushToken("TYPEDEF");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   yylval = list<SymbolInfo>();
   yylval.push_back(SymbolInfo());
   yylval.front().storage_class_specifier = SymbolTypes::TYPEDEF;
@@ -291,6 +319,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "union" {
   TR_LOGGER.PushToken("UNION");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   yylval = list<SymbolInfo>();
   yylval.push_back(SymbolInfo());
   yylval.front().type_specifier_list.push_back(SymbolTypes::UNION);
@@ -301,6 +330,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "unsigned"  {
   TR_LOGGER.PushToken("UNSIGNED");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   yylval = list<SymbolInfo>();
   yylval.push_back(SymbolInfo());
   yylval.front().type_specifier_list.push_back(SymbolTypes::UNSIGNED);
@@ -311,6 +341,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "void"  {
   TR_LOGGER.PushToken("VOID");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   return VOID;
 }
@@ -318,6 +349,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "volatile"  {
   TR_LOGGER.PushToken("VOLATILE");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   yylval = list<SymbolInfo>();
   yylval.push_back(SymbolInfo());
   yylval.front().type_qualifier_list.push_back(SymbolTypes::VOLATILE);
@@ -328,6 +360,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "while" {
   TR_LOGGER.PushToken("WHILE");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   return WHILE;
 }
@@ -339,6 +372,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 [A-Za-z][A-Za-z0-9_]* {
   // Log source word
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   // Increment COLUMN counter
   COLUMN += yyleng;
 
@@ -414,6 +448,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
   // Log token and source word.
   TR_LOGGER.PushToken("INTEGER_CONSTANT");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   
   // Check Overflow
   char** end_ptr;
@@ -443,6 +478,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
   // Log token and source word.
   TR_LOGGER.PushToken("INTEGER_CONSTANT");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
 
   // Check Overflow
   char** end_ptr;
@@ -472,6 +508,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
   // Log token and source word.
   TR_LOGGER.PushToken("INTEGER_CONSTANT");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
 
   // Check Overflow
   char** end_ptr;
@@ -504,6 +541,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
   // Log token and source word
   TR_LOGGER.PushToken("FLOATING_CONSTANT");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
 
   // Check Overflow
   char** end_ptr;
@@ -531,6 +569,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
   // Log token and source word
   TR_LOGGER.PushToken("CHARACTER_CONSTANT");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
 
   // Assign lval
   yylval.push_back(SymbolInfo());
@@ -545,6 +584,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
   // Log token and source word
   TR_LOGGER.PushToken("STRING_LITERAL");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
 
   // Assign lval
   yylval.push_back(SymbolInfo());
@@ -562,6 +602,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "->" {
   TR_LOGGER.PushToken("PTR_OP");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   return PTR_OP;
 }
@@ -569,6 +610,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "++" {
   TR_LOGGER.PushToken("INC_OP");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   return INC_OP;
 }
@@ -576,6 +618,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "--" {
   TR_LOGGER.PushToken("DEC_OP");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   return DEC_OP;
 }
@@ -583,6 +626,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "<<" {
   TR_LOGGER.PushToken("LEFT_OP");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   return LEFT_OP;
 }
@@ -590,6 +634,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 ">>" {
   TR_LOGGER.PushToken("RIGHT_OP");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   return RIGHT_OP;
 }
@@ -597,6 +642,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "<=" {
   TR_LOGGER.PushToken("LE_OP");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   return LE_OP;
 }
@@ -604,6 +650,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 ">=" {
   TR_LOGGER.PushToken("GE_OP");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   return GE_OP;
 }
@@ -611,6 +658,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "==" {
   TR_LOGGER.PushToken("EQ_OP");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   return EQ_OP;
 }
@@ -618,6 +666,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "!=" {
   TR_LOGGER.PushToken("NE_OP");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   return EQ_OP;
 }
@@ -625,6 +674,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "&&" {
   TR_LOGGER.PushToken("AND_OP");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   return AND_OP;
 }
@@ -632,6 +682,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "||" {
   TR_LOGGER.PushToken("OR_OP");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   return OR_OP;
 }
@@ -639,6 +690,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "*=" {
   TR_LOGGER.PushToken("MUL_ASSIGN");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   return AND_OP;
 }
@@ -646,6 +698,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "/=" {
   TR_LOGGER.PushToken("DIV_ASSIGN");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   return DIV_ASSIGN;
 }
@@ -653,6 +706,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "%=" {
   TR_LOGGER.PushToken("MOD_ASSIGN");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   return MOD_ASSIGN;
 }
@@ -660,6 +714,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "+=" {
   TR_LOGGER.PushToken("ADD_ASSIGN");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   return ADD_ASSIGN;
 }
@@ -667,6 +722,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "-=" {
   TR_LOGGER.PushToken("SUB_ASSIGN");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   return SUB_ASSIGN;
 }
@@ -674,6 +730,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "<<=" {
   TR_LOGGER.PushToken("LEFT_ASSIGN");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   return LEFT_ASSIGN;
 }
@@ -681,6 +738,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 ">>=" {
   TR_LOGGER.PushToken("RIGHT_ASSIGN");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   return RIGHT_ASSIGN;
 }
@@ -688,6 +746,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "&=" {
   TR_LOGGER.PushToken("AND_ASSIGN");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   return AND_ASSIGN;
 }
@@ -695,6 +754,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "^=" {
   TR_LOGGER.PushToken("XOR_ASSIGN");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   return XOR_ASSIGN;
 }
@@ -702,6 +762,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "|=" {
   TR_LOGGER.PushToken("OR_ASSIGN");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   return OR_ASSIGN;
 }
@@ -712,6 +773,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "..." {
   TR_LOGGER.PushToken("ELLIPSIS");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   return ELLIPSIS;
 }
@@ -719,6 +781,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 ";" {
   TR_LOGGER.PushToken("SEMI");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   return SEMI;
 }
@@ -726,6 +789,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 \{ {
   TR_LOGGER.PushToken("OPEN_CURLY");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   return OPEN_CURLY;
 }
@@ -733,6 +797,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 \} {
   TR_LOGGER.PushToken("CLOSE_CURLY");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   return CLOSE_CURLY;
 }
@@ -740,6 +805,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "," {
   TR_LOGGER.PushToken("COMMA");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   return COMMA;
 }
@@ -747,6 +813,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "=" {
   TR_LOGGER.PushToken("EQUALS_SIGN");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   return EQUALS_SIGN;
 }
@@ -754,6 +821,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 ":" {
   TR_LOGGER.PushToken("COLON");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   return COLON;
 }
@@ -761,6 +829,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "(" {
   TR_LOGGER.PushToken("OPEN_PAREN");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   return OPEN_PAREN;
 }
@@ -768,6 +837,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 ")" {
   TR_LOGGER.PushToken("CLOSE_PAREN");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   return CLOSE_PAREN;
 }
@@ -775,6 +845,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "[" {
   TR_LOGGER.PushToken("OPEN_SQUARE");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   return OPEN_SQUARE;
 }
@@ -782,6 +853,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "]" {
   TR_LOGGER.PushToken("CLOSE_SQUARE");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   return CLOSE_SQUARE;
 }
@@ -789,6 +861,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "*" {
   TR_LOGGER.PushToken("ASTERISK");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   return ASTERISK;
 }
@@ -796,6 +869,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "&" {
   TR_LOGGER.PushToken("AMPERSAND");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   return AMPERSAND;
 }
@@ -803,6 +877,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "?" {
   TR_LOGGER.PushToken("QUESTION");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   return QUESTION;
 }
@@ -810,6 +885,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "|" {
   TR_LOGGER.PushToken("PIPE");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   return PIPE;
 }
@@ -817,6 +893,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "^" {
   TR_LOGGER.PushToken("CARAT");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   return CARAT;
 }
@@ -824,6 +901,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "<" {
   TR_LOGGER.PushToken("LESSER");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   return LESSER;
 }
@@ -831,6 +909,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 ">" {
   TR_LOGGER.PushToken("GREATER");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   return GREATER;
 }
@@ -838,6 +917,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "+" {
   TR_LOGGER.PushToken("PLUS");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   return PLUS;
 }
@@ -845,6 +925,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "-" {
   TR_LOGGER.PushToken("MINUS");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   return MINUS;
 }
@@ -852,6 +933,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "%" {
   TR_LOGGER.PushToken("PERCENT");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   return PERCENT;
 }
@@ -859,6 +941,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "/" {
   TR_LOGGER.PushToken("FORWARD_SLASH");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   return FORWARD_SLASH;
 }
@@ -866,6 +949,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "~" {
   TR_LOGGER.PushToken("TILDE");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   return TILDE;
 }
@@ -873,6 +957,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "!" {
   TR_LOGGER.PushToken("BANG");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   return BANG;
 }
@@ -880,6 +965,7 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 "." {
   TR_LOGGER.PushToken("DOT");
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   return DOT;
 }
@@ -890,18 +976,21 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 
 \/\* {
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   BEGIN (COMMENTS);
 }
 
 <COMMENTS>"*/" {
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
   BEGIN (INITIAL);
 }   
 
 <COMMENTS>\n {
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   TR_LOGGER.LogSourceLine();
   TR_LOGGER.LogTokenReductions();
   LINE++;
@@ -910,11 +999,13 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 
 <COMMENTS>.* {
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
 }
 
 \/\/[^"\n"]* {
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
 }
 
@@ -924,18 +1015,21 @@ int_suffix  ([uU]{long_suffix}?|{long_suffix}[uU]?)
 
 [ \t]* {
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
 }
 
 "\n" {
   TR_LOGGER.LogSourceLine();
   TR_LOGGER.LogTokenReductions();
+  LineStore::LogLine();
   LINE++;
   COLUMN = 1;
 }
 
 . {
   TR_LOGGER.PushSourceWord(yytext);
+  LineStore::LogWord(yytext);
   COLUMN += yyleng;
 }
 

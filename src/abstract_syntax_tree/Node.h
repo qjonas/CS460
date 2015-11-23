@@ -39,6 +39,8 @@ public:
   // SetIdentifierType
   void SetFloating();
 
+  static int* LINE;
+
 protected:
   static std::map<std::string, int> name_count_;
   static std::list<std::map<std::string, std::string> > identifier_to_temporary_;
@@ -48,7 +50,7 @@ protected:
   std::string name_;
   std::string id_;
   std::vector<Node*> children_;
-
+  int line_number_;
 };
 }
 

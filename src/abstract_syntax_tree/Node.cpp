@@ -6,6 +6,7 @@
 #include <list>
 
 #include "../helpers/TicketCounter.h"
+#include "../helpers/LineStore.h"
 #include "../symbol_table/SymbolInfoUtil.h"
 #include "../symbol_table/SymbolTable.h"
 
@@ -18,6 +19,7 @@ list<map<string, string> > Node::identifier_to_temporary_
 TicketCounter Node::temp_int_counter_("TI");
 TicketCounter Node::temp_float_counter_("TF");
 TicketCounter Node::temp_label_counter_("TL");
+int* Node::LINE(NULL);
 
 Node::Node(const string& name) : name_(name) {
   // Add name to name count.
@@ -26,6 +28,8 @@ Node::Node(const string& name) : name_(name) {
   } else {
     name_count_[name]++;
   }
+
+  line_number_ = Node::LINE != NULL ? *Node::LINE : -1;
 
   // Set id to name count.
   id_ = to_string(name_count_[name]);
@@ -72,10 +76,11 @@ void Node::GenerateGraphviz(const string& file_name) const {
   // system("rm AST.dot");
 }
 
-string Node::Generate3AC(vector<string>& vector){
+string Node::Generate3AC(vector<string>& three_address_code_vec){
+
   for(auto node : children_){
     if (node != NULL ){
-      node->Generate3AC(vector);
+      node->Generate3AC(three_address_code_vec);
     }
   }
   return "";
@@ -115,6 +120,13 @@ AdditiveNode::AdditiveNode(bool is_add)
   : Node("Additive_Expression"), is_addition(is_add) {}
 
 string AdditiveNode::Generate3AC(vector<string>& three_address_code_vec){
+  if(line_number_ != -1) {
+    string source_line = LineStore::GetLine(line_number_);
+    if(source_line != "") {
+      three_address_code_vec.push_back(string(";") + source_line);
+    }
+  }
+
   string three_address_code = is_addition ? "ADD, " : "SUB, ";
   string sourceOne = children_[0]->Generate3AC(three_address_code_vec);
   string sourceTwo = children_[2]->Generate3AC(three_address_code_vec);
@@ -132,6 +144,12 @@ AssignmentNode::AssignmentNode(AssignmentType type) : Node("Assignment") {
   this->type = type;
 }
 string AssignmentNode::Generate3AC(vector<string>& three_address_code_vec){
+  if(line_number_ != -1) {
+    string source_line = LineStore::GetLine(line_number_);
+    if(source_line != "") {
+      three_address_code_vec.push_back(string(";") + source_line);
+    }
+  }
   if(type == EQUALS){
   string temp = "ASSIGN(equals), ";
 
@@ -157,7 +175,13 @@ ArrayAccessNode::ArrayAccessNode(SymbolInfo* symbol_info)
   }
 
 string  ArrayAccessNode::Generate3AC(vector<string>& three_address_code_vec){
-
+  if(line_number_ != -1) {
+    string source_line = LineStore::GetLine(line_number_);
+    if(source_line != "") {
+      three_address_code_vec.push_back(string(";") + source_line);
+    }
+  }
+  
   string three_address_code = "MULT, ";
   three_address_code += to_string(ArrayAccessSizeOf(*info));
   three_address_code += ", ";
@@ -192,6 +216,13 @@ CompoundStatementNode::CompoundStatementNode()
   : Node("ComoundStatmentNode") {}
 
 string CompoundStatementNode::Generate3AC(vector<string>& three_address_code_vec){
+  if(line_number_ != -1) {
+    string source_line = LineStore::GetLine(line_number_);
+    if(source_line != "") {
+      three_address_code_vec.push_back(string(";") + source_line);
+    }
+  }
+  
   Node::PushFrame();
   for(auto node : children_){
     if (node != NULL ){
@@ -210,6 +241,13 @@ DeclarationNode::DeclarationNode(const list<SymbolInfo*>& infos)
   }
 
 string DeclarationNode::Generate3AC(vector<string>& three_address_code_vec){
+  if(line_number_ != -1) {
+    string source_line = LineStore::GetLine(line_number_);
+    if(source_line != "") {
+      three_address_code_vec.push_back(string(";") + source_line);
+    }
+  }
+  
   for(auto info : Id_infos) {
     string tempReg, temp;
     tempReg = IsFloating(*info) 
@@ -228,7 +266,13 @@ string DeclarationNode::Generate3AC(vector<string>& three_address_code_vec){
 EqualityNode::EqualityNode(RelationalType t) : Node("EqualityNode"), type(t) {}
 
 string  EqualityNode::Generate3AC(vector<string>& three_address_code_vec){
-
+  if(line_number_ != -1) {
+    string source_line = LineStore::GetLine(line_number_);
+    if(source_line != "") {
+      three_address_code_vec.push_back(string(";") + source_line);
+    }
+  }
+  
   string three_address_code;
   switch(type) {
     case RelationalType::EQ:
@@ -277,8 +321,14 @@ IdentifierNode::IdentifierNode(SymbolInfo* id)
     Id_info = new SymbolInfo(*id);
     AddChild(new Node(id->identifier_name));
   }
-string  IdentifierNode::Generate3AC(vector<string>& vector){
-
+string  IdentifierNode::Generate3AC(vector<string>& three_address_code_vec){
+  if(line_number_ != -1) {
+    string source_line = LineStore::GetLine(line_number_);
+    if(source_line != "") {
+      three_address_code_vec.push_back(string(";") + source_line);
+    }
+  }
+  
   for(auto frame_map : identifier_to_temporary_) {
     map<string, string>::iterator tempIter;
     tempIter = frame_map.find(Id_info->identifier_name);
@@ -296,7 +346,7 @@ string  IdentifierNode::Generate3AC(vector<string>& vector){
   temp += ", , ";
   temp += tempReg;
   identifier_to_temporary_.front()[Id_info->identifier_name] = tempReg;
-  vector.push_back(temp);
+  three_address_code_vec.push_back(temp);
   return tempReg;
 }
 
@@ -309,7 +359,14 @@ IntegerConstantNode::IntegerConstantNode(long long int val)
   : Node("Integer_Constant"), value(val) {
   }
 
-string  IntegerConstantNode::Generate3AC(vector<string>& vector){
+string  IntegerConstantNode::Generate3AC(vector<string>& three_address_code_vec){
+  if(line_number_ != -1) {
+    string source_line = LineStore::GetLine(line_number_);
+    if(source_line != "") {
+      three_address_code_vec.push_back(string(";") + source_line);
+    }
+  }
+  
   string temp, tempReg;
 
   return to_string(value);
@@ -318,15 +375,26 @@ string  IntegerConstantNode::Generate3AC(vector<string>& vector){
 CharConstantNode::CharConstantNode(char val) 
   : Node("Char_Constant"), value(val) {
 }
-string  CharConstantNode::Generate3AC(vector<string>& vector){
-
+string  CharConstantNode::Generate3AC(vector<string>& three_address_code_vec){
+  if(line_number_ != -1) {
+    string source_line = LineStore::GetLine(line_number_);
+    if(source_line != "") {
+      three_address_code_vec.push_back(string(";") + source_line);
+    }
+  }
   return to_string((int)value);
 }
 FloatingConstantNode::FloatingConstantNode(long double val) 
   : Node("Floating_Constant"), value(val) {
   }
 
-string FloatingConstantNode::Generate3AC(vector<string>& vector){
+string FloatingConstantNode::Generate3AC(vector<string>& three_address_code_vec){
+  if(line_number_ != -1) {
+    string source_line = LineStore::GetLine(line_number_);
+    if(source_line != "") {
+      three_address_code_vec.push_back(string(";") + source_line);
+    }
+  }
   string float_register = temp_float_counter_.GenerateTicket();
 
   string three_address_code = "ASSIGN(id), ";
@@ -343,6 +411,13 @@ is_post_check(post_check) {}
 
 IterationNode::IterationNode() : IterationNode(false) {}
 string  IterationNode::Generate3AC(vector<string>& three_address_code_vec){
+  if(line_number_ != -1) {
+    string source_line = LineStore::GetLine(line_number_);
+    if(source_line != "") {
+      three_address_code_vec.push_back(string(";") + source_line);
+    }
+  }
+
   string start_of_loop_label = temp_label_counter_.GenerateTicket();
   string end_label = temp_label_counter_.GenerateTicket();
 
@@ -400,6 +475,12 @@ string  IterationNode::Generate3AC(vector<string>& three_address_code_vec){
 
 SelectionNode::SelectionNode() : Node("Selection") {}
 string  SelectionNode::Generate3AC(vector<string>& three_address_code_vec){
+  if(line_number_ != -1) {
+    string source_line = LineStore::GetLine(line_number_);
+    if(source_line != "") {
+      three_address_code_vec.push_back(string(";") + source_line);
+    }
+  }
 
   string false_label = temp_label_counter_.GenerateTicket();
   string end_label = temp_label_counter_.GenerateTicket();
@@ -438,17 +519,23 @@ FloatToIntNode::FloatToIntNode(Node * node) : Node("FloatToInt") {
 }
 
 string FloatToIntNode::Generate3AC(vector<string>& three_address_code_vec) {
+  if(line_number_ != -1) {
+    string source_line = LineStore::GetLine(line_number_);
+    if(source_line != "") {
+      three_address_code_vec.push_back(string(";") + source_line);
+    }
+  }
 
-string three_address_code = "FLTOINT, ";
-three_address_code += children_[0]->Generate3AC(three_address_code_vec);
-three_address_code += ", ,";
+  string three_address_code = "FLTOINT, ";
+  three_address_code += children_[0]->Generate3AC(three_address_code_vec);
+  three_address_code += ", ,";
 
-string int_register = temp_int_counter_.GenerateTicket();
-three_address_code += int_register;
+  string int_register = temp_int_counter_.GenerateTicket();
+  three_address_code += int_register;
 
-three_address_code_vec.push_back(three_address_code);
+  three_address_code_vec.push_back(three_address_code);
 
-return int_register;
+  return int_register;
 }
 
 IntToFloatNode::IntToFloatNode(Node * node) : Node("IntToFloatNode") {
@@ -456,16 +543,22 @@ IntToFloatNode::IntToFloatNode(Node * node) : Node("IntToFloatNode") {
 }
 
 string IntToFloatNode::Generate3AC(vector<string>& three_address_code_vec) {
+  if(line_number_ != -1) {
+    string source_line = LineStore::GetLine(line_number_);
+    if(source_line != "") {
+      three_address_code_vec.push_back(string(";") + source_line);
+    }
+  }
 
-string three_address_code = "INTTOFLT, ";
-three_address_code += children_[0]->Generate3AC(three_address_code_vec);
-three_address_code += ", ,";
+  string three_address_code = "INTTOFLT, ";
+  three_address_code += children_[0]->Generate3AC(three_address_code_vec);
+  three_address_code += ", ,";
 
-string float_register = temp_float_counter_.GenerateTicket();
-three_address_code += float_register;
+  string float_register = temp_float_counter_.GenerateTicket();
+  three_address_code += float_register;
 
-three_address_code_vec.push_back(three_address_code);
+  three_address_code_vec.push_back(three_address_code);
 
-return float_register;
+  return float_register;
 
 }

@@ -17,6 +17,7 @@
 /* Included Header Files */
 #include  "../src/helpers/CommandLineFlags.h"
 #include  "../src/helpers/Escape_Sequences_Colors.h"
+#include  "../src/helpers/LineStore.h"
 #include  "../src/helpers/TokenReductionsLogger.h"
 #include  "../src/symbol_table/SymbolInfoUtil.h"
 
@@ -165,10 +166,13 @@ translation_unit
     $$.front().node->GenerateGraphviz("Translation_Unit");
     TAC_VECTOR.clear();
     $$.front().node->Generate3AC(TAC_VECTOR);
+    LineStore::ResetChecks();
     for(auto str : TAC_VECTOR) {
+      if(str[0] == ';') cout << endl << COLOR_CYAN_NORMAL;
       cout << str << endl;
+      cout << COLOR_NORMAL;
     }
-
+    cout << endl;
   }
   | translation_unit external_declaration {
     TR_LOGGER.PushReduction(
@@ -178,9 +182,13 @@ translation_unit
     $$.front().node->GenerateGraphviz("Translation_Unit");
     TAC_VECTOR.clear();
     $$.front().node->Generate3AC(TAC_VECTOR);
+    LineStore::ResetChecks();
     for(auto str : TAC_VECTOR) {
+      if(str[0] == ';') cout << endl << COLOR_CYAN_NORMAL;
       cout << str << endl;
+      cout << COLOR_NORMAL;
     }
+    cout << endl;
   }
   ;
 
@@ -274,7 +282,6 @@ function_definition
 
     $$ = $2;
     Node * temp_node = new Node("Function_Definition");
-    temp_node->AddChild(new DeclarationNode(list<SymbolInfo*>({&$$.front()})));
     temp_node->AddChild($1.front().node);
     temp_node->AddChild($2.front().node);
     temp_node->AddChild($3.front().node);
@@ -797,7 +804,9 @@ declarator
 
     // Pass through
     $$ = $1;
-    $$.front().node = new Node("Declarator", $$.front().node);
+    Node * temp = $$.front().node;
+    $$.front().node = new DeclarationNode(list<SymbolInfo*>({&$$.front()}));
+    $$.front().node->AddChild(temp);
 
     INSERT_MODE = false;
 
@@ -2826,6 +2835,8 @@ additive_expression
       temp->AddChild($1.front().node);
       temp->AddChild(new Node("PLUS"));
       temp->AddChild($3.front().node);
+
+      $$.front().node = temp;
   }
   | additive_expression MINUS multiplicative_expression {
     TR_LOGGER.PushReduction(
@@ -2950,6 +2961,8 @@ additive_expression
       temp->AddChild($1.front().node);
       temp->AddChild(new Node("PLUS"));
       temp->AddChild($3.front().node);
+
+      $$.front().node = temp;
   }
   ;
 
@@ -3651,6 +3664,8 @@ int main(int argc, char** argv) {
   if((new ifstream(CL_FLAGS.GetInputFile()))->good()) {
     yyin = fopen(CL_FLAGS.GetInputFile().c_str(), "r");
   }
+
+  Node::LINE = &LINE;
 
   return yyparse(); 
 }
