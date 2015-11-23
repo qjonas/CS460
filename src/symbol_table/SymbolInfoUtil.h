@@ -3,6 +3,7 @@
 
 #include "SymbolTable.h"
 
+int ArrayAccessSizeOf(const SymbolInfo& symbol_info);
 bool IsDataTypeValid(const SymbolInfo& symbol_info);
 bool IsTypeQualifierValid(const SymbolInfo& symbol_info);
 bool IsExpressionValidArraySubscript(const SymbolInfo symbol_info);

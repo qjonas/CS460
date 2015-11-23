@@ -5,15 +5,19 @@
 
 #include <list>
 
-
 #include "../helpers/TicketCounter.h"
+#include "../symbol_table/SymbolInfoUtil.h"
+#include "../symbol_table/SymbolTable.h"
 
 using namespace AST;
 using namespace std;
 
 map<string, int> Node::name_count_;
-map<string, string> Node::identifier_to_temporary_;
+list<map<string, string> > Node::identifier_to_temporary_ 
+    = list<map<string, string> >({map<string, string>()});
 TicketCounter Node::temp_int_counter_("TI");
+TicketCounter Node::temp_float_counter_("TF");
+TicketCounter Node::temp_label_counter_("TL");
 
 Node::Node(const string& name) : name_(name) {
   // Add name to name count.
@@ -68,13 +72,13 @@ void Node::GenerateGraphviz(const string& file_name) const {
   // system("rm AST.dot");
 }
 
-std::string Node::Generate3AC(std::vector<std::string>& vector ){
+string Node::Generate3AC(vector<string>& vector){
   for(auto node : children_){
     if (node != NULL ){
-      Generate3AC(vector);
+      node->Generate3AC(vector);
     }
-    return "";
   }
+  return "";
 }
 void Node::GenerateGraphvizHelper(ofstream& fout) const {
   // Generate a label for each node
@@ -90,12 +94,21 @@ void Node::GenerateGraphvizHelper(ofstream& fout) const {
   }
 }
 
+void Node::PopFrame() {
+  if (identifier_to_temporary_.size() > 1) {
+    identifier_to_temporary_.pop_front();
+  }
+}
+
+void Node::PushFrame() {
+  identifier_to_temporary_.push_front(map<string,string>());
+}
+
 AdditiveNode::AdditiveNode(bool is_add) 
   : Node("Additive_Expression"), is_addition(is_add) {}
 
-std::string AdditiveNode::Generate3AC(std::vector<std::string>& vector){
-  list<Node*>::iterator tempIter;
-  tempIter = children_.begin();
+string AdditiveNode::Generate3AC(vector<string>& vector){
+  auto tempIter = children_.begin();
   string temp, sourceOne, sourceTwo, tempReg;
   if(is_addition){temp = "ADD, ";}
   else{temp = "SUB, ";}
@@ -119,16 +132,19 @@ std::string AdditiveNode::Generate3AC(std::vector<std::string>& vector){
 AssignmentNode::AssignmentNode(AssignmentType type) : Node("Assignment") {
   this->type = type;
 }
-std::string  AssignmentNode::Generate3AC(std::vector<std::string>& vector){
+string AssignmentNode::Generate3AC(vector<string>& three_address_code_vec){
   if(type == EQUALS){
   string temp = "ASSIGN(equals), ";
 
-  //should be variable or temporary from variable declaration
-  temp += name_;
-  temp += ", , ";
-  string tempReg = temp_int_counter_.GenerateTicket();
+  string tempReg = children_[0]->Generate3AC(three_address_code_vec);
   temp += tempReg;
-  vector.push_back(temp);
+
+  //should be variable or temporary from variable declaration
+  temp += ", , ";
+
+  temp += children_[1]->Generate3AC(three_address_code_vec);
+
+  three_address_code_vec.push_back(temp);
   cout << temp << endl;
   return tempReg;
  }
@@ -138,18 +154,45 @@ std::string  AssignmentNode::Generate3AC(std::vector<std::string>& vector){
 
 
 ArrayAccessNode::ArrayAccessNode(SymbolInfo* symbol_info) 
-  : Node("Array_Access"), info(symbol_info) {}
+  : Node("Array_Access") {
+    info = new SymbolInfo(*symbol_info);
+  }
 
-std::string  ArrayAccessNode::Generate3AC(std::vector<std::string>& vector){
+string  ArrayAccessNode::Generate3AC(vector<string>& three_address_code_vec){
 
+  string three_address_code = "MULT, ";
+  three_address_code += to_string(ArrayAccessSizeOf(*info));
+  three_address_code += ", ";
 
+  three_address_code += children_[1]->Generate3AC(three_address_code_vec);
+  three_address_code += ", ";
 
+  string offset_register = temp_int_counter_.GenerateTicket();
+
+  three_address_code += offset_register;
+  three_address_code_vec.push_back(three_address_code);
+  cout << three_address_code << endl;
+
+  three_address_code = string("ADDROFFSET, ");
+
+  three_address_code += children_[0]->Generate3AC(three_address_code_vec);
+  three_address_code += ", ";
+
+  three_address_code += offset_register;
+  three_address_code += ", ";
+
+  string temp_register = temp_int_counter_.GenerateTicket();
+  three_address_code += temp_register;
+
+  cout << three_address_code << endl;
+
+  return temp_register;
 }
 
 DeclarationNode::DeclarationNode(const list<SymbolInfo*>& infos) 
   : Node("Declaration"), Id_infos(infos) {}
 
-std::string DeclarationNode::Generate3AC(std::vector<std::string>& vector){
+string DeclarationNode::Generate3AC(vector<string>& vector){
 
 
 
@@ -157,7 +200,7 @@ std::string DeclarationNode::Generate3AC(std::vector<std::string>& vector){
 
 EqualityNode::EqualityNode(RelationalType t) : Node("EqualityNode"), type(t) {}
 
-std::string  EqualityNode::Generate3AC(std::vector<std::string>& vector){
+string  EqualityNode::Generate3AC(vector<string>& vector){
 
 
 
@@ -166,74 +209,125 @@ std::string  EqualityNode::Generate3AC(std::vector<std::string>& vector){
 
 ExpressNode::ExpressNode() : Node("Expression") {}
 ExpressNode::ExpressNode(Node * child) : Node("Expression", child) {}
-std::string  ExpressNode::Generate3AC(std::vector<std::string>& vector){
-
-
-
+string ExpressNode::Generate3AC(vector<string>& vector){
+  return children_[0]->Generate3AC(vector);
 }
 
 IdentifierNode::IdentifierNode(SymbolInfo* id) 
-  : Node("Identifier"), Id_info(id) {
+  : Node("Identifier") {
+    Id_info = new SymbolInfo(*id);
     AddChild(new Node(id->identifier_name));
   }
-std::string  IdentifierNode::Generate3AC(std::vector<std::string>& vector){
+string  IdentifierNode::Generate3AC(vector<string>& vector){
 
-std::map<std::string, std::string>::iterator tempIter;
-tempIter = identifier_to_temporary_.find(Id_info->identifier_name); 
-if(tempIter == identifier_to_temporary_.end()){
-  std::string tempReg, temp;
+  for(auto frame_map : identifier_to_temporary_) {
+    map<string, string>::iterator tempIter;
+    tempIter = frame_map.find(Id_info->identifier_name);
+    if(tempIter != frame_map.end()) {
+      return tempIter->second;
+    } 
+  }
+
+  string tempReg, temp;
   tempReg = temp_int_counter_.GenerateTicket();
   temp = "ASSIGN(id), ";
   temp += Id_info->identifier_name;
   temp += ", , ";
   temp += tempReg;
-  identifier_to_temporary_[Id_info->identifier_name] = tempReg;
+  identifier_to_temporary_.front()[Id_info->identifier_name] = tempReg;
   vector.push_back(temp);
   cout << temp << endl;
   return tempReg;
-}
-else{
-  return tempIter->second;
-}
 }
 
 IntegerConstantNode::IntegerConstantNode(long long int val) 
   : Node("Integer_Constant"), value(val) {
   }
-std::string  IntegerConstantNode::Generate3AC(std::vector<std::string>& vector){
-  std::string temp, tempReg;
 
+string  IntegerConstantNode::Generate3AC(vector<string>& vector){
+  string temp, tempReg;
+
+  return to_string(value);
 }
 
 CharConstantNode::CharConstantNode(char val) 
   : Node("Char_Constant"), value(val) {
 }
-std::string  CharConstantNode::Generate3AC(std::vector<std::string>& vector){
+string  CharConstantNode::Generate3AC(vector<string>& vector){
 
-
-
+  return to_string((int)value);
 }
 FloatingConstantNode::FloatingConstantNode(long double val) 
   : Node("Floating_Constant"), value(val) {
   }
-std::string FloatingConstantNode::Generate3AC(std::vector<std::string>& vector){
 
+string FloatingConstantNode::Generate3AC(vector<string>& vector){
+  string float_register = temp_float_counter_.GenerateTicket();
 
+  string three_address_code = "ASSIGN(id), ";
+  three_address_code += to_string(value);
 
+  three_address_code += ", , ";
+  three_address_code += float_register;
+
+  return float_register;
 }
 
 IterationNode::IterationNode(bool post_check) : Node("Iteration"),
 is_post_check(post_check) {}
 
 IterationNode::IterationNode() : IterationNode(false) {}
-std::string  IterationNode::Generate3AC(std::vector<std::string>& vector){
+string  IterationNode::Generate3AC(vector<string>& three_address_code_vec){
+  string start_of_loop_label = temp_label_counter_.GenerateTicket();
+  string end_label = temp_label_counter_.GenerateTicket();
 
+  // Generate code for intiializer
+  if(children_[0] != NULL) {
+    children_[0]->Generate3AC(three_address_code_vec);
+  }
 
+  // Generate start of loop label
+  string three_address_code = string("LABEL, ") + start_of_loop_label + ", ,";
+  cout << three_address_code << endl;
+  three_address_code_vec.push_back(three_address_code);
 
+  // Generate code for check
+  if(!is_post_check && children_[1] != NULL) {
+    three_address_code = string("BREQ, 0, ");
+    three_address_code += children_[1]->Generate3AC(three_address_code_vec);
+    three_address_code += ", ";
+    three_address_code += end_label;
+
+    cout << three_address_code << endl;
+
+    three_address_code_vec.push_back(three_address_code);
+  }
+
+  // Generate Statements 3AC
+  if(children_[3] != NULL) {
+    children_[3]->Generate3AC(three_address_code_vec);
+  }
+
+  // Generate Incrementer 3AC
+  if(children_[2] != NULL) {
+    children_[2]->Generate3AC(three_address_code_vec);
+  }
+
+  three_address_code = string("BRANCH, , , ") + start_of_loop_label;
+  cout << three_address_code << endl;
+
+  three_address_code_vec.push_back(three_address_code);
+
+  // Generate end label
+  three_address_code = string("LABEL, ") + end_label + ", ,";
+  cout << three_address_code << endl;
+  three_address_code_vec.push_back(three_address_code);
+
+  return "";
 }
 
 SelectionNode::SelectionNode() : Node("Selection") {}
-std::string  SelectionNode::Generate3AC(std::vector<std::string>& vector){
+string  SelectionNode::Generate3AC(vector<string>& vector){
 
 
 

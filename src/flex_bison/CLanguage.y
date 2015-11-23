@@ -191,6 +191,7 @@ external_declaration
     if(IN_FUNCTION > 0) {
       IN_FUNCTION--;
       S_TABLE.PopFrame();
+      AST::Node::PopFrame();
     }
     // pass through
     $$.front().node = new Node("Declaration", $$.front().node);
@@ -978,6 +979,7 @@ direct_declarator
 open_paren_scope 
   : OPEN_PAREN {
     S_TABLE.PushFrame();
+    AST::Node::PushFrame();
   }
   ;
 
@@ -1356,6 +1358,7 @@ compound_statement
     if(IN_FUNCTION > 0) {
       IN_FUNCTION--;
       S_TABLE.PopFrame();
+      AST::Node::PopFrame();
     }
 
     // Pass through
@@ -1369,6 +1372,7 @@ compound_statement
     if(IN_FUNCTION > 0) {
       IN_FUNCTION--;
       S_TABLE.PopFrame();
+      AST::Node::PopFrame();
     }
 
     // Pass through
@@ -1382,6 +1386,7 @@ compound_statement
     if(IN_FUNCTION > 0) {
       IN_FUNCTION--;
       S_TABLE.PopFrame();
+      AST::Node::PopFrame();
     }
     $$.front().node = new Node("Compound_Statement", $2.front().node);
   }
@@ -1394,6 +1399,7 @@ compound_statement
     if(IN_FUNCTION > 0) {
       IN_FUNCTION--;
       S_TABLE.PopFrame();
+      AST::Node::PopFrame();
     }
 
     $$.front().node = new Node("Compound_Statement", $2.front().node);
@@ -1470,10 +1476,12 @@ iteration_statement
     $$.front().node->AddChild(NULL);
     $$.front().node->AddChild($3.front().node);
     $$.front().node->AddChild(NULL);
-    $$.front().node->AddChild(NULL);
     if($5.size() > 0 && $5.front().node != NULL) {
       $$.front().node->AddChild($5.front().node);
     }
+
+    vector<string> temp_vect;
+    $$.front().node->Generate3AC(temp_vect);
   }
   | DO statement WHILE OPEN_PAREN expression CLOSE_PAREN SEMI {
     // Log reduction
@@ -1492,6 +1500,9 @@ iteration_statement
     if($2.size() > 0 && $2.front().node != NULL) {
       $$.front().node->AddChild($2.front().node);
     }
+
+    vector<string> temp_vect;
+    $$.front().node->Generate3AC(temp_vect);
   }
   | FOR OPEN_PAREN SEMI SEMI CLOSE_PAREN statement {
     // Log reduction
@@ -1507,6 +1518,9 @@ iteration_statement
     if($6.size() > 0 && $6.front().node != NULL) {
       $$.front().node->AddChild($6.front().node);
     }
+
+    vector<string> temp_vect;
+    $$.front().node->Generate3AC(temp_vect);
   }
   | FOR OPEN_PAREN SEMI SEMI expression CLOSE_PAREN statement {
     // Log Reduction
@@ -1525,6 +1539,9 @@ iteration_statement
     if($7.size() > 0 && $7.front().node != NULL) {
       $$.front().node->AddChild($7.front().node);
     }
+    
+    vector<string> temp_vect;
+    $$.front().node->Generate3AC(temp_vect);
   }
   | FOR OPEN_PAREN SEMI expression SEMI CLOSE_PAREN statement {
     // Log Reduction
@@ -1544,6 +1561,9 @@ iteration_statement
     if($7.size() > 0 && $7.front().node != NULL) {
       $$.front().node->AddChild($7.front().node);
     }
+    
+    vector<string> temp_vect;
+    $$.front().node->Generate3AC(temp_vect);
   }
   | FOR OPEN_PAREN SEMI expression SEMI expression CLOSE_PAREN statement {
     // Log Reduction
@@ -1564,6 +1584,9 @@ iteration_statement
     if($8.size() > 0 && $8.front().node != NULL) {
       $$.front().node->AddChild($8.front().node);
     }
+    
+    vector<string> temp_vect;
+    $$.front().node->Generate3AC(temp_vect);
   }
   | FOR OPEN_PAREN expression SEMI SEMI CLOSE_PAREN statement {
     // Log Reduction
@@ -1582,6 +1605,9 @@ iteration_statement
     if($7.size() > 0 && $7.front().node != NULL) {
       $$.front().node->AddChild($7.front().node);
     }
+    
+    vector<string> temp_vect;
+    $$.front().node->Generate3AC(temp_vect);
   }
   | FOR OPEN_PAREN expression SEMI SEMI expression CLOSE_PAREN statement {
     // Log reduction
@@ -1602,6 +1628,9 @@ iteration_statement
     if($8.size() > 0 && $8.front().node != NULL) {
       $$.front().node->AddChild($8.front().node);
     }
+    
+    vector<string> temp_vect;
+    $$.front().node->Generate3AC(temp_vect);
   }
   | FOR OPEN_PAREN expression SEMI expression SEMI CLOSE_PAREN statement {
     // Log reduction.
@@ -1622,6 +1651,9 @@ iteration_statement
     if($8.size() > 0 && $8.front().node != NULL) {
       $$.front().node->AddChild($8.front().node);
     }
+    
+    vector<string> temp_vect;
+    $$.front().node->Generate3AC(temp_vect);
   }
   | FOR OPEN_PAREN expression SEMI expression SEMI expression CLOSE_PAREN statement {
     // Log reduction
@@ -1644,6 +1676,9 @@ iteration_statement
     if($9.size() > 0 && $9.front().node != NULL) {
       $$.front().node->AddChild($9.front().node);
     }
+    
+    vector<string> temp_vect;
+    $$.front().node->Generate3AC(temp_vect);
   }
   ;
 
@@ -1710,6 +1745,7 @@ assignment_expression
     $2.front().node->AddChild($1.front().node);
     $2.front().node->AddChild($3.front().node);
     $$.front().node = $2.front().node;
+
   }
   ;
 
@@ -3265,6 +3301,8 @@ postfix_expression
 
     $$.front().node = temp;
 
+    vector<string> temp_vect;
+    $$.front().node->Generate3AC(temp_vect);
   }
   | postfix_expression OPEN_PAREN CLOSE_PAREN {
     // Log Reduction
@@ -3500,6 +3538,7 @@ identifier
 open_curly
   : OPEN_CURLY {
     S_TABLE.PushFrame();
+    AST::Node::PushFrame();
     INSERT_MODE = false;
     TR_LOGGER.PushReduction("OPEN_CURLY-> open_curly");
   }
@@ -3507,6 +3546,7 @@ open_curly
 close_curly
   : CLOSE_CURLY {
     S_TABLE.PopFrame();
+    AST::Node::PopFrame();
     TR_LOGGER.PushReduction("CLOSE_CURLY -> close_curly");
     INSERT_MODE = true;
   }
@@ -3524,6 +3564,7 @@ int main(int argc, char** argv) {
   if((new ifstream(CL_FLAGS.GetInputFile()))->good()) {
     yyin = fopen(CL_FLAGS.GetInputFile().c_str(), "r");
   }
+
   return yyparse(); 
 }
 

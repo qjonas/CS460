@@ -18,7 +18,7 @@ LIBS	= -L/usr/local/lib -ll
 
 # Main target executable files
 TARGET = ../bin/CLanguage.out ../bin/SymbolTableDriver.out
-TARGET += ../bin/Node_test.out ../bin/TicketCoutner_test.out
+TARGET += ../bin/TicketCoutner_test.out
 
 # CLanguage build objects
 MAINOBJS =  ../bin/CLanguage.tab.o ../bin/lex.yy.o 
@@ -53,7 +53,7 @@ all: $(TARGET)
 ../bin/CommandLineFlags.o: ../src/helpers/CommandLineFlags.cpp
 	$(CC) $(C11) -c $< -o $@
 
-../bin/Globals.o: ../src/flex_bison/Globals.cpp
+../bin/Globals.o: ../src/flex_bison/Globals.cpp ../bin/Node.o
 	$(CC) -c $< -o $@
 
 ../bin/TokenReductionsLogger.o: ../src/helpers/TokenReductionsLogger.cpp
@@ -65,11 +65,11 @@ all: $(TARGET)
 ../bin/SymbolTableDriver.out: ../src/symbol_table/SymbolTableDriver.cpp
 	$(CC) $(C11) $< ../bin/SymbolTable.o -o $@
 
-../bin/Node.o: ../src/abstract_syntax_tree/Node.cpp ../bin/TicketCounter.o
+../bin/Node.o: ../src/abstract_syntax_tree/Node.cpp ../bin/TicketCounter.o ../bin/SymbolInfoUtil.o
 	$(CC) $(C11) -c $< -o $@
 
-../bin/Node_test.out: ../src/abstract_syntax_tree/Node_test.cpp
-	$(CC) $(C11) $< ../bin/Node.o ../bin/TicketCounter.o -o $@
+# ../bin/Node_test.out: ../src/abstract_syntax_tree/Node_test.cpp
+# 	$(CC) $(C11) $< ../bin/Node.o ../bin/TicketCounter.o ../bin/SymbolInfoUtil.o -o $@
 
 ../bin/TicketCounter.o: ../src/helpers/TicketCounter.cpp
 	$(CC) $(C11) -c $< -o $@

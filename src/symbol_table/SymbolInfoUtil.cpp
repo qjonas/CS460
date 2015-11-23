@@ -15,6 +15,72 @@
 using namespace std;
 using namespace SymbolTypes;
 
+int ArrayAccessSizeOf(const SymbolInfo& symbol_info) {
+  static map<list<SymbolType>, int> data_type_sizes;
+  bool valid_data_types_initialized;
+
+  // Initialize the set with valid data types.
+  if(!valid_data_types_initialized) {
+    // Char data types
+    data_type_sizes[list<SymbolType>({CHAR})] = 1;
+    data_type_sizes[list<SymbolType>({SIGNED, CHAR})] = 1;
+    data_type_sizes[list<SymbolType>({UNSIGNED, CHAR})] = 1;
+    
+    // Short data types
+    data_type_sizes[list<SymbolType>({SHORT})] = 4;
+    data_type_sizes[list<SymbolType>({SHORT, INT})] = 4;
+    data_type_sizes[list<SymbolType>({SIGNED, SHORT})] = 4;
+    data_type_sizes[list<SymbolType>({SIGNED, SHORT, INT})] = 4;
+    data_type_sizes[list<SymbolType>({UNSIGNED, SHORT})] = 4;
+    data_type_sizes[list<SymbolType>({UNSIGNED, SHORT, INT})] = 4;
+
+    // Regular int data types
+    data_type_sizes[list<SymbolType>({INT})] = 4;
+    data_type_sizes[list<SymbolType>({SIGNED})] = 4;
+    data_type_sizes[list<SymbolType>({SIGNED, INT})] = 4;
+    data_type_sizes[list<SymbolType>({UNSIGNED})] = 4;
+    data_type_sizes[list<SymbolType>({UNSIGNED, INT})] = 4;
+
+    // Long data Types
+    data_type_sizes[list<SymbolType>({LONG})] = 8;
+    data_type_sizes[list<SymbolType>({LONG, INT})] = 8;
+    data_type_sizes[list<SymbolType>({SIGNED, LONG})] = 8;
+    data_type_sizes[list<SymbolType>({SIGNED, LONG, INT})] = 8;
+    data_type_sizes[list<SymbolType>({UNSIGNED, LONG})] = 8;
+    data_type_sizes[list<SymbolType>({UNSIGNED, LONG, INT})] = 8;
+
+    // Long Long data Types
+    data_type_sizes[list<SymbolType>({LONG, LONG})] = 8;
+    data_type_sizes[list<SymbolType>({LONG, LONG, INT})] = 8;
+    data_type_sizes[list<SymbolType>({SIGNED, LONG, LONG})] = 8;
+    data_type_sizes[list<SymbolType>({SIGNED, LONG, LONG, INT})] = 8;
+    data_type_sizes[list<SymbolType>({UNSIGNED, LONG, LONG})] = 8;
+    data_type_sizes[list<SymbolType>({UNSIGNED, LONG, LONG, INT})] = 8;
+
+    // Floating point data types
+    data_type_sizes[list<SymbolType>({FLOAT})] = 4;
+    data_type_sizes[list<SymbolType>({DOUBLE})] = 8;
+    data_type_sizes[list<SymbolType>({LONG, DOUBLE})] = 10;
+
+    valid_data_types_initialized = true;
+  }
+
+  int size = data_type_sizes[symbol_info.type_specifier_list];
+
+  vector<int> arrays;
+  for(auto i : symbol_info.array_sizes) {
+    if (i > 0) {
+      arrays.push_back(i);
+    }
+  }
+
+  for(auto i : arrays) {
+    size *= i;
+  }
+
+  return size;
+}
+
 bool IsDataTypeValid(const SymbolInfo& symbol_info){
   // Declare set to check if type exists for types.
   static set<list<SymbolType>> valid_data_types;

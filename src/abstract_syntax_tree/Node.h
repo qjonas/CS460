@@ -11,6 +11,8 @@
 
 #include "../helpers/TicketCounter.h"
 
+struct SymbolTable;
+
 namespace AST {
 class Node {
 public:
@@ -29,14 +31,20 @@ public:
   void GenerateGraphviz(const std::string& file_name) const;
   void GenerateGraphvizHelper(std::ofstream& fout) const;
 
+  // SymbolTable setter
+  static void SetSymbolTable(SymbolTable* table);
+  static void PushFrame();
+  static void PopFrame();
+
 protected:
   static std::map<std::string, int> name_count_;
-  static std::map<std::string, std::string> identifier_to_temporary_;
+  static std::list<std::map<std::string, std::string> > identifier_to_temporary_;
   static TicketCounter temp_int_counter_;
   static TicketCounter temp_float_counter_;
+  static TicketCounter temp_label_counter_;
   std::string name_;
   std::string id_;
-  std::list<Node*> children_;
+  std::vector<Node*> children_;
 
 };
 }
@@ -77,7 +85,7 @@ public:
 
 private:
   // this will hold information about the symbol so we can calculate offset.
-  SymbolInfo* info;
+  SymbolInfo *info;
 };
 
 class DeclarationNode : public Node {
