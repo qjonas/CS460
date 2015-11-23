@@ -94,12 +94,16 @@ AdditiveNode::AdditiveNode(bool is_add)
   : Node("Additive_Expression"), is_addition(is_add) {}
 
 std::string AdditiveNode::Generate3AC(std::vector<std::string>& vector){
-  std::list<Node*>::iterator tempIter;
+  list<Node*>::iterator tempIter;
   tempIter = children_.begin();
-  std:string temp, sourceOne, sourceTwo, tempReg;;
-  sourceOne = (children_.front())->Generate3AC(vector); // segfault this ine
+  string temp, sourceOne, sourceTwo, tempReg;
+  if(is_addition){temp = "ADD, ";}
+  else{temp = "SUB, ";}
+  sourceOne = "stub1";//(children_.front())->Generate3AC(vector); // segfault this ine
   tempIter++;
-  sourceTwo = (*tempIter)->Generate3AC(vector);
+  //skip plus node
+  tempIter++;
+  sourceTwo = "stub2";//(*tempIter)->Generate3AC(vector);
   temp += sourceOne;
   temp += ", ";
   temp += sourceTwo;
@@ -116,11 +120,18 @@ AssignmentNode::AssignmentNode(AssignmentType type) : Node("Assignment") {
   this->type = type;
 }
 std::string  AssignmentNode::Generate3AC(std::vector<std::string>& vector){
-string temp = "ASSIGN, ";
+  if(type == EQUALS){
+  string temp = "ASSIGN, ";
 
-  temp += temp_int_counter_.GenerateTicket();
-  temp += ", ";
-
+  //should be variable or temporary from variable
+  temp += name_;
+  temp += ", , ";
+  string tempReg = temp_int_counter_.GenerateTicket();
+  temp += tempReg;
+  vector.push_back(temp);
+  cout << temp << endl;
+  return tempReg;
+ }
 
 
 }

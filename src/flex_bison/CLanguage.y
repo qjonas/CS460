@@ -162,7 +162,7 @@ translation_unit
     Node * temp = new Node("Translation_Unit", $$.front().node);
     $$ = $1;
     $$.front().node = temp;
-    $$.front().node->GenerateGraphviz("Translation_Unit");
+    //$$.front().node->GenerateGraphviz("Translation_Unit");
 
   }
   | translation_unit external_declaration {
@@ -170,7 +170,7 @@ translation_unit
       "translation_unit external_declaration -> translation_unit");
     $$ = $1;
     $$.front().node->AddChild($2.front().node);
-    $$.front().node->GenerateGraphviz("Translation_Unit");
+    //$$.front().node->GenerateGraphviz("Translation_Unit");
   }
   ;
 
@@ -1720,6 +1720,8 @@ assignment_operator
     $$ = list<SymbolInfo>({SymbolInfo()});
     $$.front().node = new 
         AssignmentNode(AssignmentNode::AssignmentType::EQUALS);
+    //$$.front().node->Generate3AC(ThreeACvector);
+
   }
   | MUL_ASSIGN {
     // Log reduction
@@ -2698,13 +2700,13 @@ additive_expression
 
       bool is_addition = true;
       Node * temp = new AdditiveNode(is_addition);
-      temp->Generate3AC(ThreeACvector);
       temp->AddChild($1.front().node);
       temp->AddChild(new Node("PLUS"));
       temp->AddChild($3.front().node);
 
+
       $$.front().node = temp;
-      //$$.front().node->Generate3AC(ThreeACvector);
+      $$.front().node->Generate3AC(ThreeACvector);
   }
   | additive_expression MINUS multiplicative_expression {
     TR_LOGGER.PushReduction(
@@ -2816,7 +2818,9 @@ additive_expression
       temp->AddChild(new Node("PLUS"));
       temp->AddChild($3.front().node);
 
+
       $$.front().node = temp;
+      $$.front().node->Generate3AC(ThreeACvector);
   }
   ;
 
