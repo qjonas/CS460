@@ -177,24 +177,31 @@ IdentifierNode::IdentifierNode(SymbolInfo* id)
     AddChild(new Node(id->identifier_name));
   }
 std::string  IdentifierNode::Generate3AC(std::vector<std::string>& vector){
-std::string tempReg, temp;
 
-temp = "ASSIGN(id), ";
-temp += Id_info->identifier_name;
-temp += ", , ";
-tempReg = temp_int_counter_.GenerateTicket();
-temp += tempReg;
-vector.push_back(temp);
- cout << temp << endl;
-return tempReg;
+std::map<std::string, std::string>::iterator tempIter;
+tempIter = identifier_to_temporary_.find(Id_info->identifier_name); 
+if(tempIter == identifier_to_temporary_.end()){
+  std::string tempReg, temp;
+  tempReg = temp_int_counter_.GenerateTicket();
+  temp = "ASSIGN(id), ";
+  temp += Id_info->identifier_name;
+  temp += ", , ";
+  temp += tempReg;
+  identifier_to_temporary_[Id_info->identifier_name] = tempReg;
+  vector.push_back(temp);
+  cout << temp << endl;
+  return tempReg;
+}
+else{
+  return tempIter->second;
+}
 }
 
 IntegerConstantNode::IntegerConstantNode(long long int val) 
   : Node("Integer_Constant"), value(val) {
   }
 std::string  IntegerConstantNode::Generate3AC(std::vector<std::string>& vector){
-
-
+  std::string temp, tempReg;
 
 }
 
