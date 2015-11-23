@@ -99,11 +99,11 @@ std::string AdditiveNode::Generate3AC(std::vector<std::string>& vector){
   string temp, sourceOne, sourceTwo, tempReg;
   if(is_addition){temp = "ADD, ";}
   else{temp = "SUB, ";}
-  sourceOne = "stub1";//(children_.front())->Generate3AC(vector); // segfault this ine
+  sourceOne = (children_.front())->Generate3AC(vector); // segfault this ine
   tempIter++;
   //skip plus node
   tempIter++;
-  sourceTwo = "stub2";//(*tempIter)->Generate3AC(vector);
+  sourceTwo = (*tempIter)->Generate3AC(vector);
   temp += sourceOne;
   temp += ", ";
   temp += sourceTwo;
@@ -121,9 +121,9 @@ AssignmentNode::AssignmentNode(AssignmentType type) : Node("Assignment") {
 }
 std::string  AssignmentNode::Generate3AC(std::vector<std::string>& vector){
   if(type == EQUALS){
-  string temp = "ASSIGN, ";
+  string temp = "ASSIGN(equals), ";
 
-  //should be variable or temporary from variable
+  //should be variable or temporary from variable declaration
   temp += name_;
   temp += ", , ";
   string tempReg = temp_int_counter_.GenerateTicket();
@@ -177,9 +177,16 @@ IdentifierNode::IdentifierNode(SymbolInfo* id)
     AddChild(new Node(id->identifier_name));
   }
 std::string  IdentifierNode::Generate3AC(std::vector<std::string>& vector){
+std::string tempReg, temp;
 
-
-
+temp = "ASSIGN(id), ";
+temp += Id_info->identifier_name;
+temp += ", , ";
+tempReg = temp_int_counter_.GenerateTicket();
+temp += tempReg;
+vector.push_back(temp);
+ cout << temp << endl;
+return tempReg;
 }
 
 IntegerConstantNode::IntegerConstantNode(long long int val) 

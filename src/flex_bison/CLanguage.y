@@ -162,7 +162,8 @@ translation_unit
     Node * temp = new Node("Translation_Unit", $$.front().node);
     $$ = $1;
     $$.front().node = temp;
-    //$$.front().node->GenerateGraphviz("Translation_Unit");
+    $$.front().node->GenerateGraphviz("Translation_Unit");
+    //$$.front().node->Generate3AC(ThreeACvector);
 
   }
   | translation_unit external_declaration {
@@ -170,7 +171,8 @@ translation_unit
       "translation_unit external_declaration -> translation_unit");
     $$ = $1;
     $$.front().node->AddChild($2.front().node);
-    //$$.front().node->GenerateGraphviz("Translation_Unit");
+    $$.front().node->GenerateGraphviz("Translation_Unit");
+    //$$.front().node->Generate3AC(ThreeACvector);
   }
   ;
 
@@ -3490,6 +3492,8 @@ identifier
         new IdentifierNode(S_TABLE.GetMostRecentSymbolInfo(
           $$.front().identifier_name));
     TR_LOGGER.PushReduction("IDENTIFIER -> identifier");
+    $$.front().node->Generate3AC(ThreeACvector);
+
   }
   ;
 
