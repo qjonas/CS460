@@ -200,10 +200,42 @@ string DeclarationNode::Generate3AC(vector<string>& vector){
 
 EqualityNode::EqualityNode(RelationalType t) : Node("EqualityNode"), type(t) {}
 
-string  EqualityNode::Generate3AC(vector<string>& vector){
+string  EqualityNode::Generate3AC(vector<string>& three_address_code_vec){
 
+  string three_address_code;
+  switch(type) {
+    case RelationalType::EQ:
+    three_address_code += "EQ, ";
+    break;
+    case RelationalType::NE:
+    three_address_code += "NEQ, ";
+    break;
+    case RelationalType::LESS:
+    three_address_code += "LESS, ";
+    break;
+    case RelationalType::GREATER:
+    three_address_code += "GREATER, ";
+    break;
+    case RelationalType::LE:
+    three_address_code += "LE, ";
+    break;
+    case RelationalType::GE:
+    three_address_code += "GE, ";
+    break;
+  }
 
+  three_address_code += children_[0]->Generate3AC(three_address_code_vec);
+  three_address_code += ", ";
 
+  three_address_code += children_[2]->Generate3AC(three_address_code_vec);
+  three_address_code += ", ";
+
+  string temp_register = temp_int_counter_.GenerateTicket();
+  three_address_code += temp_register;
+
+  cout << three_address_code << endl;
+
+  return temp_register;
 }
 
 
@@ -327,10 +359,42 @@ string  IterationNode::Generate3AC(vector<string>& three_address_code_vec){
 }
 
 SelectionNode::SelectionNode() : Node("Selection") {}
-string  SelectionNode::Generate3AC(vector<string>& vector){
+string  SelectionNode::Generate3AC(vector<string>& three_address_code_vec){
 
+  string false_label = temp_label_counter_.GenerateTicket();
+  string end_label = temp_label_counter_.GenerateTicket();
 
+  // Branch if the expression is equal to 0;
+  string three_address_code = "BREQ, 0, ";
+  three_address_code += children_[0]->Generate3AC(three_address_code_vec);
+  three_address_code += ", ";
+  three_address_code += false_label;
 
+  cout << three_address_code << endl;
+  three_address_code_vec.push_back(three_address_code);
+
+  if(children_.size() > 1) {
+    children_[1]->Generate3AC(three_address_code_vec);
+    three_address_code = string("BRANCH, , , ") + end_label;
+    cout << three_address_code << endl;
+    three_address_code_vec.push_back(three_address_code);
+  }
+
+  // Generate false label
+  three_address_code = string("LABEL, ") + false_label + ", ,";
+  cout << three_address_code << endl;
+  three_address_code_vec.push_back(three_address_code);
+
+  if(children_.size() > 2) {
+    children_[2]->Generate3AC(three_address_code_vec);
+  }
+
+  // Generate false label
+  three_address_code = string("LABEL, ") + end_label + ", ,";
+  cout << three_address_code << endl;
+  three_address_code_vec.push_back(three_address_code);
+
+  return "";
 }
 
 
