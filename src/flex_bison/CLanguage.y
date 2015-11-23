@@ -40,7 +40,7 @@ extern bool IN_SWITCH;
 extern int LINE;
 extern int COLUMN;
 extern int IN_FUNCTION;
-extern vector<string> ThreeACvector;
+extern vector<string> TAC_VECTOR;
 
 /* Functions from Flex */
 extern int yylex();
@@ -163,7 +163,11 @@ translation_unit
     $$ = $1;
     $$.front().node = temp;
     $$.front().node->GenerateGraphviz("Translation_Unit");
-    //$$.front().node->Generate3AC(ThreeACvector);
+    TAC_VECTOR.clear();
+    $$.front().node->Generate3AC(TAC_VECTOR);
+    for(auto str : TAC_VECTOR) {
+      cout << str << endl;
+    }
 
   }
   | translation_unit external_declaration {
@@ -172,7 +176,11 @@ translation_unit
     $$ = $1;
     $$.front().node->AddChild($2.front().node);
     $$.front().node->GenerateGraphviz("Translation_Unit");
-    //$$.front().node->Generate3AC(ThreeACvector);
+    TAC_VECTOR.clear();
+    $$.front().node->Generate3AC(TAC_VECTOR);
+    for(auto str : TAC_VECTOR) {
+      cout << str << endl;
+    }
   }
   ;
 
@@ -191,7 +199,7 @@ external_declaration
     if(IN_FUNCTION > 0) {
       IN_FUNCTION--;
       S_TABLE.PopFrame();
-      AST::Node::PopFrame();
+      
     }
     // pass through
     $$.front().node = new Node("Declaration", $$.front().node);
@@ -266,6 +274,7 @@ function_definition
 
     $$ = $2;
     Node * temp_node = new Node("Function_Definition");
+    temp_node->AddChild(new DeclarationNode(list<SymbolInfo*>({&$$.front()})));
     temp_node->AddChild($1.front().node);
     temp_node->AddChild($2.front().node);
     temp_node->AddChild($3.front().node);
@@ -335,6 +344,10 @@ declaration
     $$.front().node = new DeclarationNode(*symbols_list);
     $$.front().node->AddChild($1.front().node);
     $$.front().node->AddChild($2.front().node);
+
+    if(IsFloating($$.front())) {
+      $$.front().node->SetFloating();
+    }
   }
   ;
 
@@ -979,7 +992,7 @@ direct_declarator
 open_paren_scope 
   : OPEN_PAREN {
     S_TABLE.PushFrame();
-    AST::Node::PushFrame();
+    
   }
   ;
 
@@ -1358,7 +1371,7 @@ compound_statement
     if(IN_FUNCTION > 0) {
       IN_FUNCTION--;
       S_TABLE.PopFrame();
-      AST::Node::PopFrame();
+      
     }
 
     // Pass through
@@ -1372,7 +1385,7 @@ compound_statement
     if(IN_FUNCTION > 0) {
       IN_FUNCTION--;
       S_TABLE.PopFrame();
-      AST::Node::PopFrame();
+      
     }
 
     // Pass through
@@ -1386,7 +1399,7 @@ compound_statement
     if(IN_FUNCTION > 0) {
       IN_FUNCTION--;
       S_TABLE.PopFrame();
-      AST::Node::PopFrame();
+      
     }
     $$.front().node = new Node("Compound_Statement", $2.front().node);
   }
@@ -1399,7 +1412,7 @@ compound_statement
     if(IN_FUNCTION > 0) {
       IN_FUNCTION--;
       S_TABLE.PopFrame();
-      AST::Node::PopFrame();
+      
     }
 
     $$.front().node = new Node("Compound_Statement", $2.front().node);
@@ -1439,10 +1452,6 @@ selection_statement
     if($5.size() > 0 && $5.front().node != NULL) {
       $$.front().node->AddChild($5.front().node);
     }
-
-
-    vector<string> temp_vect;
-    $$.front().node->Generate3AC(temp_vect);
   }
   | IF OPEN_PAREN expression CLOSE_PAREN statement ELSE statement {
     TR_LOGGER.PushReduction(
@@ -1459,10 +1468,6 @@ selection_statement
     if($7.size() > 0 && $7.front().node != NULL ) {
       $$.front().node->AddChild($7.front().node);
     } 
-
-    
-    vector<string> temp_vect;
-    $$.front().node->Generate3AC(temp_vect);
   }
   | SWITCH OPEN_PAREN expression CLOSE_PAREN statement  {
     TR_LOGGER.PushReduction(
@@ -1499,8 +1504,8 @@ iteration_statement
     $$ = list<SymbolInfo>({SymbolInfo()});
     bool is_post_check(true);
     $$.front().node = new IterationNode(is_post_check);
-    $$.front().node->AddChild($5.front().node);
     $$.front().node->AddChild(NULL);
+    $$.front().node->AddChild($5.front().node);
     $$.front().node->AddChild(NULL);
     $$.front().node->AddChild(NULL);
     if($2.size() > 0 && $2.front().node != NULL) {
@@ -1719,6 +1724,21 @@ assignment_expression
       "-> assignment_expression");
 
     // TODO: TypeCheck
+    if(!(IsPointer($1.front()) && IsPointer($3.front())) && 
+       !(IsNumber($1.front()) && IsNumber($3.front()))) {
+      TR_LOGGER.Error("Invalid type assignment.", LINE, COLUMN);
+    }
+
+    if (IsNumber($1.front()) && IsNumber($3.front())) {
+      if(IsFloating($1.front()) && IsInteger($3.front())) {
+        $3.front().node = new IntToFloatNode($3.front().node);
+      }
+      if(IsInteger($1.front()) && IsFloating($3.front())) {
+        $3.front().node = new FloatToIntNode($3.front().node);
+        TR_LOGGER.Warning("Down Conversion Occurring!", LINE, COLUMN);
+      }
+    }
+
     // Copy value
     $1.front().data_value.unsigned_long_long_val = $3.front().data_value.unsigned_long_long_val;
     $1.front().data_is_valid = true;
@@ -1746,7 +1766,6 @@ assignment_operator
     $$ = list<SymbolInfo>({SymbolInfo()});
     $$.front().node = new 
         AssignmentNode(AssignmentNode::AssignmentType::EQUALS);
-    //$$.front().node->Generate3AC(ThreeACvector);
 
   }
   | MUL_ASSIGN {
@@ -2153,6 +2172,19 @@ equality_expression
       $1.front().data_is_valid = false;
     }
 
+    if(IsFloating($1.front()) || IsFloating($3.front())) {
+        if(IsInteger($1.front())) {
+          $1.front().node = new IntToFloatNode($1.front().node);
+          $1.front().type_specifier_list 
+            = std::list<SymbolTypes::SymbolType>({SymbolTypes::SymbolType::FLOAT});
+        }
+        if(IsInteger($3.front())) {
+          $3.front().node = new IntToFloatNode($3.front().node);
+          $3.front().type_specifier_list 
+            = std::list<SymbolTypes::SymbolType>({SymbolTypes::SymbolType::FLOAT});
+        }
+      }
+
     $1.front().type_specifier_list 
       = list<SymbolTypes::SymbolType>({SymbolTypes::INT});
 
@@ -2225,6 +2257,19 @@ equality_expression
     } else {
       $1.front().data_is_valid = false;
     }
+
+    if(IsFloating($1.front()) || IsFloating($3.front())) {
+        if(IsInteger($1.front())) {
+          $1.front().node = new IntToFloatNode($1.front().node);
+          $1.front().type_specifier_list 
+            = std::list<SymbolTypes::SymbolType>({SymbolTypes::SymbolType::FLOAT});
+        }
+        if(IsInteger($3.front())) {
+          $3.front().node = new IntToFloatNode($3.front().node);
+          $3.front().type_specifier_list 
+            = std::list<SymbolTypes::SymbolType>({SymbolTypes::SymbolType::FLOAT});
+        }
+      }
 
     $1.front().type_specifier_list 
       = list<SymbolTypes::SymbolType>({SymbolTypes::INT});
@@ -2308,6 +2353,19 @@ relational_expression
       $1.front().data_is_valid = false;
     }
 
+    if(IsFloating($1.front()) || IsFloating($3.front())) {
+        if(IsInteger($1.front())) {
+          $1.front().node = new IntToFloatNode($1.front().node);
+          $1.front().type_specifier_list 
+            = std::list<SymbolTypes::SymbolType>({SymbolTypes::SymbolType::FLOAT});
+        }
+        if(IsInteger($3.front())) {
+          $3.front().node = new IntToFloatNode($3.front().node);
+          $3.front().type_specifier_list 
+            = std::list<SymbolTypes::SymbolType>({SymbolTypes::SymbolType::FLOAT});
+        }
+      }
+
     $1.front().type_specifier_list 
       = list<SymbolTypes::SymbolType>({SymbolTypes::INT});
 
@@ -2382,6 +2440,19 @@ relational_expression
     } else {
       $1.front().data_is_valid = false;
     }
+
+    if(IsFloating($1.front()) || IsFloating($3.front())) {
+        if(IsInteger($1.front())) {
+          $1.front().node = new IntToFloatNode($1.front().node);
+          $1.front().type_specifier_list 
+            = std::list<SymbolTypes::SymbolType>({SymbolTypes::SymbolType::FLOAT});
+        }
+        if(IsInteger($3.front())) {
+          $3.front().node = new IntToFloatNode($3.front().node);
+          $3.front().type_specifier_list 
+            = std::list<SymbolTypes::SymbolType>({SymbolTypes::SymbolType::FLOAT});
+        }
+      }
 
     $1.front().type_specifier_list 
       = list<SymbolTypes::SymbolType>({SymbolTypes::INT});
@@ -2528,6 +2599,19 @@ relational_expression
       $1.front().data_is_valid = false;
     }
 
+    if(IsFloating($1.front()) || IsFloating($3.front())) {
+        if(IsInteger($1.front())) {
+          $1.front().node = new IntToFloatNode($1.front().node);
+          $1.front().type_specifier_list 
+            = std::list<SymbolTypes::SymbolType>({SymbolTypes::SymbolType::FLOAT});
+        }
+        if(IsInteger($3.front())) {
+          $3.front().node = new IntToFloatNode($3.front().node);
+          $3.front().type_specifier_list 
+            = std::list<SymbolTypes::SymbolType>({SymbolTypes::SymbolType::FLOAT});
+        }
+      }
+
     $1.front().type_specifier_list 
       = list<SymbolTypes::SymbolType>({SymbolTypes::INT});
 
@@ -2623,7 +2707,7 @@ additive_expression
     TR_LOGGER.PushReduction(
       "additive_expression PLUS multiplicative_expression "
       "-> additive_expression");
-  //long Double maxValue(SymbolInfo)
+    //long Double maxValue(SymbolInfo)
     if(!IsNumber($1.front()) || !IsNumber($3.front())){
       TR_LOGGER.Error("Cannot add minus something not of NUMBER type.",
                       LINE, COLUMN);  
@@ -2724,15 +2808,24 @@ additive_expression
         $$.front().type_specifier_list = $3.front().type_specifier_list;
       }
 
+      if(IsFloating($1.front()) || IsFloating($3.front())) {
+        if(IsInteger($1.front())) {
+          $1.front().node = new IntToFloatNode($1.front().node);
+          $1.front().type_specifier_list 
+            = std::list<SymbolTypes::SymbolType>({SymbolTypes::SymbolType::FLOAT});
+        }
+        if(IsInteger($3.front())) {
+          $3.front().node = new IntToFloatNode($3.front().node);
+          $3.front().type_specifier_list 
+            = std::list<SymbolTypes::SymbolType>({SymbolTypes::SymbolType::FLOAT});
+        }
+      }
+
       bool is_addition = true;
       Node * temp = new AdditiveNode(is_addition);
       temp->AddChild($1.front().node);
       temp->AddChild(new Node("PLUS"));
       temp->AddChild($3.front().node);
-
-
-      $$.front().node = temp;
-      $$.front().node->Generate3AC(ThreeACvector);
   }
   | additive_expression MINUS multiplicative_expression {
     TR_LOGGER.PushReduction(
@@ -2838,15 +2931,25 @@ additive_expression
         }
         $$.front().type_specifier_list = $3.front().type_specifier_list;
       }
+
+      if(IsFloating($1.front()) || IsFloating($3.front())) {
+        if(IsInteger($1.front())) {
+          $1.front().node = new IntToFloatNode($1.front().node);
+          $1.front().type_specifier_list 
+            = std::list<SymbolTypes::SymbolType>({SymbolTypes::SymbolType::FLOAT});
+        }
+        if(IsInteger($3.front())) {
+          $3.front().node = new IntToFloatNode($3.front().node);
+          $3.front().type_specifier_list 
+            = std::list<SymbolTypes::SymbolType>({SymbolTypes::SymbolType::FLOAT});
+        }
+      }
+
       bool is_addition = false;
       Node * temp = new AdditiveNode(is_addition);
       temp->AddChild($1.front().node);
       temp->AddChild(new Node("PLUS"));
       temp->AddChild($3.front().node);
-
-
-      $$.front().node = temp;
-      $$.front().node->Generate3AC(ThreeACvector);
   }
   ;
 
@@ -3516,15 +3619,13 @@ identifier
         new IdentifierNode(S_TABLE.GetMostRecentSymbolInfo(
           $$.front().identifier_name));
     TR_LOGGER.PushReduction("IDENTIFIER -> identifier");
-    $$.front().node->Generate3AC(ThreeACvector);
-
   }
   ;
 
 open_curly
   : OPEN_CURLY {
     S_TABLE.PushFrame();
-    AST::Node::PushFrame();
+    
     INSERT_MODE = false;
     TR_LOGGER.PushReduction("OPEN_CURLY-> open_curly");
   }
@@ -3532,7 +3633,7 @@ open_curly
 close_curly
   : CLOSE_CURLY {
     S_TABLE.PopFrame();
-    AST::Node::PopFrame();
+    
     TR_LOGGER.PushReduction("CLOSE_CURLY -> close_curly");
     INSERT_MODE = true;
   }

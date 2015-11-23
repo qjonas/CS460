@@ -104,31 +104,30 @@ void Node::PushFrame() {
   identifier_to_temporary_.push_front(map<string,string>());
 }
 
+void Node::SetFloating() {
+  for(auto node : children_) {
+    if (node != NULL) node->SetFloating();
+  }
+}
+
+
 AdditiveNode::AdditiveNode(bool is_add) 
   : Node("Additive_Expression"), is_addition(is_add) {}
 
-string AdditiveNode::Generate3AC(vector<string>& vector){
-  auto tempIter = children_.begin();
-  string temp, sourceOne, sourceTwo, tempReg;
-  if(is_addition){temp = "ADD, ";}
-  else{temp = "SUB, ";}
-  sourceOne = (children_.front())->Generate3AC(vector); // segfault this ine
-  tempIter++;
-  //skip plus node
-  tempIter++;
-  sourceTwo = (*tempIter)->Generate3AC(vector);
-  temp += sourceOne;
-  temp += ", ";
-  temp += sourceTwo;
-  temp += ", ";
-  tempReg = temp_int_counter_.GenerateTicket();
-  temp += tempReg;
-  vector.push_back(temp);
-  cout << temp << endl;
-  return tempReg;
+string AdditiveNode::Generate3AC(vector<string>& three_address_code_vec){
+  string three_address_code = is_addition ? "ADD, " : "SUB, ";
+  string sourceOne = children_[0]->Generate3AC(three_address_code_vec);
+  string sourceTwo = children_[2]->Generate3AC(three_address_code_vec);
+  string dest = (sourceOne[1] == 'F' || sourceTwo[1] == 'F') 
+                    ? temp_float_counter_.GenerateTicket()
+                    : temp_int_counter_.GenerateTicket();
 
+  three_address_code += sourceOne + ", " + sourceTwo + ", " + dest;
+  three_address_code_vec.push_back(three_address_code);
 
+  return dest;
 }
+
 AssignmentNode::AssignmentNode(AssignmentType type) : Node("Assignment") {
   this->type = type;
 }
@@ -145,11 +144,10 @@ string AssignmentNode::Generate3AC(vector<string>& three_address_code_vec){
   temp += children_[1]->Generate3AC(three_address_code_vec);
 
   three_address_code_vec.push_back(temp);
-  cout << temp << endl;
   return tempReg;
  }
 
-
+ return "";
 }
 
 
@@ -171,7 +169,6 @@ string  ArrayAccessNode::Generate3AC(vector<string>& three_address_code_vec){
 
   three_address_code += offset_register;
   three_address_code_vec.push_back(three_address_code);
-  cout << three_address_code << endl;
 
   three_address_code = string("ADDROFFSET, ");
 
@@ -184,18 +181,48 @@ string  ArrayAccessNode::Generate3AC(vector<string>& three_address_code_vec){
   string temp_register = temp_int_counter_.GenerateTicket();
   three_address_code += temp_register;
 
-  cout << three_address_code << endl;
+  three_address_code_vec.push_back(three_address_code);
 
   return temp_register;
 }
 
+
+
+CompoundStatementNode::CompoundStatementNode() 
+  : Node("ComoundStatmentNode") {}
+
+string CompoundStatementNode::Generate3AC(vector<string>& three_address_code_vec){
+  Node::PushFrame();
+  for(auto node : children_){
+    if (node != NULL ){
+      node->Generate3AC(three_address_code_vec);
+    }
+  }
+  Node::PopFrame();
+  return "";
+}
+
 DeclarationNode::DeclarationNode(const list<SymbolInfo*>& infos) 
-  : Node("Declaration"), Id_infos(infos) {}
+  : Node("Declaration") {
+    for(auto info : infos) {
+      Id_infos.push_back(new SymbolInfo(*info));
+    }
+  }
 
-string DeclarationNode::Generate3AC(vector<string>& vector){
-
-
-
+string DeclarationNode::Generate3AC(vector<string>& three_address_code_vec){
+  for(auto info : Id_infos) {
+    string tempReg, temp;
+    tempReg = IsFloating(*info) 
+                ? temp_float_counter_.GenerateTicket() 
+                : temp_int_counter_.GenerateTicket();
+    temp = "ASSIGN(id), ";
+    temp += info->identifier_name;
+    temp += ", , ";
+    temp += tempReg;
+    identifier_to_temporary_.front()[info->identifier_name] = tempReg;
+    three_address_code_vec.push_back(temp);
+  }
+  return "";
 }
 
 EqualityNode::EqualityNode(RelationalType t) : Node("EqualityNode"), type(t) {}
@@ -233,7 +260,7 @@ string  EqualityNode::Generate3AC(vector<string>& three_address_code_vec){
   string temp_register = temp_int_counter_.GenerateTicket();
   three_address_code += temp_register;
 
-  cout << three_address_code << endl;
+  three_address_code_vec.push_back(three_address_code);
 
   return temp_register;
 }
@@ -261,15 +288,21 @@ string  IdentifierNode::Generate3AC(vector<string>& vector){
   }
 
   string tempReg, temp;
-  tempReg = temp_int_counter_.GenerateTicket();
+  tempReg = IsFloating(*Id_info) 
+              ? temp_float_counter_.GenerateTicket() 
+              : temp_int_counter_.GenerateTicket();
   temp = "ASSIGN(id), ";
   temp += Id_info->identifier_name;
   temp += ", , ";
   temp += tempReg;
   identifier_to_temporary_.front()[Id_info->identifier_name] = tempReg;
   vector.push_back(temp);
-  cout << temp << endl;
   return tempReg;
+}
+
+void IdentifierNode::SetFloating() {
+  Id_info->type_specifier_list 
+    = list<SymbolTypes::SymbolType>({SymbolTypes::SymbolType::FLOAT});
 }
 
 IntegerConstantNode::IntegerConstantNode(long long int val) 
@@ -320,7 +353,6 @@ string  IterationNode::Generate3AC(vector<string>& three_address_code_vec){
 
   // Generate start of loop label
   string three_address_code = string("LABEL, ") + start_of_loop_label + ", ,";
-  cout << three_address_code << endl;
   three_address_code_vec.push_back(three_address_code);
 
   // Generate code for check
@@ -330,7 +362,6 @@ string  IterationNode::Generate3AC(vector<string>& three_address_code_vec){
     three_address_code += ", ";
     three_address_code += end_label;
 
-    cout << three_address_code << endl;
 
     three_address_code_vec.push_back(three_address_code);
   }
@@ -345,14 +376,23 @@ string  IterationNode::Generate3AC(vector<string>& three_address_code_vec){
     children_[2]->Generate3AC(three_address_code_vec);
   }
 
+  // Generate code for check
+  if(is_post_check && children_[1] != NULL) {
+    three_address_code = string("BREQ, 0, ");
+    three_address_code += children_[1]->Generate3AC(three_address_code_vec);
+    three_address_code += ", ";
+    three_address_code += end_label;
+
+
+    three_address_code_vec.push_back(three_address_code);
+  }
+
   three_address_code = string("BRANCH, , , ") + start_of_loop_label;
-  cout << three_address_code << endl;
 
   three_address_code_vec.push_back(three_address_code);
 
   // Generate end label
   three_address_code = string("LABEL, ") + end_label + ", ,";
-  cout << three_address_code << endl;
   three_address_code_vec.push_back(three_address_code);
 
   return "";
@@ -370,19 +410,16 @@ string  SelectionNode::Generate3AC(vector<string>& three_address_code_vec){
   three_address_code += ", ";
   three_address_code += false_label;
 
-  cout << three_address_code << endl;
   three_address_code_vec.push_back(three_address_code);
 
   if(children_.size() > 1) {
     children_[1]->Generate3AC(three_address_code_vec);
     three_address_code = string("BRANCH, , , ") + end_label;
-    cout << three_address_code << endl;
     three_address_code_vec.push_back(three_address_code);
   }
 
   // Generate false label
   three_address_code = string("LABEL, ") + false_label + ", ,";
-  cout << three_address_code << endl;
   three_address_code_vec.push_back(three_address_code);
 
   if(children_.size() > 2) {
@@ -391,10 +428,44 @@ string  SelectionNode::Generate3AC(vector<string>& three_address_code_vec){
 
   // Generate false label
   three_address_code = string("LABEL, ") + end_label + ", ,";
-  cout << three_address_code << endl;
   three_address_code_vec.push_back(three_address_code);
 
   return "";
 }
 
+FloatToIntNode::FloatToIntNode(Node * node) : Node("FloatToInt") {
+  AddChild(node);
+}
 
+string FloatToIntNode::Generate3AC(vector<string>& three_address_code_vec) {
+
+string three_address_code = "FLTOINT, ";
+three_address_code += children_[0]->Generate3AC(three_address_code_vec);
+three_address_code += ", ,";
+
+string int_register = temp_int_counter_.GenerateTicket();
+three_address_code += int_register;
+
+three_address_code_vec.push_back(three_address_code);
+
+return int_register;
+}
+
+IntToFloatNode::IntToFloatNode(Node * node) : Node("IntToFloatNode") {
+  AddChild(node);
+}
+
+string IntToFloatNode::Generate3AC(vector<string>& three_address_code_vec) {
+
+string three_address_code = "INTTOFLT, ";
+three_address_code += children_[0]->Generate3AC(three_address_code_vec);
+three_address_code += ", ,";
+
+string float_register = temp_float_counter_.GenerateTicket();
+three_address_code += float_register;
+
+three_address_code_vec.push_back(three_address_code);
+
+return float_register;
+
+}

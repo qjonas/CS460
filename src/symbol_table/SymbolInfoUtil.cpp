@@ -328,6 +328,10 @@ void IncrementSymbolInfoBy(SymbolInfo* symbol_info, int value) {
   }
 }
 
+bool IsPointer(const SymbolInfo& symbol_info) {
+  return symbol_info.array_sizes.size() > 0;
+}
+
 bool IsNumber(const SymbolInfo& symbol_info) {
   // Declare set to check if type exists for types.
   static set<list<SymbolType>> valid_data_types;

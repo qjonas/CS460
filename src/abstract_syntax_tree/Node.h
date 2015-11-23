@@ -36,6 +36,9 @@ public:
   static void PushFrame();
   static void PopFrame();
 
+  // SetIdentifierType
+  void SetFloating();
+
 protected:
   static std::map<std::string, int> name_count_;
   static std::list<std::map<std::string, std::string> > identifier_to_temporary_;
@@ -88,6 +91,12 @@ private:
   SymbolInfo *info;
 };
 
+class CompoundStatementNode : public Node {
+public:
+  CompoundStatementNode();
+  std::string Generate3AC(std::vector<std::string>& three_address_code_vec);
+};
+
 class DeclarationNode : public Node {
 public:
   // Constructors 
@@ -130,6 +139,7 @@ public:
   // constructor
   IdentifierNode(SymbolInfo * id);
   std::string Generate3AC(std::vector<std::string>& vector );
+  void SetFloating();
 
 private:
   SymbolInfo* Id_info;
@@ -178,6 +188,18 @@ private:
 class SelectionNode : public Node {
 public:
   SelectionNode();
+  std::string Generate3AC(std::vector<std::string>& vector );
+};
+
+class FloatToIntNode : public Node {
+public:
+  FloatToIntNode(Node * node);
+  std::string Generate3AC(std::vector<std::string>& vector );
+};
+
+class IntToFloatNode : public Node {
+public:
+  IntToFloatNode(Node * node);
   std::string Generate3AC(std::vector<std::string>& vector );
 };
 

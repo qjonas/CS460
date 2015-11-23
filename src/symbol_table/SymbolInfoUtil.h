@@ -10,6 +10,7 @@ bool IsExpressionValidArraySubscript(const SymbolInfo symbol_info);
 bool IsDataTypeValidForIncDec(const SymbolInfo& symbol_info);
 bool IsConst(const SymbolInfo& symbol_info);
 void IncrementSymbolInfoBy(SymbolInfo* symbol_info, int value);
+bool IsPointer(const SymbolInfo& symbol_info);
 bool IsNumber(const SymbolInfo& symbol_info);
 bool IsInteger(const SymbolInfo& symbol_info);
 bool IsFloating(const SymbolInfo& symbol_info);
