@@ -9,28 +9,31 @@ using namespace std;
 
 string ThreeACtoASM::getReg(string var){
 		// // check if already in a register
-		// if(addressTable[var] == NULL){	
-		// 	if(var[1] == 'I'){
-		// 		string temp = INT_LRU.pop();
-		// 		adressTable[var] = temp;
-		// 		// add MIPS code for loading value into register
-					
-		// 		INT_LRU += temp);
-		// 		return temp;
-		// 	}
-		// 	else{
-		// 		string temp = FLOAT_LRU.pop();
-		// 		adressTable[var] = temp;
-		// 		// add MIPS code for loading value into register
+		 if(addressTable[var] == ""){	
+			if(var[1] == 'I'){
+		 		string temp = INT_LRU.front();
+				INT_LRU.pop_front();
 
-		// 		FLOAT_LRU += temp);
-		// 		return temp;
-		// 	}
-		// }
-		// // variable is already loaded into a register
-		// else{
-		// 	return addressTable[var];
-		// }
+		 		addressTable[var] = temp;
+		 		// add MIPS code for loading value into register
+					
+		 		INT_LRU.push_back(temp);
+		 		return temp;
+		 	}
+		 	else{
+		 		string temp = FLOAT_LRU.front();
+		 		FLOAT_LRU.pop_front();
+				addressTable[var] = temp;
+		 		// add MIPS code for loading value into register
+
+		 		FLOAT_LRU.push_back(temp);
+		 		return temp;
+		 	}
+		 }
+		 // variable is already loaded into a register
+		 else{
+		 	return addressTable[var];
+		 }
 	return var;
 }
 
