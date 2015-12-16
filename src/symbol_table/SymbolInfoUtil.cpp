@@ -872,3 +872,7 @@ void Harris() {
 "NNNNNNNNNNNNNNNNNNNNNNNNNNNNND$::::::++++??????+???IIIIII77$$$$$ZZZ$ZZ$ZZZOOO888888OOOOOZZZZZOODMMMMMMMMMMMMMMMMMMMMMMMM" << endl
 << COLOR_NORMAL;
 }
+
+bool IsFunction(const SymbolInfo& symbol_info) {
+  return symbol_info.is_function;
+}

@@ -8,7 +8,7 @@
 CommandLineFlags CL_FLAGS = CommandLineFlags::GetInstance();
 SymbolTable S_TABLE;
 TokenReductionsLogger TR_LOGGER = TokenReductionsLogger::GetInstance();
-std::vector<std::string> TAC_VECTOR;
+std::vector< std::vector<std::string> > TAC_VECTOR;
 
 
 bool INSERT_MODE = true;

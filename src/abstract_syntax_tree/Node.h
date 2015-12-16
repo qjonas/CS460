@@ -25,7 +25,7 @@ public:
   void AddChild(Node * node);
 
   // Generate 3AC; The string returned is the temporary that it should return.
-  virtual std::string Generate3AC(std::vector<std::string>& vector );
+  virtual std::string Generate3AC(std::vector< std::vector<std::string> >& vector );
 
   // Generate Graphviz Code:
   void GenerateGraphviz(const std::string& file_name) const;
@@ -63,7 +63,7 @@ namespace AST {
 class AdditiveNode : public Node {
 public:
   AdditiveNode(bool is_add);
-  std::string Generate3AC(std::vector<std::string>& vector );
+  std::string Generate3AC(std::vector< std::vector<std::string> >& vector );
   
 private:
   bool is_addition;
@@ -77,7 +77,7 @@ public:
 
   // Constructors 
   AssignmentNode(AssignmentType type);
-std::string Generate3AC(std::vector<std::string>& vector );
+std::string Generate3AC(std::vector< std::vector<std::string> >& vector );
 private:
   AssignmentType type;
 
@@ -86,7 +86,7 @@ private:
 class ArrayAccessNode : public Node {
 public:
   ArrayAccessNode(SymbolInfo* symbol_info);
-  std::string Generate3AC(std::vector<std::string>& vector );
+  std::string Generate3AC(std::vector< std::vector<std::string> >& vector );
 
 private:
   // this will hold information about the symbol so we can calculate offset.
@@ -96,14 +96,14 @@ private:
 class CompoundStatementNode : public Node {
 public:
   CompoundStatementNode();
-  std::string Generate3AC(std::vector<std::string>& three_address_code_vec);
+  std::string Generate3AC(std::vector< std::vector<std::string> >& three_address_code_vec);
 };
 
 class DeclarationNode : public Node {
 public:
   // Constructors 
   DeclarationNode(const std::list<SymbolInfo*>& infos);
-  std::string Generate3AC(std::vector<std::string>& vector );
+  std::string Generate3AC(std::vector< std::vector<std::string> >& vector );
 
 private:
   // SymbolInfo of the declaration
@@ -113,7 +113,7 @@ private:
 class DeclarationSpecifierNode : public Node {
 public:
   DeclarationSpecifierNode();
-  std::string Generate3AC(std::vector<std::string>& vector );
+  std::string Generate3AC(std::vector< std::vector<std::string> >& vector );
 
 };
 
@@ -123,7 +123,7 @@ public:
     EQ, NE, LESS, GREATER, LE, GE
   };
   EqualityNode(RelationalType t);
-  std::string Generate3AC(std::vector<std::string>& vector );
+  std::string Generate3AC(std::vector< std::vector<std::string> >& vector );
 
 private:
   RelationalType type;
@@ -133,14 +133,14 @@ class ExpressNode: public Node{
 public:
   ExpressNode();
   ExpressNode(Node * child);
-  std::string Generate3AC(std::vector<std::string>& vector );
+  std::string Generate3AC(std::vector< std::vector<std::string> >& vector );
 };
 
 class IdentifierNode: public Node{
 public:
   // constructor
   IdentifierNode(SymbolInfo * id);
-  std::string Generate3AC(std::vector<std::string>& vector );
+  std::string Generate3AC(std::vector< std::vector<std::string> >& vector );
   void SetFloating();
 
 private:
@@ -150,7 +150,7 @@ private:
 class IntegerConstantNode : public Node {
 public:
   IntegerConstantNode(long long int val);
-  std::string Generate3AC(std::vector<std::string>& vector );
+  std::string Generate3AC(std::vector< std::vector<std::string> >& vector );
 
 private:
   long long int value;
@@ -160,7 +160,7 @@ private:
 class CharConstantNode : public Node {
 public:
   CharConstantNode(char val);
-  std::string Generate3AC(std::vector<std::string>& vector );
+  std::string Generate3AC(std::vector< std::vector<std::string> >& vector );
 
 private:
   char value;
@@ -170,7 +170,7 @@ private:
 class FloatingConstantNode : public Node {
 public:
   FloatingConstantNode(long double val);
-  std::string Generate3AC(std::vector<std::string>& vector );
+  std::string Generate3AC(std::vector< std::vector<std::string> >& vector );
 
 private:
   long double value;
@@ -181,7 +181,7 @@ class IterationNode : public Node {
 public:
   IterationNode();
   IterationNode(bool post_check);
-  std::string Generate3AC(std::vector<std::string>& vector );
+  std::string Generate3AC(std::vector< std::vector<std::string> >& vector );
 
 private:
   bool is_post_check;
@@ -190,19 +190,19 @@ private:
 class SelectionNode : public Node {
 public:
   SelectionNode();
-  std::string Generate3AC(std::vector<std::string>& vector );
+  std::string Generate3AC(std::vector< std::vector<std::string> >& vector );
 };
 
 class FloatToIntNode : public Node {
 public:
   FloatToIntNode(Node * node);
-  std::string Generate3AC(std::vector<std::string>& vector );
+  std::string Generate3AC(std::vector< std::vector<std::string> >& vector );
 };
 
 class IntToFloatNode : public Node {
 public:
   IntToFloatNode(Node * node);
-  std::string Generate3AC(std::vector<std::string>& vector );
+  std::string Generate3AC(std::vector< std::vector<std::string> >& vector );
 };
 
 }
