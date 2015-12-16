@@ -18,7 +18,7 @@
 #include <vector>
 #include <map>
 #include <string>
-#include <queue>
+#include <list>
 #include "abstract_syntax_tree/Node.h"
 
 // register 0, has value zero
@@ -36,10 +36,10 @@ public:
 	std::string getReg(std::string var);
 
 	// Queue of available integer registers
-	std::queue<std::string> INT_LRU;
+	std::list<std::string> INT_LRU;
 
 	//Queue of available float registers
-	std::queue<std::string> FLOAT_LRU;
+	std::list<std::string> FLOAT_LRU;
 
 	// Where is the value of a variable being stored.
 	std::map <std::string, std::string> addressTable;
@@ -47,7 +47,7 @@ public:
 	//intializes MIPS program to be run
 	void init();
 
-	std::string wrapOffsetIfAddress(const std::string& str, int offset);
+	std::string wrapOffsetIfAddress(const std::string& str);
 
 private:
 	//Output Vector
