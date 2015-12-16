@@ -47,6 +47,8 @@ protected:
   static TicketCounter temp_int_counter_;
   static TicketCounter temp_float_counter_;
   static TicketCounter temp_label_counter_;
+  static TicketCounter temp_int_address_counter_;
+  static TicketCounter temp_float_address_counter_;
   std::string name_;
   std::string id_;
   std::vector<Node*> children_;
