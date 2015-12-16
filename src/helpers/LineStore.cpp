@@ -15,7 +15,8 @@ void LineStore::LogWord(string word) {
 }
 
 void LineStore::LogLine() {
-  lines_.push_back(make_pair(words_, false));
+  string line = string("Line ") + to_string(lines_.size() + 1) + ": " + words_;
+  lines_.push_back(make_pair(line, false));
   words_ = "";
 }
 

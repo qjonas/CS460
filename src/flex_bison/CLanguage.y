@@ -41,7 +41,7 @@ extern bool IN_SWITCH;
 extern int LINE;
 extern int COLUMN;
 extern int IN_FUNCTION;
-extern vector<string> TAC_VECTOR;
+extern vector< vector<string> > TAC_VECTOR;
 
 /* Functions from Flex */
 extern int yylex();
@@ -168,15 +168,20 @@ translation_unit
     $$.front().node->Generate3AC(TAC_VECTOR);
     LineStore::ResetChecks();
     for(auto str : TAC_VECTOR) {
-      if(str[0] == ';') cout << endl << COLOR_CYAN_NORMAL;
-      cout << str << endl;
+      if(str[0][0] == ';') cout << endl << COLOR_CYAN_NORMAL;
+      for(int i = 0; i < str.size(); i++) {
+          cout << str[i];
+          if(i != str.size() - 1) {
+            cout << ",\t";
+          }
+        }
       cout << COLOR_NORMAL;
+      cout << endl;
     }
-    cout << endl;
   }
   | translation_unit external_declaration {
     TR_LOGGER.PushReduction(
-      "translation_unit external_declaration -> translation_unit");
+    "translation_unit external_declaration -> translation_unit");
     $$ = $1;
     $$.front().node->AddChild($2.front().node);
     $$.front().node->GenerateGraphviz("Translation_Unit");
@@ -184,11 +189,16 @@ translation_unit
     $$.front().node->Generate3AC(TAC_VECTOR);
     LineStore::ResetChecks();
     for(auto str : TAC_VECTOR) {
-      if(str[0] == ';') cout << endl << COLOR_CYAN_NORMAL;
-      cout << str << endl;
+      if(str[0][0] == ';') cout << endl << COLOR_CYAN_NORMAL;
+      for(int i = 0; i < str.size(); i++) {
+          cout << str[i];
+          if(i != str.size() - 1) {
+            cout << ", ";
+          }
+        }
       cout << COLOR_NORMAL;
+      cout << endl;
     }
-    cout << endl;
   }
   ;
 
