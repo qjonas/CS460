@@ -26,6 +26,7 @@
 // 24-25 Free temps
 class ThreeACtoASM{
 public:
+	ThreeACtoASM();
 	// types of registers for use:
 	enum RegType{ integer, floating };
 

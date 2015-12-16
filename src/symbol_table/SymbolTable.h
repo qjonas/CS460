@@ -175,6 +175,8 @@ typedef struct SymbolInfo {
 
 	// Node
 	AST::Node * node;
+
+	bool is_address;
 } SymbolInfo;
 
 std::ostream& operator<<(std::ostream &os, SymbolTypes::SymbolType symbol_type);

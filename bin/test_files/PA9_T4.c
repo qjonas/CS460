@@ -1,17 +1,9 @@
-// This shows three address matrix addition;
+// This shows the use of a for loop.
+int i;
+int j[10];
 
 int main() {
-  float i[100][100][100];
-  float n[100][100][100];
-
-  int j;
-  int k;
-  int l;
-  for(j = 1; j < 100; j = j +1) {
-    for(k = 1; k < 100; k = k +1) {
-      for(l = 1; l < 100; l = l +1) {
-        n[j][k][l] = i[j][k][l] + n[j][k][l];
-      }
-    }
+  for(i = 0; i < 10; i = i + 1) {
+    j[i] = i;
   }
 }

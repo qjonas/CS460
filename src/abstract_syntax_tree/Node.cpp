@@ -147,6 +147,29 @@ string AdditiveNode::Generate3AC(vector< vector<string> >& three_address_code_ve
   return dest;
 }
 
+AddressToValueNode::AddressToValueNode() : Node("AddressToValue") {}
+
+string AddressToValueNode::Generate3AC(vector< vector<string> >& three_address_code_vec){
+  if(line_number_ != -1) {
+    string source_line = LineStore::GetLine(line_number_);
+    if(source_line != "") {
+      three_address_code_vec.push_back( vector<string>({(";") + source_line}));
+    }
+  }
+  vector<string> three_address_code;
+  three_address_code.push_back("ADRTOVAL");
+  string sourceOne = children_[0]->Generate3AC(three_address_code_vec);
+  three_address_code.push_back(sourceOne);
+  three_address_code.push_back("");
+  string dest = (sourceOne[1] == 'F') 
+                    ? temp_float_counter_.GenerateTicket()
+                    : temp_int_counter_.GenerateTicket();
+
+  three_address_code.push_back(dest);
+  three_address_code_vec.push_back(three_address_code);
+  return dest;
+}
+
 AssignmentNode::AssignmentNode(AssignmentType type) : Node("Assignment") {
   this->type = type;
 }
@@ -193,7 +216,7 @@ string  ArrayAccessNode::Generate3AC(vector< vector<string> >& three_address_cod
   three_address_code.push_back("SET");
   three_address_code.push_back(to_string(ArrayAccessSizeOf(*info)));
   three_address_code.push_back("");
-  string size_reg = temp_int_counter_.GenerateTicket();
+  string size_reg = temp_int_address_counter_.GenerateTicket();
   three_address_code.push_back(size_reg);
   three_address_code_vec.push_back(three_address_code);
   three_address_code.clear();
@@ -457,6 +480,7 @@ string  IterationNode::Generate3AC(vector< vector<string> >& three_address_code_
   vector<string> three_address_code; 
   three_address_code.push_back(string("LABEL"));
   three_address_code.push_back(start_of_loop_label);
+  three_address_code.push_back("");
   three_address_code.push_back("");
   three_address_code_vec.push_back(three_address_code);
   three_address_code.clear();

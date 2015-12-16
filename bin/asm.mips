@@ -1,0 +1,33 @@
+	.data
+i:	 .space 4
+j:	 .space 40
+	.text
+#Line 2: int i;
+#Line 3: int j[10];
+#Line 5: int main() {
+main:
+#Line 8:   }
+#Line 6:   for(i = 0; i < 10; i = i + 1) {
+la $t0, i
+li $t1, 0
+sw $t1, 0($t0)
+TL00001:
+lw $t2, 0($t0)
+li $t3, 10
+slt $t4, $t2, $t3
+beq $zero, $t4, TL00002
+#Line 7:     j[i] = i;
+li $t5, 4
+lw $t6, 0($t0)
+mult $t5, $t6
+mflo $t5
+la $t7, j
+add $t8, $t7, $t5
+lw $t9, 0($t0)
+sw $t9, 0($t8)
+lw $s0, 0($t0)
+li $s1, 1
+add $s2, $s0, $s1
+sw $s2, 0($t0)
+b TL00001
+TL00002:

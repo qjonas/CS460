@@ -11,6 +11,7 @@
 %{
 /* Included C/C++ Libraries */
 #include <iostream>
+#include <fstream>
 #include <list>
 #include <locale>
 
@@ -170,10 +171,10 @@ translation_unit
     LineStore::ResetChecks();
     ThreeACtoASM tactoasm;
     vector<string> assembly = tactoasm.Convert(TAC_VECTOR);
+    ofstream fout("asm.mips");
     for(auto str : assembly) {
-      cout << str << endl;
+      fout << str << endl;
     }
-    cout << endl << endl;
   }
   | translation_unit external_declaration {
     TR_LOGGER.PushReduction(
@@ -186,11 +187,10 @@ translation_unit
     LineStore::ResetChecks();
     ThreeACtoASM tactoasm;
     vector<string> assembly = tactoasm.Convert(TAC_VECTOR);
+    ofstream fout("asm.mips");
     for(auto str : assembly) {
-      cout << str << endl;
+      fout << str << endl;
     }
-    cout << endl << endl;
-    
   }
   ;
 
@@ -1759,11 +1759,19 @@ assignment_expression
       *temp = $1.front();
     } 
 
+    Node * addrToValTwo = $3.front().node;
+    if($3.front().is_address) {
+      addrToValTwo = new AddressToValueNode();
+      addrToValTwo->AddChild($3.front().node);
+    }
+
     // Pass through
     $$ = $1;
     $2.front().node->AddChild($1.front().node);
-    $2.front().node->AddChild($3.front().node);
+    $2.front().node->AddChild(addrToValTwo);
     $$.front().node = $2.front().node;
+
+
 
   }
   ;
@@ -1777,7 +1785,6 @@ assignment_operator
     $$ = list<SymbolInfo>({SymbolInfo()});
     $$.front().node = new 
         AssignmentNode(AssignmentNode::AssignmentType::EQUALS);
-
   }
   | MUL_ASSIGN {
     // Log reduction
@@ -2200,11 +2207,22 @@ equality_expression
       = list<SymbolTypes::SymbolType>({SymbolTypes::INT});
 
     $$ = $1;
+    Node * addrToValOne = $1.front().node;
+      Node * addrToValTwo = $3.front().node;
+      if($1.front().is_address) {
+        addrToValOne = new AddressToValueNode();
+        addrToValOne->AddChild($1.front().node);
+      }
+
+      if($3.front().is_address) {
+        addrToValTwo = new AddressToValueNode();
+        addrToValTwo->AddChild($3.front().node);
+      }
 
     Node * temp = new EqualityNode(EqualityNode::RelationalType::EQ);
-    temp->AddChild($1.front().node);
+    temp->AddChild(addrToValOne);
     temp->AddChild(new Node("EQUALS"));
-    temp->AddChild($3.front().node);
+    temp->AddChild(addrToValTwo);
     $$.front().node = temp;
   }
   | equality_expression NE_OP relational_expression {
@@ -2287,10 +2305,23 @@ equality_expression
 
     $$ = $1;
 
+        Node * addrToValOne = $1.front().node;
+      Node * addrToValTwo = $3.front().node;
+      if($1.front().is_address) {
+        addrToValOne = new AddressToValueNode();
+        addrToValOne->AddChild($1.front().node);
+      }
+
+      if($3.front().is_address) {
+        addrToValTwo = new AddressToValueNode();
+        addrToValTwo->AddChild($3.front().node);
+      }
+
+
     Node * temp = new EqualityNode(EqualityNode::RelationalType::NE);
-    temp->AddChild($1.front().node);
+    temp->AddChild(addrToValOne);
     temp->AddChild(new Node("NOT_EQ"));
-    temp->AddChild($3.front().node);
+    temp->AddChild(addrToValTwo);
     $$.front().node = temp;
   }
   ;
@@ -2382,10 +2413,23 @@ relational_expression
 
     $$ = $1;
 
+    Node * addrToValOne = $1.front().node;
+      Node * addrToValTwo = $3.front().node;
+      if($1.front().is_address) {
+        addrToValOne = new AddressToValueNode();
+        addrToValOne->AddChild($1.front().node);
+      }
+
+      if($3.front().is_address) {
+        addrToValTwo = new AddressToValueNode();
+        addrToValTwo->AddChild($3.front().node);
+      }
+
+
     Node * temp = new EqualityNode(EqualityNode::RelationalType::LESS);
-    temp->AddChild($1.front().node);
+    temp->AddChild(addrToValOne);
     temp->AddChild(new Node("LESS"));
-    temp->AddChild($3.front().node);
+    temp->AddChild(addrToValTwo);
     $$.front().node = temp;
   }
   | relational_expression GREATER shift_expression {
@@ -2470,10 +2514,23 @@ relational_expression
 
     $$ = $1;
 
+    Node * addrToValOne = $1.front().node;
+      Node * addrToValTwo = $3.front().node;
+      if($1.front().is_address) {
+        addrToValOne = new AddressToValueNode();
+        addrToValOne->AddChild($1.front().node);
+      }
+
+      if($3.front().is_address) {
+        addrToValTwo = new AddressToValueNode();
+        addrToValTwo->AddChild($3.front().node);
+      }
+
+
     Node * temp = new EqualityNode(EqualityNode::RelationalType::GREATER);
-    temp->AddChild($1.front().node);
+    temp->AddChild(addrToValOne);
     temp->AddChild(new Node("GREATER"));
-    temp->AddChild($3.front().node);
+    temp->AddChild(addrToValTwo);
     $$.front().node = temp;
   }
   | relational_expression LE_OP shift_expression {
@@ -2543,10 +2600,23 @@ relational_expression
 
     $$ = $1;
 
+    Node * addrToValOne = $1.front().node;
+      Node * addrToValTwo = $3.front().node;
+      if($1.front().is_address) {
+        addrToValOne = new AddressToValueNode();
+        addrToValOne->AddChild($1.front().node);
+      }
+
+      if($3.front().is_address) {
+        addrToValTwo = new AddressToValueNode();
+        addrToValTwo->AddChild($3.front().node);
+      }
+
+
     Node * temp = new EqualityNode(EqualityNode::RelationalType::LE);
-    temp->AddChild($1.front().node);
+    temp->AddChild(addrToValOne);
     temp->AddChild(new Node("LEES_EQUAL"));
-    temp->AddChild($3.front().node);
+    temp->AddChild(addrToValTwo);
     $$.front().node = temp;
   }
   | relational_expression GE_OP shift_expression {
@@ -2628,10 +2698,23 @@ relational_expression
 
     $$ = $1;
 
+    Node * addrToValOne = $1.front().node;
+      Node * addrToValTwo = $3.front().node;
+      if($1.front().is_address) {
+        addrToValOne = new AddressToValueNode();
+        addrToValOne->AddChild($1.front().node);
+      }
+
+      if($3.front().is_address) {
+        addrToValTwo = new AddressToValueNode();
+        addrToValTwo->AddChild($3.front().node);
+      }
+
+
     Node * temp = new EqualityNode(EqualityNode::RelationalType::GE);
-    temp->AddChild($1.front().node);
+    temp->AddChild(addrToValOne);
     temp->AddChild(new Node("GREATER_EQUAL"));
-    temp->AddChild($3.front().node);
+    temp->AddChild(addrToValTwo);
     $$.front().node = temp;
   }
   ;
@@ -2832,13 +2915,28 @@ additive_expression
         }
       }
 
+      Node * addrToValOne = $1.front().node;
+      Node * addrToValTwo = $3.front().node;
+      if($1.front().is_address) {
+        addrToValOne = new AddressToValueNode();
+        addrToValOne->AddChild($1.front().node);
+      }
+
+      if($3.front().is_address) {
+        addrToValTwo = new AddressToValueNode();
+        addrToValTwo->AddChild($3.front().node);
+      }
+
       bool is_addition = true;
       Node * temp = new AdditiveNode(is_addition);
-      temp->AddChild($1.front().node);
+      temp->AddChild(addrToValOne);
       temp->AddChild(new Node("PLUS"));
-      temp->AddChild($3.front().node);
+      temp->AddChild(addrToValTwo);
 
       $$.front().node = temp;
+    $$.front().is_address = false;
+
+
   }
   | additive_expression MINUS multiplicative_expression {
     TR_LOGGER.PushReduction(
@@ -2958,13 +3056,29 @@ additive_expression
         }
       }
 
+      Node * addrToValOne = $1.front().node;
+      Node * addrToValTwo = $3.front().node;
+      if($1.front().is_address) {
+        addrToValOne = new AddressToValueNode();
+        addrToValOne->AddChild($1.front().node);
+      }
+
+      if($3.front().is_address) {
+        addrToValTwo = new AddressToValueNode();
+        addrToValTwo->AddChild($3.front().node);
+      }
+
       bool is_addition = false;
       Node * temp = new AdditiveNode(is_addition);
-      temp->AddChild($1.front().node);
-      temp->AddChild(new Node("PLUS"));
-      temp->AddChild($3.front().node);
+      temp->AddChild(addrToValOne);
+      temp->AddChild(new Node("MINUS"));
+      temp->AddChild(addrToValTwo);
+
+
 
       $$.front().node = temp;
+    $$.front().is_address = false;
+
   }
   ;
 
@@ -3401,9 +3515,18 @@ postfix_expression
       $$.front().array_sizes.pop_back();
     }
 
+    Node * addrToValTwo = $3.front().node;
+
+    if($3.front().identifier_name != "") {
+      addrToValTwo = new AddressToValueNode();
+      addrToValTwo->AddChild($3.front().node);
+    }
+
     Node * temp = new ArrayAccessNode(&($$.front()));
     temp->AddChild($1.front().node);
-    temp->AddChild($3.front().node);
+    temp->AddChild(addrToValTwo);
+
+    $$.front().is_address = true;
 
     $$.front().node = temp;
 
@@ -3553,6 +3676,7 @@ primary_expression
     TR_LOGGER.PushReduction("identifier -> primary_expression");
     // Pass through
     $$ = $1;
+    $$.front().is_address = true;
   }
   | constant {
     // Log reduction;

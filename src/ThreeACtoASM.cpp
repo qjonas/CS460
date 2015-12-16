@@ -7,34 +7,37 @@
 
 using namespace std;
 
+ThreeACtoASM::ThreeACtoASM() {}
+
 string ThreeACtoASM::getReg(string var){
-		// // check if already in a register
-		 if(addressTable[var] == ""){	
-			if(var[1] == 'I'){
-		 		string temp = INT_LRU.front();
-				INT_LRU.pop_front();
+	if(var == "0") return "$zero";
+	// // check if already in a register
+	 if(addressTable[var] == ""){	
+		if(var[1] == 'I'){
+	 		string temp = INT_LRU.front();
+	 		
+			INT_LRU.pop_front();
 
-		 		addressTable[var] = temp;
-		 		// add MIPS code for loading value into register
-					
-		 		INT_LRU.push_back(temp);
-		 		return temp;
-		 	}
-		 	else{
-		 		string temp = FLOAT_LRU.front();
-		 		FLOAT_LRU.pop_front();
-				addressTable[var] = temp;
-		 		// add MIPS code for loading value into register
+	 		addressTable[var] = temp;
+	 		// add MIPS code for loading value into register
+				
+	 		INT_LRU.push_back(temp);
+	 		return temp;
+	 	}
+	 	else{
+	 		string temp = FLOAT_LRU.front();
+	 		FLOAT_LRU.pop_front();
+			addressTable[var] = temp;
+	 		// add MIPS code for loading value into register
 
-		 		FLOAT_LRU.push_back(temp);
-		 		return temp;
-		 	}
-		 }
-		 // variable is already loaded into a register
-		 else{
-		 	return addressTable[var];
-		 }
-	return var;
+	 		FLOAT_LRU.push_back(temp);
+	 		return temp;
+	 	}
+	 }
+	 // variable is already loaded into a register
+	 else{
+	 	return addressTable[var];
+	 }
 }
 
 void ThreeACtoASM::init(){
@@ -45,15 +48,17 @@ void ThreeACtoASM::init(){
 	text_code.clear();
 	data_code.clear();
 
-	int counter = 8;
-	for(;counter < 16;counter++)
+	int counter = 0;
+	for(;counter < 10;counter++)
 	{
-		string temp = "$" + to_string(counter);
+		string temp = "$t" + to_string(counter);
 		INT_LRU.push_back(temp);
 	}
-	//don't forget last 2
-	INT_LRU.push_back("$24");
-	INT_LRU.push_back("$25");
+
+	for(counter = 0; counter < 8; counter++) {
+		string temp = "$s" + to_string(counter);
+		INT_LRU.push_back(temp);
+	}
 
 	//load fLRU
 	for(counter = 4; counter < 11; counter++)
@@ -76,6 +81,7 @@ vector<string> ThreeACtoASM::Convert( vector< vector<string> > three_address_cod
   init();
   for(auto str : three_address_code) {
     if(str.size() != 4) {
+    	str[0][0] = '#';
       text_code.push_back(str[0]);
     } else {
       string operation = str[0];
@@ -89,9 +95,9 @@ vector<string> ThreeACtoASM::Convert( vector< vector<string> > three_address_cod
         machine_code += "add ";
         machine_code += getReg(op_three);
         machine_code += ", ";
-        machine_code += wrapOffsetIfAddress(getReg(op_one));
+        machine_code += wrapOffsetIfAddress(op_one);
         machine_code += ", ";
-        machine_code += wrapOffsetIfAddress(getReg(op_two));
+        machine_code += wrapOffsetIfAddress(op_two);
       } else if (operation == "ADDROFFSET") {
         machine_code += "add ";
         machine_code += getReg(op_three);
@@ -99,42 +105,47 @@ vector<string> ThreeACtoASM::Convert( vector< vector<string> > three_address_cod
         machine_code += getReg(op_one);
         machine_code += ", ";
         machine_code += getReg(op_two);
+      } else if (operation == "ADRTOVAL") {
+      	machine_code += "lw ";
+      	machine_code += getReg(op_three);
+        machine_code += ", ";
+        machine_code += wrapOffsetIfAddress(op_one);
       } else if (operation == "ASSIGN") {
         machine_code += "sw ";
         machine_code += getReg(op_three);
         machine_code += ", ";
-        machine_code += getReg(op_one);
+        machine_code += wrapOffsetIfAddress(op_one);
       } else if (operation == "BRANCH") {
         machine_code += "b ";
         machine_code += op_three;
       } else if (operation == "BREQ") {
-        machine_code += "breq ";
-        machine_code += wrapOffsetIfAddress(getReg(op_one));
+        machine_code += "beq ";
+        machine_code += wrapOffsetIfAddress(op_one);
         machine_code += ", ";
-        machine_code += wrapOffsetIfAddress(getReg(op_two));
+        machine_code += wrapOffsetIfAddress(op_two);
         machine_code += ", ";
         machine_code += op_three;
       } else if (operation == "EQ") {
         machine_code += "seq ";
         machine_code += getReg(op_three);
         machine_code += ", ";
-        machine_code += wrapOffsetIfAddress(getReg(op_one));
+        machine_code += wrapOffsetIfAddress(op_one);
         machine_code += ", ";
-        machine_code += wrapOffsetIfAddress(getReg(op_two));
+        machine_code += wrapOffsetIfAddress(op_two);
       } else if (operation == "GE") {
         machine_code += "sge ";
         machine_code += getReg(op_three);
         machine_code += ", ";
-        machine_code += wrapOffsetIfAddress(getReg(op_one));
+        machine_code += wrapOffsetIfAddress(op_one);
         machine_code += ", ";
-        machine_code += wrapOffsetIfAddress(getReg(op_two));
+        machine_code += wrapOffsetIfAddress(op_two);
       } else if (operation == "GREATER") {
         machine_code += "sgt ";
         machine_code += getReg(op_three);
         machine_code += ", ";
-        machine_code += wrapOffsetIfAddress(getReg(op_one));
+        machine_code += wrapOffsetIfAddress(op_one);
         machine_code += ", ";
-        machine_code += wrapOffsetIfAddress(getReg(op_two));
+        machine_code += wrapOffsetIfAddress(op_two);
       } else if (operation == "IDTOTEMP") {
         machine_code += "la ";
         machine_code += getReg(op_three);
@@ -147,31 +158,36 @@ vector<string> ThreeACtoASM::Convert( vector< vector<string> > three_address_cod
         machine_code += "sle ";
         machine_code += getReg(op_three);
         machine_code += ", ";
-        machine_code += wrapOffsetIfAddress(getReg(op_one));
+        machine_code += wrapOffsetIfAddress(op_one);
         machine_code += ", ";
-        machine_code += wrapOffsetIfAddress(getReg(op_two));
+        machine_code += wrapOffsetIfAddress(op_two);
       } else if (operation == "LESS") {
         machine_code += "slt ";
         machine_code += getReg(op_three);
         machine_code += ", ";
-        machine_code += wrapOffsetIfAddress(getReg(op_one));
+        machine_code += wrapOffsetIfAddress(op_one);
         machine_code += ", ";
-        machine_code += wrapOffsetIfAddress(getReg(op_two));
+        machine_code += wrapOffsetIfAddress(op_two);
       } else if (operation == "MULT") {
         machine_code += "mult ";
-        machine_code += wrapOffsetIfAddress(getReg(op_one));
+        string reg_one = getReg(op_one);
+        machine_code += reg_one;
         machine_code += ", ";
-        machine_code += wrapOffsetIfAddress(getReg(op_two));
+        machine_code += getReg(op_two);
+
+        text_code.push_back(machine_code);
+        machine_code = "mflo ";
+        machine_code += reg_one;
       } else if (operation == "NEQ") {
         machine_code += "sne ";
         machine_code += getReg(op_three);
         machine_code += ", ";
-        machine_code += wrapOffsetIfAddress(getReg(op_one));
+        machine_code += wrapOffsetIfAddress(op_one);
         machine_code += ", ";
-        machine_code += wrapOffsetIfAddress(getReg(op_two));
+        machine_code += wrapOffsetIfAddress(op_two);
       } else if (operation == "NEWID") {
         data_code_ += op_one;
-        data_code_ += ":\t .word ";
+        data_code_ += ":\t .space ";
         data_code_ += op_two;
       } else if (operation == "SET") {
         machine_code += "li ";
@@ -182,9 +198,9 @@ vector<string> ThreeACtoASM::Convert( vector< vector<string> > three_address_cod
         machine_code += "sub ";
         machine_code += getReg(op_three);
         machine_code += ", ";
-        machine_code += wrapOffsetIfAddress(getReg(op_one));
+        machine_code += wrapOffsetIfAddress(op_one);
         machine_code += ", ";
-        machine_code += wrapOffsetIfAddress(getReg(op_two));
+        machine_code += wrapOffsetIfAddress(op_two);
       }
 
       if (!machine_code.empty()) {
@@ -201,7 +217,7 @@ vector<string> ThreeACtoASM::Convert( vector< vector<string> > three_address_cod
 }
 
 string ThreeACtoASM::wrapOffsetIfAddress(const string& str) {
-  string temp = str;
+  string temp = getReg(str);
   if (str[2] == 'A') {
     temp = string("0(")+temp+string(")");
   }

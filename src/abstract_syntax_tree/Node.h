@@ -71,6 +71,12 @@ private:
   bool is_addition;
 };
 
+class AddressToValueNode : public Node {
+public:
+  AddressToValueNode();
+  std::string Generate3AC(std::vector< std::vector<std::string> >& vector );
+};
+
 class AssignmentNode : public Node {
 public:
    enum AssignmentType {
