@@ -25,7 +25,7 @@ MAINOBJS =  ../bin/CLanguage.tab.o ../bin/lex.yy.o
 MAINOBJS += ../bin/SymbolTable.o ../bin/CommandLineFlags.o 
 MAINOBJS += ../bin/Globals.o ../bin/TokenReductionsLogger.o 
 MAINOBJS += ../bin/SymbolInfoUtil.o ../bin/Node.o ../bin/TicketCounter.o
-MAINOBJS += ../bin/LineStore.o
+MAINOBJS += ../bin/LineStore.o ../bin/ThreeACtoASM.o
 
 # Cleanup
 CLEAN = ../bin/CLanguage.tab.cc ../bin/CLanguage.tab.hh ../bin/lex.yy.cc
@@ -80,6 +80,10 @@ all: $(TARGET)
 
 ../bin/LineStore.o: ../src/helpers/LineStore.cpp
 	$(CC) $(C11) -c $< -o $@
+
+../bin/ThreeACtoASM.o: ../src/ThreeACtoASM.cpp
+	$(CC) $(C11) -c $< -o $@
+
 
 clean:
 	rm $(MAINOBJS) $(CLEAN) $(TARGET)

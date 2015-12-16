@@ -20,6 +20,7 @@
 #include  "../src/helpers/LineStore.h"
 #include  "../src/helpers/TokenReductionsLogger.h"
 #include  "../src/symbol_table/SymbolInfoUtil.h"
+#include  "../src/ThreeACtoASM.h"
 
 using namespace AST;
 using namespace std;
@@ -167,16 +168,10 @@ translation_unit
     TAC_VECTOR.clear();
     $$.front().node->Generate3AC(TAC_VECTOR);
     LineStore::ResetChecks();
-    for(auto str : TAC_VECTOR) {
-      if(str[0][0] == ';') cout << endl << COLOR_CYAN_NORMAL;
-      for(int i = 0; i < str.size(); i++) {
-          cout << str[i];
-          if(i != str.size() - 1) {
-            cout << ",\t";
-          }
-        }
-      cout << COLOR_NORMAL;
-      cout << endl;
+    ThreeACtoASM tactoasm;
+    vector<string> assembly = tactoasm.Convert(TAC_VECTOR);
+    for(auto str : assembly) {
+      cout << str << endl;
     }
   }
   | translation_unit external_declaration {
@@ -188,16 +183,10 @@ translation_unit
     TAC_VECTOR.clear();
     $$.front().node->Generate3AC(TAC_VECTOR);
     LineStore::ResetChecks();
-    for(auto str : TAC_VECTOR) {
-      if(str[0][0] == ';') cout << endl << COLOR_CYAN_NORMAL;
-      for(int i = 0; i < str.size(); i++) {
-          cout << str[i];
-          if(i != str.size() - 1) {
-            cout << ", ";
-          }
-        }
-      cout << COLOR_NORMAL;
-      cout << endl;
+    ThreeACtoASM tactoasm;
+    vector<string> assembly = tactoasm.Convert(TAC_VECTOR);
+    for(auto str : assembly) {
+      cout << str << endl;
     }
   }
   ;
