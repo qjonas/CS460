@@ -67,7 +67,6 @@ void ThreeACtoASM::init(){
 	// load text_code with headers
 	data_code.push_back("	.data");
 	text_code.push_back("	.text");
-	text_code.push_back("main:");
 }
 
 vector<string> ThreeACtoASM::Convert( vector< vector<string> > three_address_code) {
@@ -100,6 +99,7 @@ vector<string> ThreeACtoASM::Convert( vector< vector<string> > three_address_cod
       } else if (operation == "ASSIGN") {
         machine_code += "sw ";
         machine_code += getReg(op_three);
+        machine_code += ", ";
         machine_code += getReg(op_one);
       } else if (operation == "BRANCH") {
         machine_code += "b ";
@@ -171,7 +171,7 @@ vector<string> ThreeACtoASM::Convert( vector< vector<string> > three_address_cod
         data_code_ += ":\t .word ";
         data_code_ += op_two;
       } else if (operation == "SET") {
-        machine_code += "li";
+        machine_code += "li ";
         machine_code += getReg(op_three);
         machine_code += ", ";
         machine_code += op_one;
@@ -187,7 +187,7 @@ vector<string> ThreeACtoASM::Convert( vector< vector<string> > three_address_cod
       if (!machine_code.empty()) {
         text_code.push_back(machine_code);
       }
-      if (data_code.empty()) {
+      if (!data_code_.empty()) {
         data_code.push_back(data_code_);
       }
     }

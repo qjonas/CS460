@@ -173,6 +173,7 @@ translation_unit
     for(auto str : assembly) {
       cout << str << endl;
     }
+    cout << endl << endl;
   }
   | translation_unit external_declaration {
     TR_LOGGER.PushReduction(
@@ -188,6 +189,8 @@ translation_unit
     for(auto str : assembly) {
       cout << str << endl;
     }
+    cout << endl << endl;
+    
   }
   ;
 
